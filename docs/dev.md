@@ -41,7 +41,7 @@ services:
       PGDATA: /data/postgres
     volumes:
       - ./volumes/data/postgres:/data/postgres
-      - ./volumes/data/backups:/backups       
+      - ./volumes/data/backups:/backups
     ports:
       - "5454:5432" # use free port
     networks:
@@ -73,3 +73,11 @@ Later we must specify user for better security
 pnpm prisma db push --schema=./prisma/db-honorarium/schema.prisma
 pnpm prisma generate --schema=./prisma/db-honorarium/schema.prisma
 ```
+
+## UI
+
+### install zustand for state management
+
+pnpm add zustand
+pnpm add lodash
+pnpm add -D @types/lodash
