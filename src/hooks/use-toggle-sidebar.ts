@@ -3,16 +3,16 @@ import { persist, PersistOptions } from "zustand/middleware";
 
 // Define the state interface
 interface ToggleSidebarState {
-  collapse: boolean;
+  collapsed: boolean;
   toggle: () => void;
-  setCollapse: (collapse: boolean) => void;
+  setCollapse: (collapsed: boolean) => void;
 }
 
 // Define the Zustand state creator function
 const createState: StateCreator<ToggleSidebarState> = (set) => ({
-  collapse: false,
-  toggle: () => set((state) => ({ collapse: !state.collapse })),
-  setCollapse: (collapse) => set({ collapse }),
+  collapsed: false,
+  toggle: () => set((state) => ({ collapsed: !state.collapsed })),
+  setCollapse: (collapsed) => set({ collapsed }),
 });
 
 // Configure persistence options
