@@ -6,9 +6,49 @@
 
 generator client {
   provider = "prisma-client-js"
+  output = "../../node_modules/@prisma-honorarium/client"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL_HONORARIUM")
+}
+
+// Model for Users, Accounts, Sessions, and Verification Tokens
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  sessions      Session[]
+  roles         Role[]
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("sessions")
+}
+
+model Role {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+
+  @@map("roles")
 }
