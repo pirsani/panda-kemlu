@@ -62,3 +62,14 @@ notes:
 Later we must specify user for better security
 
 ### set .env
+
+### update schema.prisma
+
+- update schema
+- push to database
+
+```sh
+# pnpm prisma db pull --schema=./prisma/db-honorarium/schema.prisma
+pnpm prisma db push --schema=./prisma/db-honorarium/schema.prisma
+pnpm prisma generate --schema=./prisma/db-honorarium/schema.prisma
+```
