@@ -20,3 +20,45 @@ pnpm dlx shadcn-ui@latest add alert-dialog avatar badge breadcrumb button calend
 pnpm add ts-node prisma -D
 pnpm prisma init
 ```
+
+modify prisma
+
+```sh
+mkdir prisma/db-honorarium
+mv prisma/schema.prisma prisma/db-honorarium/schema.prisma
+```
+
+create database docker
+
+```yml
+services:
+  postgres:
+    container_name: postgres-honorarium
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /data/postgres
+    volumes:
+      - ./volumes/data/postgres:/data/postgres
+      - ./volumes/data/backups:/backups       
+    ports:
+      - "5454:5432" # use free port
+    networks:
+      - postgres
+    restart: unless-stopped
+networks:
+  postgres:
+    driver: bridge
+```
+
+run docker
+
+```sh
+docker compose up -d
+```
+
+notes:
+Later we must specify user for better security
+
+### set .env
