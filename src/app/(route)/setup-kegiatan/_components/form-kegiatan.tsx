@@ -38,6 +38,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
   });
 
   const {
+    register,
     handleSubmit,
     formState: { errors },
   } = form;
@@ -168,9 +169,23 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
           name="lokasi"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Lokasi</FormLabel>
+              <label htmlFor={field.name}>Lokasi</label>
               <FormControl>
-                <Input placeholder="lokasi" {...field} />
+                <select
+                  id="lokasi"
+                  {...field}
+                  className="border-2 border-gray-300 p-2 rounded w-full"
+                >
+                  <option value={0} className="p-2">
+                    Dalam Kota
+                  </option>
+                  <option value={1} className="p-2">
+                    Luar Kota
+                  </option>
+                  <option value={2} className="p-2">
+                    Luar Negeri
+                  </option>
+                </select>
               </FormControl>
               <FormMessage />
             </FormItem>
