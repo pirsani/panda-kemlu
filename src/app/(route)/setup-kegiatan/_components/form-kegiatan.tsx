@@ -1,5 +1,6 @@
 "use client";
-import InputDatePicker from "@/components/date-picker/input-date-picker";
+import InputDatePicker from "@/components/form/date-picker/input-date-picker";
+import FormFileUpload from "@/components/form/form-file-upload";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -11,6 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import useFileStore from "@/hooks/use-file-store";
 import kegiatanSchema, {
   Kegiatan,
   KegiatanEditMode,
@@ -45,10 +47,23 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
     console.log(data);
   };
 
+  const setFileUrl = useFileStore((state) => state.setFileUrl);
+
+  const handleFileChange = (file: File | null) => {
+    if (file !== null) {
+      const fileUrl = URL.createObjectURL(file);
+      console.log(fileUrl);
+      setFileUrl(fileUrl);
+    } else {
+      setFileUrl(null);
+    }
+  };
+
+  const displayAllErrors = true;
   return (
     <Form {...form}>
       {/* Map errors to a div */}
-      {Object.keys(errors).length > 0 && (
+      {Object.keys(errors).length > 0 && displayAllErrors && (
         <div className="bg-red-100 p-4 mt-4 rounded">
           <h3 className="text-red-500 font-bold mb-2">Form Errors:</h3>
           <ul className="list-disc list-inside text-red-500">
@@ -80,7 +95,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             name="tanggalMulai"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Tanggal Mulai</FormLabel>
+                <label htmlFor="tanggalMulai">Tanggal Mulai</label>
                 <InputDatePicker
                   name={field.name}
                   error={errors.tanggalMulai}
@@ -98,7 +113,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             name="tanggalSelesai"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Tanggal Selesai</FormLabel>
+                <label htmlFor="tanggalSelesai">Tanggal Selesai</label>
                 <InputDatePicker
                   name={field.name}
                   error={errors.tanggalSelesai}
@@ -112,6 +127,55 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             )}
           />
         </div>
+        <FormField
+          control={form.control}
+          name="dokumenSurat"
+          render={({ field }) => (
+            <FormItem>
+              <label htmlFor="dokumenSurat">
+                Upload Nota Dinas/Memorandum/SK Tim
+              </label>
+              <FormControl>
+                <FormFileUpload
+                  name={field.name}
+                  onFileChange={handleFileChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="dokumenJadwal"
+          render={({ field }) => (
+            <FormItem>
+              <label htmlFor="dokumenJadwal">
+                Upload Nota Dinas/Memorandum/SK Tim
+              </label>
+              <FormControl>
+                <FormFileUpload
+                  name={field.name}
+                  onFileChange={handleFileChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="lokasi"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Lokasi</FormLabel>
+              <FormControl>
+                <Input placeholder="lokasi" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <Button type="submit" variant={"outline"}>
           Submit
         </Button>

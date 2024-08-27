@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { fileSchema } from "./file-schema";
 
 export const baseKegiatanSchema = z.object({
   nama: z
@@ -11,9 +12,9 @@ export const baseKegiatanSchema = z.object({
     }),
   tanggalMulai: z.coerce.date(),
   tanggalSelesai: z.coerce.date(),
-  lokasi: z.number().min(0).max(2),
-  dokumenSurat: z.string().min(10).max(500),
-  dokumenJadwal: z.string().min(10).max(500),
+  lokasi: z.coerce.number().min(0).max(2), // Coerce lokasi to number
+  dokumenSurat: fileSchema({ required: true }),
+  dokumenJadwal: fileSchema({ required: true }),
 });
 
 // Apply the refine method to add custom validation
@@ -28,8 +29,8 @@ export const kegiatanSchema = baseKegiatanSchema.refine(
 // Extend the refined schema for edit mode
 export const kegiatanSchemaEditMode = baseKegiatanSchema
   .extend({
-    dokumenSurat: z.string().optional(),
-    dokumenJadwal: z.string().optional(),
+    dokumenSurat: fileSchema({ required: false }),
+    dokumenJadwal: fileSchema({ required: false }),
   })
   .refine((data) => data.tanggalMulai <= data.tanggalSelesai, {
     message: "Tanggal Mulai harus kurang dari atau sama dengan Tanggal Selesai",
