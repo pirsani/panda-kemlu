@@ -210,7 +210,7 @@ model SBMUangRepresentasi {
 }
 
 model UnitKerja {
-  id        String         @id @default(cuid())
+  id        String    @id @default(cuid())
   nama      String
   aktif     Boolean
   createdBy String    @map("created_by")
@@ -430,11 +430,11 @@ model Jadwal {
   jamSelesai                        DateTime?             @map("jam_selesai")
   ruang                             String?
   jumlahJamPelajaran                Int?                  @map("jumlah_jam_pelajaran")
+  dokumenUndanganNarasumber         String?               @map("dokumen_undangan_narasumber")
   dokumenKofirmasiKesediaanMengajar String?               @map("dokumen_kofirmasi_kesediaan_mengajar")
   dokumenDaftarHadir                String?               @map("dokumen_daftar_hadir")
-  tautanMaterial                    String?               @map("tautan_material")
-  dokumenNarasumber                 String?               @map("dokumen_narasumber")
   dokumenJadwalKegiatan             String?               @map("dokumen_jadwal_kegiatan")
+  tautanMaterial                    String?               @map("tautan_material")
   createdBy                         String                @map("created_by")
   createdAt                         DateTime              @default(now()) @map("created_at")
   updatedBy                         String?               @map("updated_by")
@@ -447,6 +447,10 @@ model Jadwal {
 model JenisDokumenKegiatan {
   id              Int               @id @default(autoincrement())
   nama            String
+  deskripsi       String?
+  untukLangkahKe  Int               @default(0) @map("untuk_langkah_ke") // enum 0, 1, 2, 4 as setup, pengajuan, daftar nominatif, pembayaran
+  untukLokasiDi   String            @default("0;1") @map("untuk_lokasi_di") // enum 0, 1, 2 as Dalam Kota, Luar Kota, Luar Negeri
+  isMultiple      Boolean           @default(false) @map("is_multiple")
   createdBy       String            @map("created_by")
   createdAt       DateTime          @default(now()) @map("created_at")
   updatedBy       String?           @map("updated_by")
@@ -466,6 +470,8 @@ model DokumenKegiatan {
   dokumen        String
   createdBy      String                @map("created_by")
   createdAt      DateTime              @default(now()) @map("created_at")
+  verifiedBy     String?               @map("verified_by")
+  verifiedAt     DateTime?             @map("verified_at")
   updatedBy      String?               @map("updated_by")
   updatedAt      DateTime              @updatedAt @map("updated_at")
 
