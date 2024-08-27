@@ -60,7 +60,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
     }
   };
 
-  const displayAllErrors = true;
+  const displayAllErrors = false;
   return (
     <Form {...form}>
       {/* Map errors to a div */}
