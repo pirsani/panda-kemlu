@@ -245,8 +245,6 @@ model Kegiatan {
   aktif             Boolean
   tanggalMulai      DateTime             @map("tanggal_mulai")
   tanggalSelesai    DateTime             @map("tanggal_selesai")
-  dokumenSurat      String               @map("dokumen_surat")
-  dokumenJadwal     String               @map("dokumen_jadwal")
   lokasi            Lokasi // enum 0, 1, 2
   keterangan        String
   createdBy         String               @map("created_by")

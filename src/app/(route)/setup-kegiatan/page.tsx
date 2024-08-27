@@ -1,7 +1,10 @@
+import { Form } from "react-hook-form";
+import SetupKegiatanContainer from "./_components/setup-kegiatan-container";
+
 const SetupKegiatanPage = () => {
   return (
-    <div>
-      <h1>Setup Kegiatan</h1>
+    <div className="p-2 h-full w-full bg-gray-200">
+      <SetupKegiatanContainer />
     </div>
   );
 };
