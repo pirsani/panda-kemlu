@@ -51,7 +51,7 @@ const SidebarItem = ({
           <Icon
             size={22}
             className={cn(
-              "hidden md:block text-slate-500",
+              "hidden sm:block text-slate-500",
               isActive && "text-sky-700"
             )}
           />
@@ -63,7 +63,7 @@ const SidebarItem = ({
                 <Icon
                   size={22}
                   className={cn(
-                    "hidden md:block text-slate-500",
+                    "hidden sm:block text-slate-500",
                     isActive && "text-sky-700"
                   )}
                 />
