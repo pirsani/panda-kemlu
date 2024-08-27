@@ -20,6 +20,7 @@ import kegiatanSchema, {
 } from "@/zod/schemas/kegiatan";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import PesertaContainer from "./peserta-container";
 
 type FormValues<T> = T extends true ? KegiatanEditMode : Kegiatan;
 
@@ -57,6 +58,14 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
       setFileUrl(fileUrl);
     } else {
       setFileUrl(null);
+    }
+  };
+
+  const handleUploadPeserta = (file: File | null) => {
+    if (file !== null) {
+      console.log("File is not null");
+    } else {
+      console.warn("File is null");
     }
   };
 
@@ -191,6 +200,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             </FormItem>
           )}
         />
+        <PesertaContainer />
         <Button type="submit" variant={"outline"}>
           Submit
         </Button>

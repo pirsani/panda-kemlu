@@ -3,8 +3,8 @@ import SetupKegiatanContainer from "./_components/setup-kegiatan-container";
 
 const SetupKegiatanPage = () => {
   return (
-    <div className="p-4 h-full w-full bg-gray-200">
-      <div className="flex flex-col w-full lg:w-2/3">
+    <div className="p-4 min-h-screen bg-gray-200 flex flex-col">
+      <div className="flex-grow w-full lg:w-2/3">
         <SetupKegiatanContainer />
       </div>
     </div>
