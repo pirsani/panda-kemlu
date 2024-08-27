@@ -4,6 +4,8 @@ async function main() {
   const routes = await dbHonorarium.jadwal.findMany({});
   console.log(routes);
 
+  // Truncate the table
+  await dbHonorarium.jenisDokumenKegiatan.deleteMany({});
   const dokumenKegiatan = await dbHonorarium.jenisDokumenKegiatan.createMany({
     data: [
       {
@@ -77,6 +79,101 @@ async function main() {
       },
     ],
   });
+
+  // Truncate the table
+  await dbHonorarium.unitKerja.deleteMany({});
+  const unitKerja = await dbHonorarium.unitKerja.createMany({
+    data: [
+      {
+        nama: "Tata Usaha",
+        namaSingkatan: "TU",
+        createdBy: "init",
+      },
+      {
+        nama: "PPE",
+        namaSingkatan: "PPE",
+        createdBy: "init",
+      },
+      {
+        nama: "UPT Sekdilu",
+        namaSingkatan: "UPT Sekdilu",
+        createdBy: "init",
+      },
+      {
+        nama: "UPT Sesdilu",
+        namaSingkatan: "UPT Sesdilu ",
+        createdBy: "init",
+      },
+      {
+        nama: "UPT Sesparlu",
+        namaSingkatan: "UPT Sesparlu",
+        createdBy: "init",
+      },
+    ],
+  });
+
+  // Truncate the table
+  await dbHonorarium.role.deleteMany({});
+  const role = await dbHonorarium.role.createMany({
+    data: [
+      {
+        id: "superadmin",
+        name: "Superadmin",
+        createdBy: "init",
+      },
+      {
+        id: "admin",
+        name: "Bendahara",
+        createdBy: "init",
+      },
+      {
+        id: "operator-keuangan",
+        name: "Operator Keuangan",
+        createdBy: "init",
+      },
+      {
+        id: "uploader",
+        name: "Uploader",
+        createdBy: "init",
+      },
+      {
+        id: "viewer",
+        name: "Viewer",
+        createdBy: "init",
+      },
+    ],
+  });
+
+  // Truncate the table
+  await dbHonorarium.user.deleteMany({});
+  const user = await dbHonorarium.user.createMany({
+    data: [
+      {
+        id: "admin",
+        password: "admin",
+        name: "admin",
+        email: "admin@super.id",
+      },
+    ],
+  });
+
+  // Truncate the table
+  await dbHonorarium.userRole.deleteMany({});
+  const userRole = await dbHonorarium.userRole.createMany({
+    data: [
+      {
+        userId: "admin",
+        roleId: "superadmin",
+      },
+    ],
+  });
 }
 
-main();
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await dbHonorarium.$disconnect();
+  });

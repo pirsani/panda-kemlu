@@ -16,22 +16,44 @@ datasource db {
 
 // Model for Users, Accounts, Sessions, and Verification Tokens
 
+model Role {
+  id        String     @id @default(cuid())
+  name      String
+  createdBy String     @map("created_by")
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedBy String?    @map("updated_by")
+  updatedAt DateTime?  @updatedAt @map("updated_at")
+  UserRole  UserRole[]
+
+  @@map("roles")
+}
+
+model UserRole {
+  userId String
+  roleId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
 model User {
-  id                  String         @id @default(cuid())
-  name                String?
-  email               String         @unique
-  emailVerified       DateTime?      @map("email_verified")
-  image               String?
-  sessions            Session[]
-  roles               Role[]
-  unitKerjaId         String?
-  unitKerja           UnitKerja?     @relation(fields: [unitKerjaId], references: [id])
-  createdAt           DateTime       @default(now()) @map("created_at")
-  updatedAt           DateTime       @updatedAt @map("updated_at")
-  AlurKegiatanCreator AlurKegiatan[] @relation("alur_kegiatan_creator")
-  AlurKegiatanUpdater AlurKegiatan[] @relation("alur_kegiatan_updater")
-  KegiatanCreator     Kegiatan[]     @relation("kegiatan_creator")
-  KegiatanUpdater     Kegiatan[]     @relation("kegiatan_updater")
+  id                   String          @id @default(cuid())
+  name                 String?
+  email                String          @unique
+  password             String?
+  emailVerified        DateTime?       @map("email_verified")
+  image                String?
+  sessions             Session[]
+  unitKerjaId          String?
+  unitKerja            UnitKerja?      @relation(fields: [unitKerjaId], references: [id])
+  createdAt            DateTime        @default(now()) @map("created_at")
+  updatedAt            DateTime        @updatedAt @map("updated_at")
+  riwayatProsesCreator RiwayatProses[] @relation("riwayat_proses_creator")
+  riwayatProsesUpdater RiwayatProses[] @relation("riwayat_proses_updater")
+  kegiatanCreator      Kegiatan[]      @relation("kegiatan_creator")
+  kegiatanUpdater      Kegiatan[]      @relation("kegiatan_updater")
+  userRole             UserRole[]
 
   @@map("users")
 }
@@ -48,19 +70,6 @@ model Session {
   @@map("sessions")
 }
 
-model Role {
-  id        String    @id @default(cuid())
-  name      String
-  createdBy String    @map("created_by")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedBy String?   @map("updated_by")
-  updatedAt DateTime? @updatedAt @map("updated_at")
-  User      User?     @relation(fields: [userId], references: [id])
-  userId    String?
-
-  @@map("roles")
-}
-
 model PejabatPenandatangan {
   id                Int        @id @default(autoincrement())
   nama              String
@@ -73,8 +82,8 @@ model PejabatPenandatangan {
   createdAt         DateTime   @default(now()) @map("created_at")
   updatedBy         String?    @map("updated_by")
   updatedAt         DateTime?  @updatedAt @map("updated_at")
-  KegiatanBendahara Kegiatan[] @relation("bendahara_kegiatan")
-  KegiatanPPK       Kegiatan[] @relation("ppk_kegiatan")
+  kegiatanBendahara Kegiatan[] @relation("bendahara_kegiatan")
+  kegiatanPPK       Kegiatan[] @relation("ppk_kegiatan")
 
   @@map("pejabat_penandatangan")
 }
@@ -84,8 +93,8 @@ model PangkatGolongan {
   pangkat         String            @unique
   golongan        String            @unique
   deskripsi       String?
-  PesertaKegiatan PesertaKegiatan[]
-  Pengajar        Pengajar[]
+  pesertaKegiatan PesertaKegiatan[]
+  pengajar        Pengajar[]
   createdBy       String            @map("created_by")
   createdAt       DateTime          @default(now()) @map("created_at")
   updatedBy       String?           @map("updated_by")
@@ -112,7 +121,7 @@ model Pengajar {
   createdAt         DateTime        @default(now()) @map("created_at")
   updatedBy         String?         @map("updated_by")
   updatedAt         DateTime?       @updatedAt @map("updated_at")
-  Jadwal            Jadwal[]
+  jadwal            Jadwal[]
 
   @@map("pengajar")
 }
@@ -128,11 +137,11 @@ model SBMAcuan {
   createdAt        DateTime           @default(now()) @map("created_at")
   updatedBy        String?            @map("updated_by")
   updatedAt        DateTime?          @updatedAt @map("updated_at")
-  SBMHonorarium    SBMHonorarium[]
-  SBMUHDalamNegeri SBMUHDalamNegeri[]
-  SBMUHLuarNegeri  SBMUHLuarNegeri[]
-  UHDalamNegeri    UHDalamNegeri[]
-  UHLuarNegeri     UHLuarNegeri[]
+  sbmHonorarium    SBMHonorarium[]
+  sbmUHDalamNegeri SBMUHDalamNegeri[]
+  sbmUHLuarNegeri  SBMUHLuarNegeri[]
+  uhDalamNegeri    UHDalamNegeri[]
+  uhLuarNegeri     UHLuarNegeri[]
 
   @@map("sbm_acuan")
 }
@@ -189,8 +198,8 @@ model SBMUHLuarNegeri {
   createdAt    DateTime       @default(now()) @map("created_at")
   updatedBy    String?        @map("updated_by")
   updatedAt    DateTime?      @updatedAt @map("updated_at")
-  Itinerary    Itinerary[]
-  UHLuarNegeri UHLuarNegeri[]
+  itinerary    Itinerary[]
+  uhLuarNegeri UHLuarNegeri[]
 
   @@map("sbm_uh_luar_negeri")
 }
@@ -210,14 +219,15 @@ model SBMUangRepresentasi {
 }
 
 model UnitKerja {
-  id        String    @id @default(cuid())
-  nama      String
-  aktif     Boolean
-  createdBy String    @map("created_by")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedBy String?   @map("updated_by")
-  updatedAt DateTime? @updatedAt @map("updated_at")
-  User      User[]
+  id            String    @id @default(cuid())
+  nama          String
+  namaSingkatan String?   @map("nama_singkatan")
+  aktif         Boolean   @default(true)
+  createdBy     String    @map("created_by")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedBy     String?   @map("updated_by")
+  updatedAt     DateTime? @updatedAt @map("updated_at")
+  User          User[]
 
   @@map("unit_kerja")
 }
@@ -250,11 +260,11 @@ model Kegiatan {
   ppkId             Int                  @map("ppk_id")
   ppk               PejabatPenandatangan @relation(fields: [ppkId], references: [id], name: "ppk_kegiatan")
   dokumenSuratTugas DokumenSuratTugas[]
-  PesertaKegiatan   PesertaKegiatan[]
-  Itinerary         Itinerary[]
-  AlurKegiatan      AlurKegiatan[]
-  Kelas             Kelas[]
-  DokumenKegiatan   DokumenKegiatan[]
+  pesertaKegiatan   PesertaKegiatan[]
+  itinerary         Itinerary[]
+  riwayatProses     RiwayatProses[]
+  kelas             Kelas[]
+  dokumenKegiatan   DokumenKegiatan[]
 
   @@map("kegiatan")
 }
@@ -294,8 +304,8 @@ model PesertaKegiatan {
   createdAt                       DateTime        @default(now()) @map("created_at")
   updatedBy                       String?         @map("updated_by")
   updatedAt                       DateTime?       @updatedAt @map("updated_at")
-  UHDalamNegeri                   UHDalamNegeri[]
-  UHLuarNegeri                    UHLuarNegeri[]
+  uhDalamNegeri                   UHDalamNegeri[]
+  uhLuarNegeri                    UHLuarNegeri[]
 
   @@unique([kegiatanId, NIP])
   @@map("peserta_kegiatan")
@@ -371,7 +381,7 @@ model Itinerary {
   @@map("itinerary")
 }
 
-model AlurKegiatan {
+model RiwayatProses {
   id         Int       @id @default(autoincrement())
   status     String
   keterangan String
@@ -382,10 +392,10 @@ model AlurKegiatan {
   createdAt  DateTime  @default(now()) @map("created_at")
   updatedBy  String?   @map("updated_by")
   updatedAt  DateTime? @updatedAt @map("updated_at")
-  creator    User?     @relation(fields: [createdBy], references: [id], name: "alur_kegiatan_creator")
-  updater    User?     @relation(fields: [updatedBy], references: [id], name: "alur_kegiatan_updater")
+  creator    User?     @relation(fields: [createdBy], references: [id], name: "riwayat_proses_creator")
+  updater    User?     @relation(fields: [updatedBy], references: [id], name: "riwayat_proses_updater")
 
-  @@map("alur_kegiatan")
+  @@map("riwayat_proses")
 }
 
 model Kelas {
@@ -399,7 +409,7 @@ model Kelas {
   createdAt  DateTime  @default(now()) @map("created_at")
   updatedBy  String?   @map("updated_by")
   updatedAt  DateTime? @updatedAt @map("updated_at")
-  Jadwal     Jadwal[]
+  jadwal     Jadwal[]
 
   @@map("kelas")
 }
@@ -412,7 +422,7 @@ model Materi {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedBy String?   @map("updated_by")
   updatedAt DateTime? @updatedAt @map("updated_at")
-  Jadwal    Jadwal[]
+  jadwal    Jadwal[]
 
   @@map("materi")
 }
@@ -439,7 +449,7 @@ model Jadwal {
   createdAt                         DateTime              @default(now()) @map("created_at")
   updatedBy                         String?               @map("updated_by")
   updatedAt                         DateTime?             @updatedAt @map("updated_at")
-  NominatifHonorarium               NominatifHonorarium[]
+  nominatifHonorarium               NominatifHonorarium[]
 
   @@map("jadwal")
 }
@@ -455,7 +465,7 @@ model JenisDokumenKegiatan {
   createdAt       DateTime          @default(now()) @map("created_at")
   updatedBy       String?           @map("updated_by")
   updatedAt       DateTime?         @updatedAt @map("updated_at")
-  DokumenKegiatan DokumenKegiatan[]
+  dokumenKegiatan DokumenKegiatan[]
 
   @@map("jenis_dokumen_kegiatan")
 }
