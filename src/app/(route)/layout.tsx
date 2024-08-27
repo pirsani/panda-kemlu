@@ -7,11 +7,11 @@ const RouteLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="h-full">
       <TopBar />
-      <div className="flex flex-row pt-[76px]  h-full">
+      <div className="flex flex-row pt-[76px] h-[calc(100vh)] h-auto overflow-hidden">
         <div>
           <SidebarContariner />
         </div>
-        <main className="w-full">{children}</main>
+        <main className="w-full overflow-auto">{children}</main>
       </div>
     </div>
   );

@@ -11,6 +11,7 @@ const PesertaContainer = () => {
   const handleOnChange = (data: Record<string, any>[]) => {
     if (data) {
       setData(data);
+      console.log(data);
     }
   };
 
@@ -30,7 +31,7 @@ const PesertaContainer = () => {
         >
           Upload xlsx peserta
         </label>
-        <InputFileXlsx onChange={handleOnChange} />
+        <InputFileXlsx onChange={handleOnChange} maxColumns={9} />
       </div>
       {data.length > 0 && <TabelPeserta data={data} />}
     </div>
