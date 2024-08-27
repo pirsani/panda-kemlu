@@ -63,9 +63,9 @@ export const alurProsesRoutes: RouteItem[] = [
     displayAsMenu: true,
   },
   {
-    name: "daftar-nomitatif",
+    name: "daftar-nominatif",
     title: "3. Daftar Nominatif",
-    href: "/daftar-nomitatif",
+    href: "/daftar-nominatif",
     icon: "table",
     order: 3,
     displayAsMenu: true,

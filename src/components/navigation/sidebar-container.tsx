@@ -7,7 +7,7 @@ import SidebarItems from "./sidebar-items";
 const SidebarContariner = () => {
   return (
     <div className="h-full bg-gray-100">
-      <div className="h-full overflow-y-auto pb-24">
+      <div className="h-full overflow-y-auto pb-6">
         <SidebarItems routes={publicRoutes} />
         <SidebarItems routes={alurProsesRoutes} groupTitle="Alur Proses" />
         <SidebarItems
