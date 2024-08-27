@@ -1,4 +1,5 @@
 "use client";
+import InputDatePicker from "@/components/date-picker/input-date-picker";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -34,15 +35,32 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
     },
   });
 
-  const { handleSubmit } = form;
+  const {
+    handleSubmit,
+    formState: { errors },
+  } = form;
 
-  const onSubmit = async (data: FormValues<FormMode>) => {
+  const onSubmit: SubmitHandler<FormValues<FormMode>> = async (data) => {
+    console.log(data.tanggalMulai); // Check the format here
     console.log(data);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      {/* Map errors to a div */}
+      {Object.keys(errors).length > 0 && (
+        <div className="bg-red-100 p-4 mt-4 rounded">
+          <h3 className="text-red-500 font-bold mb-2">Form Errors:</h3>
+          <ul className="list-disc list-inside text-red-500">
+            {Object.entries(errors).map(([key, error]) => (
+              <li key={key}>
+                {key}: {error?.message}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
         <FormField
           control={form.control}
           name="nama"
@@ -56,6 +74,44 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             </FormItem>
           )}
         />
+        <div className="flex flex-row w-full gap-2">
+          <FormField
+            control={form.control}
+            name="tanggalMulai"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tanggal Mulai</FormLabel>
+                <InputDatePicker
+                  name={field.name}
+                  error={errors.tanggalMulai}
+                  className="md:w-full"
+                  calendarOptions={{
+                    fromDate: new Date(new Date().getFullYear(), 0, 1),
+                    toDate: new Date(new Date().getFullYear(), 11, 31),
+                  }}
+                />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="tanggalSelesai"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tanggal Selesai</FormLabel>
+                <InputDatePicker
+                  name={field.name}
+                  error={errors.tanggalSelesai}
+                  className="md:w-full"
+                  calendarOptions={{
+                    fromDate: new Date(new Date().getFullYear(), 0, 1),
+                    toDate: new Date(new Date().getFullYear(), 11, 31),
+                  }}
+                />
+              </FormItem>
+            )}
+          />
+        </div>
         <Button type="submit" variant={"outline"}>
           Submit
         </Button>

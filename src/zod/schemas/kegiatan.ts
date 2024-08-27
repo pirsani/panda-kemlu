@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const kegiatanSchema = z.object({
+export const baseKegiatanSchema = z.object({
   nama: z
     .string()
     .min(10, {
@@ -16,10 +16,25 @@ export const kegiatanSchema = z.object({
   dokumenJadwal: z.string().min(10).max(500),
 });
 
-export const kegiatanSchemaEditMode = kegiatanSchema.extend({
-  dokumenSurat: z.string().optional(),
-  dokumenJadwal: z.string().optional(),
-});
+// Apply the refine method to add custom validation
+export const kegiatanSchema = baseKegiatanSchema.refine(
+  (data) => data.tanggalMulai <= data.tanggalSelesai,
+  {
+    message: "Tanggal Mulai harus kurang dari atau sama dengan Tanggal Selesai",
+    path: ["tanggalMulai"], // This will point the error to the tanggalMulai field
+  }
+);
+
+// Extend the refined schema for edit mode
+export const kegiatanSchemaEditMode = baseKegiatanSchema
+  .extend({
+    dokumenSurat: z.string().optional(),
+    dokumenJadwal: z.string().optional(),
+  })
+  .refine((data) => data.tanggalMulai <= data.tanggalSelesai, {
+    message: "Tanggal Mulai harus kurang dari atau sama dengan Tanggal Selesai",
+    path: ["tanggalMulai"], // This will point the error to the tanggalMulai field
+  });
 
 export type Kegiatan = z.infer<typeof kegiatanSchema>;
 export type KegiatanEditMode = z.infer<typeof kegiatanSchemaEditMode>;
