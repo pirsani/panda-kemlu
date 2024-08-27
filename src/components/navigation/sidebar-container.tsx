@@ -1,30 +1,19 @@
+import { alurProsesRoutes, dataReferensiRoutes, publicRoutes } from "@/route";
 import SidebarItems from "./sidebar-items";
 
 // TODO
 // Implement route from some settings
 
 const SidebarContariner = () => {
-  const routes = [
-    {
-      name: "Dashboard",
-      icon: "home",
-      href: "/",
-    },
-    {
-      name: "Profile",
-      icon: "user",
-      href: "/profile",
-    },
-    {
-      name: "Settings",
-      icon: "settings",
-      href: "/settings",
-    },
-  ];
   return (
     <div className="h-full bg-gray-100">
-      <div className="h-full overflow-y-auto">
-        <SidebarItems routes={routes} />
+      <div className="h-full overflow-y-auto pb-24">
+        <SidebarItems routes={publicRoutes} />
+        <SidebarItems routes={alurProsesRoutes} groupTitle="Alur Proses" />
+        <SidebarItems
+          routes={dataReferensiRoutes}
+          groupTitle="Tabel Referensi"
+        />
       </div>
     </div>
   );

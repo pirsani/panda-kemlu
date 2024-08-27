@@ -1,9 +1,11 @@
 "use client";
 import { useIsLoading } from "@/hooks/use-loading";
 import { cn } from "@/lib/utils";
+import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { Icon, List, LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { Tooltip, TooltipContent, TooltipProvider } from "../ui/tooltip";
 
 interface SidebarItemProps {
   icon: LucideIcon;
@@ -34,7 +36,7 @@ const SidebarItem = ({
 
   return (
     <Link
-      href={"/"}
+      href={href}
       onClick={handleOnClick}
       type="button"
       className={cn(
@@ -45,13 +47,34 @@ const SidebarItem = ({
       )}
     >
       <div className="flex items-center gap-x-2 py-2 flex-grow">
-        <Icon
-          size={22}
-          className={cn(
-            "hidden md:block text-slate-500",
-            isActive && "text-sky-700"
-          )}
-        />
+        {!collapsed && (
+          <Icon
+            size={22}
+            className={cn(
+              "hidden md:block text-slate-500",
+              isActive && "text-sky-700"
+            )}
+          />
+        )}
+        {collapsed && (
+          <TooltipProvider>
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger>
+                <Icon
+                  size={22}
+                  className={cn(
+                    "hidden md:block text-slate-500",
+                    isActive && "text-sky-700"
+                  )}
+                />
+              </TooltipTrigger>
+              <TooltipContent align="center" side="right" className="ml-2">
+                <span className="text-slate-500">{title}</span>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+
         <span className={cn(collapsed ? "hidden" : "block")}>{title}</span>
       </div>
     </Link>
