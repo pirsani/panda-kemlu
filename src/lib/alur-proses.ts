@@ -1,4 +1,6 @@
 "use server";
+
+// Define possible statuses as a type
 type StatusLangkah =
   | "Draft"
   | "Submitted"
@@ -7,32 +9,29 @@ type StatusLangkah =
   | "Paid"
   | "End";
 
+// Define the Kegiatan interface with correct types
 export interface Kegiatan {
   id: number;
   langkahSekarang: string;
   langkahSelanjutnya: string | null;
-  status: string;
+  status: StatusLangkah; // Ensure StatusLangkah includes all possible values
   updatedAt?: Date;
 }
 
+// Define the LogEntry interface for logging purposes
 interface LogEntry {
   id: number;
   kegiatanId: number;
   langkahSekarang: string;
-  langkahSelanjutnya: string;
-  status: string;
+  langkahSelanjutnya: string | null;
+  status: StatusLangkah;
   createdAt: Date;
 }
 
-const kegiatan: Kegiatan = {
-  id: 1,
-  langkahSekarang: "setup",
-  langkahSelanjutnya: "pengajuan",
-  status: "Draft",
-};
+// Define the possible actions
+type Aksi = "Proceed" | "Revise";
 
-type Aksi = "proceed" | "Revise";
-
+// Main function to update the Kegiatan status and steps
 export const updateAlurLangkah = async (
   kegiatan: Kegiatan,
   aksi: Aksi
@@ -40,50 +39,85 @@ export const updateAlurLangkah = async (
   console.log("[SEBELUM]", kegiatan);
   console.log("[AKSI]", aksi);
 
-  // Update the status of the kegiatan
+  // Handle the 'End' status case
   if (kegiatan.status === "End") {
     console.log("Kegiatan sudah selesai");
     return kegiatan;
   }
-  if (aksi === "proceed" && kegiatan.status === "Paid") {
-    kegiatan.status = "End";
-  } else if (
-    aksi === "proceed" &&
-    kegiatan.status === "Submitted" &&
-    kegiatan.langkahSelanjutnya === "selesai"
-  ) {
-    kegiatan.status = "Paid";
-  } else if (aksi === "proceed" && kegiatan.status === "Draft") {
-    kegiatan.status = "Submitted";
-  } else if (aksi === "proceed" && kegiatan.status === "Revise") {
-    kegiatan.status = "Revised";
-  } else if (aksi === "proceed" && kegiatan.status === "Revised") {
-    kegiatan.status = "Submitted";
-    kegiatan.langkahSekarang = kegiatan.langkahSelanjutnya || "";
-    kegiatan.langkahSelanjutnya = tentukanLangkahSelanjutnya(
-      kegiatan.langkahSekarang,
-      kegiatan.status as StatusLangkah
-    );
-  } else if (aksi === "proceed" && kegiatan.status === "Submitted") {
-    kegiatan.status = "Submitted";
-    // If the status is Submitted, move to the next step
-    kegiatan.langkahSekarang = kegiatan.langkahSelanjutnya || "";
-    kegiatan.langkahSelanjutnya = tentukanLangkahSelanjutnya(
-      kegiatan.langkahSekarang,
-      kegiatan.status as StatusLangkah
-    );
-  } else if (aksi === "Revise") {
-    kegiatan.status = "Revise";
+
+  // Handle different actions
+  switch (aksi) {
+    case "Revise":
+      if (kegiatan.status !== "Paid") {
+        kegiatan.status = "Revise";
+      }
+      break;
+    case "Proceed":
+      kegiatan = handleProceedAction(kegiatan);
+      break;
+    default:
+      console.log("Aksi tidak dikenal");
   }
+
+  // Update the timestamp
+  kegiatan.updatedAt = new Date();
+
   console.log("[SESUDAH]", kegiatan);
 
   return kegiatan;
 
-  //logFlowPost(postID, currentStep || "", nextStep, newStatus, userID);
+  // Optional logging function
+  // logFlowPost(kegiatan.id, kegiatan.langkahSekarang, kegiatan.langkahSelanjutnya, kegiatan.status);
 };
 
-// only move to the next step if the new status is Submitted
-// if the status is Draft, stay in the current step
+// Function to handle 'Proceed' actions based on current status
+const handleProceedAction = (kegiatan: Kegiatan): Kegiatan => {
+  switch (kegiatan.status) {
+    case "Draft":
+      kegiatan.status = "Submitted";
+      kegiatan.langkahSelanjutnya = tentukanLangkahSelanjutnya(
+        kegiatan.langkahSekarang,
+        kegiatan.status
+      );
+      break;
+    case "Submitted":
+      if (kegiatan.langkahSelanjutnya === "selesai") {
+        kegiatan.status = "Paid";
+        kegiatan.langkahSelanjutnya = "selesai"; // Stay at the final step
+      } else {
+        kegiatan.langkahSekarang =
+          kegiatan.langkahSelanjutnya || kegiatan.langkahSekarang;
+        kegiatan.langkahSelanjutnya = tentukanLangkahSelanjutnya(
+          kegiatan.langkahSekarang,
+          kegiatan.status
+        );
+      }
+      break;
+    case "Revised":
+      kegiatan.status = "Submitted";
+      kegiatan.langkahSekarang =
+        kegiatan.langkahSelanjutnya || kegiatan.langkahSekarang;
+      kegiatan.langkahSelanjutnya = tentukanLangkahSelanjutnya(
+        kegiatan.langkahSekarang,
+        kegiatan.status
+      );
+      break;
+    case "Revise":
+      kegiatan.status = "Revised";
+      break;
+    case "Paid":
+      kegiatan.status = "End";
+      break;
+    case "End":
+      console.log("Kegiatan sudah selesai");
+      break;
+    default:
+      break;
+  }
+  return kegiatan;
+};
+
+// Determine the next step based on the current step and status
 function tentukanLangkahSelanjutnya(
   langkahSekarang: string | null,
   statusBaru: StatusLangkah
@@ -100,24 +134,10 @@ function tentukanLangkahSelanjutnya(
   if (!langkahSekarang) return langkah[0]; // Start from 'setup' if current step is null
 
   const currentIndex = langkah.indexOf(langkahSekarang);
-  if (currentIndex === -1) return null; // Current step not found in the list
+  if (currentIndex === -1 || currentIndex === langkah.length - 1) return null; // Last step or not found
 
-  if (currentIndex === langkah.length - 1) return langkahSekarang; // Already at the last step
-
-  switch (statusBaru) {
-    case "Submitted":
-      // If status is 'Submitted' move to the next step if possible
-      return currentIndex + 1 < langkah.length
-        ? langkah[currentIndex + 1]
-        : null;
-    case "Draft":
-    case "Revise":
-    case "Revised":
-    case "Paid":
-    case "End":
-      // If status is 'Revise' or 'Paid', stay in the current step
-      return null;
-    default:
-      return null;
-  }
+  // Move to the next step if status is 'Submitted' or 'Revised'
+  return statusBaru === "Submitted" || statusBaru === "Revised"
+    ? langkah[currentIndex + 1]
+    : null;
 }

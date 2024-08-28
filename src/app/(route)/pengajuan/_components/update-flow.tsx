@@ -15,7 +15,7 @@ const UpdateFlow = ({ initKegiatan }: { initKegiatan: Kegiatan }) => {
 
   const handleSubmit = async () => {
     console.log("Update Flow");
-    const response = await updateAlurLangkah(kegiatan, "proceed");
+    const response = await updateAlurLangkah(kegiatan, "Proceed");
     setKegiatan(response);
     console.log(response);
   };
