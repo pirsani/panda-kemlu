@@ -9,7 +9,7 @@ type StatusLangkah =
   | "Paid"
   | "Other";
 
-const langkah = ["setup", "pengajuan", "verfikasi", "nominatif", "pembayaran"];
+const langkah = ["setup", "pengajuan", "verifikasi", "nominatif", "pembayaran"];
 ```
 
 Example Workflow
