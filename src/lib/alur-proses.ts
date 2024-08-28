@@ -1,13 +1,5 @@
 "use server";
-
-// Define possible statuses as a type
-type StatusLangkah =
-  | "Draft"
-  | "Submitted"
-  | "Revise"
-  | "Revised"
-  | "Paid"
-  | "End";
+import { LANGKAH, StatusLangkah } from "./constants";
 
 // Define the Kegiatan interface with correct types
 export interface Kegiatan {
@@ -122,22 +114,13 @@ function tentukanLangkahSelanjutnya(
   langkahSekarang: string | null,
   statusBaru: StatusLangkah
 ): string | null {
-  const langkah = [
-    "setup",
-    "pengajuan",
-    "verifikasi",
-    "nominatif",
-    "pembayaran",
-    "selesai",
-  ];
+  if (!langkahSekarang) return LANGKAH[0]; // Start from 'setup' if current step is null
 
-  if (!langkahSekarang) return langkah[0]; // Start from 'setup' if current step is null
-
-  const currentIndex = langkah.indexOf(langkahSekarang);
-  if (currentIndex === -1 || currentIndex === langkah.length - 1) return null; // Last step or not found
+  const currentIndex = LANGKAH.indexOf(langkahSekarang);
+  if (currentIndex === -1 || currentIndex === LANGKAH.length - 1) return null; // Last step or not found
 
   // Move to the next step if status is 'Submitted' or 'Revised'
   return statusBaru === "Submitted" || statusBaru === "Revised"
-    ? langkah[currentIndex + 1]
+    ? LANGKAH[currentIndex + 1]
     : null;
 }

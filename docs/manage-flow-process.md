@@ -7,9 +7,16 @@ type StatusLangkah =
   | "Revise"
   | "Revised"
   | "Paid"
-  | "Other";
+  | "End";
 
-const langkah = ["setup", "pengajuan", "verifikasi", "nominatif", "pembayaran"];
+const langkah = [
+  "setup",
+  "pengajuan",
+  "verifikasi",
+  "nominatif",
+  "pembayaran",
+  "selesai",
+];
 ```
 
 Example Workflow
