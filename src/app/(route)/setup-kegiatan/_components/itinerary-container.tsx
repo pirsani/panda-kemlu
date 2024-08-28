@@ -3,7 +3,7 @@ import TabelItinerary from "./tabel-itinerary";
 
 const ItineraryContainer = () => {
   return (
-    <div>
+    <div className="w-full">
       <TabelItinerary />
       <FormItinerary />
     </div>
