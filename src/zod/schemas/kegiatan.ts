@@ -12,7 +12,8 @@ export const baseKegiatanSchema = z.object({
     }),
   tanggalMulai: z.coerce.date(),
   tanggalSelesai: z.coerce.date(),
-  lokasi: z.coerce.number().min(0).max(2), // Coerce lokasi to number
+  lokasi: z.coerce.number().min(0).max(2), // Coerce lokasi to number dalam kota, luar kota, luar negeri
+  provinsi: z.number(),
   dokumenSurat: fileSchema({ required: true }),
   dokumenJadwal: fileSchema({ required: true }),
 });

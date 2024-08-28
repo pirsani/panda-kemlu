@@ -35,6 +35,7 @@ model UserRole {
   role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@id([userId, roleId])
+  @@map("user_roles")
 }
 
 model User {
@@ -166,7 +167,8 @@ model SBMHonorarium {
 
 model SBMUHDalamNegeri {
   id             Int      @id @default(autoincrement())
-  lokasi         String
+  provinsiId     Int      @map("provinsi_id")
+  provinsi       Provinsi @relation(fields: [provinsiId], references: [id])
   satuan         String
   fullboard      Int
   fulldayHalfday String   @map("full_day_half_day")
@@ -186,7 +188,8 @@ model SBMUHDalamNegeri {
 
 model SBMUHLuarNegeri {
   id           Int            @id @default(autoincrement())
-  lokasi       String
+  negaraId     Int            @map("negara_id")
+  negara       Negara         @relation(fields: [negaraId], references: [id])
   satuan       String
   golonganA    Int            @map("golongan_a")
   golonganB    Int            @map("golongan_b")
@@ -246,6 +249,7 @@ model Kegiatan {
   tanggalMulai      DateTime             @map("tanggal_mulai")
   tanggalSelesai    DateTime             @map("tanggal_selesai")
   lokasi            Lokasi // enum 0, 1, 2
+  provinsi          String
   keterangan        String
   createdBy         String               @map("created_by")
   creator           User                 @relation(fields: [createdBy], references: [id], name: "kegiatan_creator")
@@ -501,4 +505,37 @@ model NominatifHonorarium {
   dokumenBuktiPembayaran String? @map("dokumen_bukti_pembayaran")
 
   @@map("daftar_nominatif_honorarium")
+}
+
+// berdasarkan data dari https://e-database.kemendagri.go.id/kemendagri/dataset/1121/tabel-data
+model Provinsi {
+  id               Int                @id @default(autoincrement())
+  tahun            Int
+  kode             Int
+  nama             String
+  namaSingkatan    String?            @map("nama_singkatan")
+  aktif            Boolean            @default(true)
+  createdBy        String             @default("init") @map("created_by")
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedBy        String?            @map("updated_by")
+  updatedAt        DateTime?          @updatedAt @map("updated_at")
+  SBMUHDalamNegeri SBMUHDalamNegeri[]
+
+  @@map("provinsi")
+}
+
+model Negara {
+  id          Int    @id @default(autoincrement())
+  nama        String
+  kodeAlpha2  String @map("kode_alpha_2") // ISO 3166-1 alpha-2 code
+  kodeAlpha3  String @map("kode_alpha_3") // ISO 3166-1 alpha-3 code
+  kodeNumeric String @map("kode_numeric") // ISO 3166-1 numeric code
+
+  createdBy       String            @default("init") @map("created_by")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedBy       String?           @map("updated_by")
+  updatedAt       DateTime?         @updatedAt @map("updated_at")
+  SBMUHLuarNegeri SBMUHLuarNegeri[]
+
+  @@map("negara")
 }

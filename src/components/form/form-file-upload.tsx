@@ -1,13 +1,16 @@
+import { cn } from "@/lib/utils";
 import { Controller, useFormContext } from "react-hook-form";
 
 interface FormFileUploadProps {
   name: string;
   onFileChange?: (file: File | null) => void;
+  className?: string;
   ref?: React.RefObject<HTMLInputElement>;
 }
 export const FormFileUpload = ({
   name,
   onFileChange,
+  className,
   ref,
 }: FormFileUploadProps) => {
   const {
@@ -26,7 +29,10 @@ export const FormFileUpload = ({
             id={name}
             type="file"
             accept=".pdf"
-            className="border-2 border-gray-300 p-2 rounded w-full"
+            className={cn(
+              "border-2 border-gray-300 p-2 rounded w-full",
+              className
+            )}
             onChange={(e) => {
               const file = e.target.files?.[0] || null;
               field.onChange(file);

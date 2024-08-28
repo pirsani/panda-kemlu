@@ -3,27 +3,28 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { Delete, Edit, Save, Trash } from "lucide-react";
 import { useState } from "react";
+import SelectSbmNegara from "./select-sbm-negara";
 
 const data = [
   {
     no: 1,
-    startDate: "01 Jan 2024",
-    endDate: "06 Jan 2024",
-    country: "Prancis",
+    tanggalMulai: "01 Jan 2024",
+    tanggalSelesai: "06 Jan 2024",
+    negara: "Prancis",
   },
   {
     no: 2,
     startDate: "01 Jan 2024",
     endDate: "06 Jan 2024",
-    country: "Prancis",
+    negara: "Prancis",
   },
 ];
 const TabelItinerary = () => {
   const rowData = data;
   const labelTh = ["No", "Tanggal Mulai", "Tanggal Akhir", "Negara", "Aksi"];
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full bg-white border">
+    <div className="overflow-x-auto flex-grow">
+      <table className="min-w-full bg-white border h-full">
         <thead>
           <tr>
             {labelTh.map((label) => (
@@ -107,6 +108,11 @@ const RowItineraryEditMode = ({
 }) => {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
+  const [negara, setNegara] = useState(data.negara);
+
+  const handleChangeNegara = (value: number | null) => {
+    if (value) setNegara(value);
+  };
 
   return (
     <tr>
@@ -126,7 +132,11 @@ const RowItineraryEditMode = ({
         />
       </td>
       <td className="px-4 py-2 border-b border-gray-200 text-sm">
-        {data.country}
+        <SelectSbmNegara
+          fullKey="negara"
+          value={negara}
+          onChange={handleChangeNegara}
+        />
       </td>
       <td className="px-4 py-2 border-b border-gray-200 text-sm">
         <Button type="button" onClick={onSave}>

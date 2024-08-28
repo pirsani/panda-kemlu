@@ -23,6 +23,7 @@ import { useEffect } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import ItineraryContainer from "./itinerary-container";
 import PesertaContainer from "./peserta-container";
+import SelectSbmProvinsi from "./select-sbm-provinsi";
 
 type FormValues<T> = T extends true ? KegiatanEditMode : Kegiatan;
 
@@ -38,6 +39,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
     defaultValues: {
       nama: "",
       lokasi: 0, // Default value for lokasi atau nantinya bisa diisi dari data yang sudah ada klo mode edit
+      provinsi: 24, // Default value for provinsi atau nantinya bisa diisi dari data yang sudah ada klo mode edit
     },
   });
 
@@ -89,7 +91,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
           </ul>
         </div>
       )}
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <FormField
           control={form.control}
           name="nama"
@@ -153,6 +155,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
                 <FormFileUpload
                   name={field.name}
                   onFileChange={handleFileChange}
+                  className="bg-white"
                 />
               </FormControl>
               <FormMessage />
@@ -171,6 +174,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
                 <FormFileUpload
                   name={field.name}
                   onFileChange={handleFileChange}
+                  className="bg-white"
                 />
               </FormControl>
               <FormMessage />
@@ -205,8 +209,27 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
           )}
         />
         {lokasi == 2 && <ItineraryContainer />}
+        {lokasi !== 2 && (
+          <FormField
+            control={form.control}
+            name="provinsi"
+            render={({ field }) => (
+              <FormItem>
+                <label htmlFor={field.name}>Provinsi</label>
+                <FormControl>
+                  <SelectSbmProvinsi
+                    fullKey={field.name}
+                    onChange={field.onChange}
+                    value={field.value}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
         <PesertaContainer />
-        <Button type="submit" variant={"outline"}>
+        <Button className="my-8" type="submit">
           Submit
         </Button>
       </form>
