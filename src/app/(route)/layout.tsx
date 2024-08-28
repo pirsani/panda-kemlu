@@ -5,13 +5,14 @@ import { Suspense } from "react";
 
 const RouteLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="h-full">
+    <div className="h-full overflow-hidden">
       <TopBar />
-      <div className="flex flex-row pt-[76px] h-[calc(100vh)] h-auto overflow-hidden">
-        <div>
-          <SidebarContariner />
-        </div>
-        <main className="w-full overflow-auto">{children}</main>
+      <div
+        id="page-container"
+        className="flex flex-row pt-[76px] h-[calc(100vh)]"
+      >
+        <SidebarContariner />
+        <main className="w-full overflow-auto h-full">{children}</main>
       </div>
     </div>
   );
