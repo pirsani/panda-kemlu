@@ -19,7 +19,9 @@ import kegiatanSchema, {
   kegiatanSchemaEditMode,
 } from "@/zod/schemas/kegiatan";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import ItineraryContainer from "./itinerary-container";
 import PesertaContainer from "./peserta-container";
 
 type FormValues<T> = T extends true ? KegiatanEditMode : Kegiatan;
@@ -35,6 +37,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
     resolver: zodResolver(isEditMode ? kegiatanSchemaEditMode : kegiatanSchema),
     defaultValues: {
       nama: "",
+      lokasi: 0, // Default value for lokasi atau nantinya bisa diisi dari data yang sudah ada klo mode edit
     },
   });
 
@@ -42,6 +45,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = form;
 
   const onSubmit: SubmitHandler<FormValues<FormMode>> = async (data) => {
@@ -61,13 +65,13 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
     }
   };
 
-  const handleUploadPeserta = (file: File | null) => {
-    if (file !== null) {
-      console.log("File is not null");
-    } else {
-      console.warn("File is null");
-    }
-  };
+  // Watch the lokasi field to update the state
+  const lokasi = watch("lokasi");
+
+  // Update selectedLokasi state when lokasi changes
+  useEffect(() => {
+    console.log(lokasi);
+  }, [lokasi]);
 
   const displayAllErrors = false;
   return (
@@ -200,6 +204,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             </FormItem>
           )}
         />
+        {lokasi == 2 && <ItineraryContainer />}
         <PesertaContainer />
         <Button type="submit" variant={"outline"}>
           Submit
