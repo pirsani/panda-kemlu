@@ -28,6 +28,11 @@ interface IUserButtonProps {
     email?: string | null;
     image?: string | null;
     role?: string | null;
+    nip?: string | null;
+    unitKerjaId?: string | null;
+    unitKerjaNama?: string | null;
+    roles?: string[] | null;
+    permissions?: string[] | null;
   };
 }
 const UserButtonDropdown = ({ user }: IUserButtonProps) => (
@@ -49,7 +54,7 @@ const UserButtonDropdown = ({ user }: IUserButtonProps) => (
         {user.name ?? user.email ?? "Unknown"}
       </DropdownMenuLabel>
       <DropdownMenuLabel className="font-light">
-        Fungsi: {user.role ?? "Guest"}
+        Unit: {user.unitKerjaNama ?? "Guest"}
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
