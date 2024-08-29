@@ -13,6 +13,7 @@ import {
 import { LogOut, User as UserIcon } from "lucide-react";
 //import { signOut } from "next-auth/react";
 import Link from "next/link";
+import { SignOut } from "./signout-button";
 
 function getInitials(name: string) {
   return name
@@ -59,12 +60,8 @@ const UserButtonDropdown = ({ user }: IUserButtonProps) => (
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
-        <DropdownMenuItem
-          className="flex items-center gap-x-2 hover:cursor-pointer"
-          //onClick={() => signOut({ callbackUrl: "/" })}
-        >
-          <LogOut size={9} />
-          <span>Sign out</span>
+        <DropdownMenuItem className="flex items-center gap-x-2 hover:cursor-pointer">
+          <SignOut />
         </DropdownMenuItem>
       </DropdownMenuGroup>
     </DropdownMenuContent>

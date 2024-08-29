@@ -11,13 +11,16 @@ export default function Home() {
             Aplikasi Pengelolan Administrasi Perbendaharaan
           </p>
           <div className="py-10 flex flex-row gap-6 h-auto">
-            <div className="w-1/2 h-full">
+            <div className="w-1/2 h-96 relative">
               <Image
                 src="/images/hero-1.png"
                 alt="Panda"
-                width={512}
-                height={512}
-                className="rounded-lg w-full"
+                layout="fill"
+                objectFit="cover"
+                className="rounded-lg"
+                priority
+                placeholder="blur"
+                blurDataURL="/images/hero-1-blur.png" // Add a small, low-quality version of the image
               />
             </div>
 

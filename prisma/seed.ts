@@ -1,4 +1,5 @@
 import { dbHonorarium } from "@/lib/db-honorarium";
+import bcrypt from "bcryptjs"; // Import bcrypt for password hashing and comparison
 
 async function main() {
   const routes = await dbHonorarium.jadwal.findMany({});
@@ -146,11 +147,12 @@ async function main() {
 
   // Truncate the table
   await dbHonorarium.user.deleteMany({});
+  const pass = bcrypt.hashSync("123456", 10);
   const user = await dbHonorarium.user.createMany({
     data: [
       {
         id: "admin",
-        password: "admin",
+        password: pass,
         name: "admin",
         email: "admin@super.id",
       },
