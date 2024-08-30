@@ -1,18 +1,18 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Minus, Plus } from "lucide-react";
+import { ChevronDown, ChevronRight, Minus, Plus } from "lucide-react";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
-export type Payment = {
+export type Kelas = {
   id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
+  kelas: string;
+  tanggal: Date;
+  materi: string;
 };
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<Kelas>[] = [
   {
     id: "expander", // ID for the expander column
     header: () => null, // Empty header for the expander column
@@ -22,24 +22,27 @@ export const columns: ColumnDef<Payment>[] = [
         //onClick={() => row.toggleExpanded()} // Toggle row expansion
       >
         {row.getIsExpanded() ? (
-          <Minus size={12} className="rounded-full text-white bg-blue-500" />
+          <ChevronDown
+            size={12}
+            className="rounded-full text-white bg-blue-500"
+          />
         ) : (
-          <Plus size={12} className="rounded-full" />
+          <ChevronRight size={12} className="rounded-full" />
         )}{" "}
         {/* Plus/Minus sign for expansion */}
       </span>
     ),
   },
   {
-    accessorKey: "status",
+    accessorKey: "kelas",
     header: "Kelas",
   },
   {
-    accessorKey: "email",
-    header: "Email",
+    accessorKey: "tanggal",
+    header: "Tanggal",
   },
   {
-    accessorKey: "amount",
-    header: "Amount",
+    accessorKey: "materi",
+    header: "Materi",
   },
 ];

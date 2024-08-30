@@ -1,30 +1,44 @@
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Book, Calendar, File, Plus, Users2 } from "lucide-react";
 import { DataTable } from "./kelas-data-table";
-import { columns, Payment } from "./kelas-table-columns";
+import { columns, Kelas } from "./kelas-table-columns";
 
 const KelasContainer = () => {
-  const data: Payment[] = [
+  const data: Kelas[] = [
     {
       id: "1",
-      amount: 1000,
-      status: "pending",
-      email: "asdsa@email.com",
+      kelas: "Kelas A",
+      tanggal: new Date(),
+      materi: "Materi A",
     },
     {
-      id: "2",
-      amount: 2000,
-      status: "processing",
-      email: "sdsd@asd.com",
+      id: "1",
+      kelas: "Kelas A",
+      tanggal: new Date(),
+      materi: "Materi A",
     },
   ];
 
   return (
-    <div>
-      <Button>
-        <Plus size={16} />
-        <span>Tambah Kelas</span>
-      </Button>
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-row gap-2">
+        <Button variant={"outline"}>
+          <Plus size={12} />
+          <span>Tambah Jadwal</span>
+          <Calendar size={16} />
+        </Button>
+        <Button variant={"outline"}>
+          <Plus size={12} />
+          <span>Tambah Kelas</span>
+          <Users2 size={16} />
+        </Button>
+        <Button variant={"outline"}>
+          <Plus size={12} />
+          <span>Tambah Materi</span>
+          <Book size={16} />
+        </Button>
+      </div>
+
       <div>
         <DataTable columns={columns} data={data} />
       </div>

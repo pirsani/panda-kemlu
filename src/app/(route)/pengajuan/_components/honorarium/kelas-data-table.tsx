@@ -73,14 +73,7 @@ export function DataTable<TData, TValue>({
                 {row.getIsExpanded() && (
                   <TableRow>
                     <TableCell colSpan={columns.length}>
-                      {row.getVisibleCells().map((cell) => (
-                        <div key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </div>
-                      ))}
+                      <DataTableJadwal />
                     </TableCell>
                   </TableRow>
                 )}
@@ -99,13 +92,27 @@ export function DataTable<TData, TValue>({
   );
 }
 
-export function DataTableJadwal<TData, TValue>({
-  columns,
-  data,
-}: DataTableProps<TData, TValue>) {
+// Nested table data and columns
+const nestedData = [
+  { id: "a1", order: "Order 1", amount: 100 },
+  { id: "a2", order: "Order 2", amount: 200 },
+];
+
+const nestedColumns = [
+  {
+    accessorKey: "order",
+    header: "Order",
+  },
+  {
+    accessorKey: "amount",
+    header: "Amount ($)",
+  },
+];
+
+export function DataTableJadwal() {
   const table = useReactTable({
-    data,
-    columns,
+    data: nestedData,
+    columns: nestedColumns,
     getCoreRowModel: getCoreRowModel(),
   });
   return (
