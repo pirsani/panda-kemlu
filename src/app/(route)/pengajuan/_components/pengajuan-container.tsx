@@ -28,7 +28,7 @@ const PengajuanContainer = () => {
     <div>
       <ButtonsPengajuan
         handleSelection={handleSelection}
-        lokasi={2}
+        lokasi={1}
         statusRampungan="sudah-ada"
       />
       {jenisPengajuan == "honorarium" && <HonorariumContainer />}
