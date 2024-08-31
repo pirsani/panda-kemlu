@@ -1,4 +1,5 @@
 import { dbHonorarium } from "@/lib/db-honorarium";
+import { Lokasi } from "@prisma-honorarium/client";
 import bcrypt from "bcryptjs"; // Import bcrypt for password hashing and comparison
 
 async function main() {
@@ -166,6 +167,104 @@ async function main() {
       {
         userId: "admin",
         roleId: "superadmin",
+      },
+    ],
+  });
+
+  await dbHonorarium.kegiatan.deleteMany({});
+  const kegiatan = await dbHonorarium.kegiatan.create({
+    data: {
+      nama: "Kegiatan DalamKota",
+      createdBy: "admin",
+      keterangan: "Kegiatan DalamKota",
+      tanggalMulai: new Date(),
+      tanggalSelesai: new Date(),
+      lokasi: Lokasi.DalamKota,
+      //unitKerjaId: "1",
+      status: "setup-kegiatan",
+    },
+  });
+
+  await dbHonorarium.kelas.deleteMany({});
+  const kelas = await dbHonorarium.kelas.createMany({
+    data: [
+      {
+        nama: "Kelas A",
+        createdBy: "init",
+        kode: "PDK-75-A",
+        kegiatanId: kegiatan.id,
+      },
+      {
+        nama: "Kelas B",
+        createdBy: "init",
+        kode: "PDK-75-B",
+        kegiatanId: kegiatan.id,
+      },
+    ],
+  });
+
+  const materi = await dbHonorarium.materi.createMany({
+    data: [
+      {
+        kode: "MPU-PDK-A001",
+        nama: "Entrepreurship in Digital Age",
+        createdBy: "init",
+      },
+      {
+        kode: "MPU-PDK-A002",
+        nama: "Digital Marketing",
+        createdBy: "init",
+      },
+      {
+        kode: "MPU-PDK-A003",
+        nama: "Digital Transformation",
+        createdBy: "init",
+      },
+      {
+        kode: "MPK-PDK-A004",
+        nama: "Digital Diplomacy",
+        createdBy: "init",
+      },
+
+      {
+        kode: "MPK-PDK-A005",
+        nama: "ASEAN: overview and challenges",
+        createdBy: "init",
+      },
+      {
+        kode: "MPK-PDK-A006",
+        nama: "OECD: cooperation and opportunities",
+        createdBy: "init",
+      },
+      {
+        kode: "MPK-PDK-A007",
+        nama: "ASEAN: regional security",
+        createdBy: "init",
+      },
+      {
+        kode: "MPK-PDK-A008",
+        nama: "ASEAN: economic integration",
+        createdBy: "init",
+      },
+      {
+        kode: "MPU-PID-A001",
+        nama: "Digital Economy",
+        createdBy: "init",
+      },
+      {
+        kode: "MPU-PID-A002",
+        nama: "Digital Governance",
+        createdBy: "init",
+      },
+      {
+        kode: "MPU-PID-A003",
+        nama: "Digital Society",
+        createdBy: "init",
+      },
+      {
+        kode: "MPU-PID-A004",
+        nama: "Digital Security",
+        createdBy: "init",
       },
     ],
   });

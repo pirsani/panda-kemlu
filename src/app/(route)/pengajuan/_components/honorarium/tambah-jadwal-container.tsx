@@ -24,6 +24,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Calendar, Plus, Users } from "lucide-react";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import SelectKelas from "./select-kelas";
 
 const TambahJadwalContainer = () => {
   const [open, setOpen] = useState(false);
@@ -71,7 +72,11 @@ const TambahJadwalContainer = () => {
                 <FormItem>
                   <FormLabel>Kelas</FormLabel>
                   <FormControl>
-                    <Input placeholder="[MPU-PDK-A001]" {...field} />
+                    <SelectKelas
+                      fullKey={field.name}
+                      onChange={field.onChange}
+                      value={field.value}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

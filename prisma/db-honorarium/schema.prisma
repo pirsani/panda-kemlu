@@ -243,24 +243,24 @@ enum Lokasi {
 }
 
 model Kegiatan {
-  id                Int                  @id @default(autoincrement())
+  id                Int                   @id @default(autoincrement())
   nama              String
-  aktif             Boolean
-  tanggalMulai      DateTime             @map("tanggal_mulai")
-  tanggalSelesai    DateTime             @map("tanggal_selesai")
+  tanggalMulai      DateTime              @map("tanggal_mulai")
+  tanggalSelesai    DateTime              @map("tanggal_selesai")
   lokasi            Lokasi // enum 0, 1, 2
-  provinsi          String
-  keterangan        String
-  createdBy         String               @map("created_by")
-  creator           User                 @relation(fields: [createdBy], references: [id], name: "kegiatan_creator")
-  createdAt         DateTime             @default(now()) @map("created_at")
-  updatedBy         String               @map("updated_by")
-  updater           User                 @relation(fields: [updatedBy], references: [id], name: "kegiatan_updater")
-  updatedAt         DateTime             @updatedAt @map("updated_at")
-  bendaharaId       Int                  @map("bendahara_id")
-  bendahara         PejabatPenandatangan @relation(fields: [bendaharaId], references: [id], name: "bendahara_kegiatan")
-  ppkId             Int                  @map("ppk_id")
-  ppk               PejabatPenandatangan @relation(fields: [ppkId], references: [id], name: "ppk_kegiatan")
+  provinsi          String?
+  keterangan        String?
+  status            String
+  createdBy         String                @map("created_by")
+  creator           User                  @relation(fields: [createdBy], references: [id], name: "kegiatan_creator")
+  createdAt         DateTime              @default(now()) @map("created_at")
+  updatedBy         String?               @map("updated_by")
+  updater           User?                 @relation(fields: [updatedBy], references: [id], name: "kegiatan_updater")
+  updatedAt         DateTime?             @updatedAt @map("updated_at")
+  bendaharaId       Int?                  @map("bendahara_id")
+  bendahara         PejabatPenandatangan? @relation(fields: [bendaharaId], references: [id], name: "bendahara_kegiatan")
+  ppkId             Int?                  @map("ppk_id")
+  ppk               PejabatPenandatangan? @relation(fields: [ppkId], references: [id], name: "ppk_kegiatan")
   dokumenSuratTugas DokumenSuratTugas[]
   pesertaKegiatan   PesertaKegiatan[]
   itinerary         Itinerary[]
@@ -401,10 +401,9 @@ model RiwayatProses {
 }
 
 model Kelas {
-  id         Int       @id
+  id         Int       @id @default(autoincrement())
   nama       String
   kode       String?
-  tanggal    DateTime?
   kegiatanId Int       @map("kegiatan_id")
   kegiatan   Kegiatan  @relation(fields: [kegiatanId], references: [id])
   createdBy  String    @map("created_by")
