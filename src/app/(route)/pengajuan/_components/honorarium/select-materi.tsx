@@ -1,9 +1,9 @@
 "use client";
-import { getOptionsKelas } from "@/actions/honorarium";
+import { getOptionsMateri } from "@/actions/honorarium";
 import { useEffect, useState } from "react";
 import Select, { SingleValue } from "react-select";
 
-interface SelectKelasProps {
+interface SelectMateriProps {
   inputId: string;
   onChange: (value: number | null) => void;
   value: number | null;
@@ -14,14 +14,14 @@ interface Option {
   label: string;
 }
 
-const SelectKelas = ({ inputId, onChange, value }: SelectKelasProps) => {
+const SelectMateri = ({ inputId, onChange, value }: SelectMateriProps) => {
   const [options, setOptions] = useState<Option[]>([]);
 
   useEffect(() => {
     const fetchOptions = async () => {
-      const optionKelas = await getOptionsKelas();
-      if (optionKelas) {
-        const mappedOptions = optionKelas.map((kelas) => ({
+      const optionMateri = await getOptionsMateri();
+      if (optionMateri) {
+        const mappedOptions = optionMateri.map((kelas) => ({
           value: kelas.value,
           label: kelas.label,
         }));
@@ -35,7 +35,6 @@ const SelectKelas = ({ inputId, onChange, value }: SelectKelasProps) => {
   return (
     <Select
       instanceId={inputId}
-      inputId={inputId} // Pass the inputId prop here
       options={options}
       isClearable
       onChange={(option: SingleValue<Option>) =>
@@ -53,4 +52,4 @@ const SelectKelas = ({ inputId, onChange, value }: SelectKelasProps) => {
   );
 };
 
-export default SelectKelas;
+export default SelectMateri;

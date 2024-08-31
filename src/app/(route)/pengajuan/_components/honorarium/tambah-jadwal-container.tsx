@@ -25,6 +25,7 @@ import { Calendar, Plus, Users } from "lucide-react";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import SelectKelas from "./select-kelas";
+import SelectMateri from "./select-materi";
 
 const TambahJadwalContainer = () => {
   const [open, setOpen] = useState(false);
@@ -70,10 +71,10 @@ const TambahJadwalContainer = () => {
               name="kelasId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Kelas</FormLabel>
+                  <FormLabel htmlFor="kelasId">Kelas</FormLabel>
                   <FormControl>
                     <SelectKelas
-                      fullKey={field.name}
+                      inputId={field.name}
                       onChange={field.onChange}
                       value={field.value}
                     />
@@ -87,11 +88,12 @@ const TambahJadwalContainer = () => {
               name="materiId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Materi</FormLabel>
+                  <FormLabel htmlFor="materiId">Materi</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Entrepreurship in Digital Age"
-                      {...field}
+                    <SelectMateri
+                      inputId={field.name}
+                      onChange={field.onChange}
+                      value={field.value}
                     />
                   </FormControl>
                   <FormMessage />
@@ -103,7 +105,6 @@ const TambahJadwalContainer = () => {
               name="tanggal"
               render={({ field }) => (
                 <FormItem>
-                  <label htmlFor="tanggal">Tanggal</label>
                   <InputDatePicker
                     name={field.name}
                     error={errors.tanggal}
