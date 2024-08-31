@@ -209,7 +209,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
           )}
         />
         {lokasi == 2 && <ItineraryContainer />}
-        {lokasi !== 2 && (
+        {lokasi != 2 && (
           <FormField
             control={form.control}
             name="provinsi"
