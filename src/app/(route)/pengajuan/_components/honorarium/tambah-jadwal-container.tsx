@@ -149,6 +149,9 @@ const TambahJadwalContainer = () => {
             />
             <DialogFooter>
               <Button type="submit">Simpan</Button>
+              <Button variant="outline" onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
             </DialogFooter>
           </form>
         </Form>
