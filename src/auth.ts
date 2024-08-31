@@ -7,7 +7,7 @@ import { UncomplexLoginSchema } from "./zod/schemas/login";
 export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
     signIn: "/",
-    error: "/auth/error",
+    //error: "/auth/error",
   },
   providers: [
     Credentials({
@@ -25,9 +25,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (validatedCredentials.success) {
           const { email, password } = validatedCredentials.data;
 
-          // logic to salt and hash password
-          const isValidPassword = await bcrypt.compare(password, password);
-
           // logic to verify if the user exists
           // user = await getUserFromDb(credentials.email, pwHash);
           const user = await getUser(email);
@@ -36,6 +33,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             // No user found, so this is their first attempt to login
             // meaning this is also the place you could do registration
             //throw new Error("User not found.");
+            return null;
+          }
+
+          // logic to salt and hash password
+          const isValidPassword = await bcrypt.compare(
+            password,
+            user.password?.toString() || ""
+          );
+
+          if (!isValidPassword) {
+            // Passwords don't match
             return null;
           }
 
