@@ -403,8 +403,8 @@ model RiwayatProses {
 model Kelas {
   id         Int       @id
   nama       String
-  kode       String
-  tanggal    DateTime
+  kode       String?
+  tanggal    DateTime?
   kegiatanId Int       @map("kegiatan_id")
   kegiatan   Kegiatan  @relation(fields: [kegiatanId], references: [id])
   createdBy  String    @map("created_by")

@@ -2,6 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Book, Calendar, File, Plus, Users2 } from "lucide-react";
 import { DataTable } from "./kelas-data-table";
 import { columns, Kelas } from "./kelas-table-columns";
+import TambahJadwalContainer from "./tambah-jadwal-container";
+import TambahKelasContainer from "./tambah-kelas-container";
+import TambahMateriContainer from "./tambah-materi-container";
 
 const KelasContainer = () => {
   const data: Kelas[] = [
@@ -22,21 +25,9 @@ const KelasContainer = () => {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-row gap-2">
-        <Button variant={"outline"}>
-          <Plus size={12} />
-          <span>Tambah Jadwal</span>
-          <Calendar size={16} />
-        </Button>
-        <Button variant={"outline"}>
-          <Plus size={12} />
-          <span>Tambah Kelas</span>
-          <Users2 size={16} />
-        </Button>
-        <Button variant={"outline"}>
-          <Plus size={12} />
-          <span>Tambah Materi</span>
-          <Book size={16} />
-        </Button>
+        <TambahJadwalContainer />
+        <TambahKelasContainer />
+        <TambahMateriContainer />
       </div>
 
       <div>
