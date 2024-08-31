@@ -1,6 +1,7 @@
 import FormFileUpload from "@/components/form/form-file-upload";
 import PdfPreview from "@/components/pdf-preview";
 import PdfPreviewContainer from "@/components/pdf-preview-container";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -51,21 +52,19 @@ const UhDalamNegeriContainer = ({ editId }: UhDalamNegeriContainerProps) => {
   const setFileUrl = useFileStore((state) => state.setFileUrl);
 
   const handleFileChange = (file: File | null) => {
-    const handleFileChange = (file: File | null) => {
-      if (file !== null) {
-        const fileUrl = URL.createObjectURL(file);
-        setFileUrl(fileUrl);
-      } else {
-        setFileUrl(null);
-      }
-    };
+    if (file !== null) {
+      const fileUrl = URL.createObjectURL(file);
+      setFileUrl(fileUrl);
+    } else {
+      setFileUrl(null);
+    }
   };
 
   return (
     <div>
       <h1>Uang Harian Dalam Negeri</h1>
-      <div className="flex flex-row">
-        <div>
+      <div className="flex flex-row border p-2 gap-2">
+        <div className="w-1/2">
           <Form {...form}>
             <form
               onSubmit={handleSubmit(onSubmit)}
@@ -76,9 +75,7 @@ const UhDalamNegeriContainer = ({ editId }: UhDalamNegeriContainerProps) => {
                 name="laporanKegiatan"
                 render={({ field }) => (
                   <FormItem>
-                    <label htmlFor="laporanKegiatan">
-                      Upload Nota Dinas/Memorandum/SK Tim
-                    </label>
+                    <label htmlFor="laporanKegiatan">laporan Kegiatan</label>
                     <FormControl>
                       <FormFileUpload
                         name={field.name}
@@ -95,9 +92,7 @@ const UhDalamNegeriContainer = ({ editId }: UhDalamNegeriContainerProps) => {
                 name="daftarHadir"
                 render={({ field }) => (
                   <FormItem>
-                    <label htmlFor="daftarHadir">
-                      Upload Nota Dinas/Memorandum/SK Tim
-                    </label>
+                    <label htmlFor="daftarHadir">Daftar Hadir</label>
                     <FormControl>
                       <FormFileUpload
                         name={field.name}
@@ -114,9 +109,7 @@ const UhDalamNegeriContainer = ({ editId }: UhDalamNegeriContainerProps) => {
                 name="dokumentasi"
                 render={({ field }) => (
                   <FormItem>
-                    <label htmlFor="dokumentasi">
-                      Upload Nota Dinas/Memorandum/SK Tim
-                    </label>
+                    <label htmlFor="dokumentasi">Dokumentasi</label>
                     <FormControl>
                       <FormFileUpload
                         name={field.name}
@@ -133,9 +126,7 @@ const UhDalamNegeriContainer = ({ editId }: UhDalamNegeriContainerProps) => {
                 name="rampungan"
                 render={({ field }) => (
                   <FormItem>
-                    <label htmlFor="rampungan">
-                      Upload Nota Dinas/Memorandum/SK Tim
-                    </label>
+                    <label htmlFor="rampungan">Rampungan yang distempel</label>
                     <FormControl>
                       <FormFileUpload
                         name={field.name}
@@ -150,9 +141,12 @@ const UhDalamNegeriContainer = ({ editId }: UhDalamNegeriContainerProps) => {
             </form>
           </Form>
         </div>
-        <div>
-          <PdfPreviewContainer />
+        <div className="w-1/2">
+          <PdfPreviewContainer className="w-full h-full" />
         </div>
+      </div>
+      <div>
+        <Button>Ajukan</Button>
       </div>
     </div>
   );

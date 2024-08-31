@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { JenisPengajuan } from "@/types";
+import { useState } from "react";
 
 interface ButtonsPengajuanProps {
   handleSelection: (jenis: JenisPengajuan) => void;
@@ -12,23 +14,45 @@ const ButtonsPengajuan = ({
   lokasi,
   statusRampungan,
 }: ButtonsPengajuanProps) => {
+  const [jenisPengajuan, setJenisPengajuan] = useState<JenisPengajuan | null>();
+
+  const handleOnClick = (jenis: JenisPengajuan) => {
+    setJenisPengajuan(jenis);
+    handleSelection(jenis);
+  };
+
   return (
     <div className="flex flex-wrap gap-2">
       <Button
         variant="outline"
-        onClick={() => handleSelection("generate-rampungan")}
+        onClick={() => handleOnClick("generate-rampungan")}
         disabled={statusRampungan == "sudah-ada"}
+        className={cn(
+          "hover:bg-blue-400 hover:text-white",
+          jenisPengajuan == "generate-rampungan" && "bg-blue-500 text-white"
+        )}
       >
         Ajukan Generate Rampungan
       </Button>
-      <Button variant="outline" onClick={() => handleSelection("honorarium")}>
+      <Button
+        variant="outline"
+        onClick={() => handleOnClick("honorarium")}
+        className={cn(
+          "hover:bg-blue-400 hover:text-white",
+          jenisPengajuan == "honorarium" && "bg-blue-500 text-white"
+        )}
+      >
         Ajukan Honorarium
       </Button>
       {lokasi != 2 && (
         <Button
           variant="outline"
-          onClick={() => handleSelection("uh-dalam-negeri")}
+          onClick={() => handleOnClick("uh-dalam-negeri")}
           disabled={statusRampungan == "belum-ada"}
+          className={cn(
+            "hover:bg-blue-400 hover:text-white",
+            jenisPengajuan == "uh-dalam-negeri" && "bg-blue-500 text-white"
+          )}
         >
           Ajukan UH Dalam Negeri
         </Button>
@@ -36,8 +60,12 @@ const ButtonsPengajuan = ({
       {lokasi == 2 && (
         <Button
           variant="outline"
-          onClick={() => handleSelection("uh-luar-negeri")}
+          onClick={() => handleOnClick("uh-luar-negeri")}
           disabled={statusRampungan == "belum-ada"}
+          className={cn(
+            "hover:bg-blue-400 hover:text-white",
+            jenisPengajuan == "uh-luar-negeri" && "bg-blue-500 text-white"
+          )}
         >
           Ajukan UH Luar Negeri
         </Button>
@@ -45,13 +73,22 @@ const ButtonsPengajuan = ({
 
       <Button
         variant="outline"
-        onClick={() => handleSelection("penggantian-reinbursement")}
+        onClick={() => handleOnClick("penggantian-reinbursement")}
+        className={cn(
+          "hover:bg-blue-400 hover:text-white",
+          jenisPengajuan == "penggantian-reinbursement" &&
+            "bg-blue-500 text-white"
+        )}
       >
         Ajukan Penggantian/Reinbursement
       </Button>
       <Button
         variant="outline"
-        onClick={() => handleSelection("pembayaran-pihak-ke-3")}
+        onClick={() => handleOnClick("pembayaran-pihak-ke-3")}
+        className={cn(
+          "hover:bg-blue-400 hover:text-white",
+          jenisPengajuan == "pembayaran-pihak-ke-3" && "bg-blue-500 text-white"
+        )}
       >
         Ajukan Pembayaran Pihak Ke-3
       </Button>

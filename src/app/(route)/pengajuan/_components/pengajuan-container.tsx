@@ -26,9 +26,14 @@ const PengajuanContainer = () => {
 
   return (
     <div>
+      <div className="h-[500px] bg-gray-300">
+        <h1>Kegiatan</h1>
+        <div></div>
+      </div>
+
       <ButtonsPengajuan
         handleSelection={handleSelection}
-        lokasi={1}
+        lokasi={2}
         statusRampungan="sudah-ada"
       />
       {jenisPengajuan == "honorarium" && <HonorariumContainer />}
@@ -39,7 +44,7 @@ const PengajuanContainer = () => {
       )}
       {jenisPengajuan == "pembayaran-pihak-ke-3" && <PihakKe3Container />}
 
-      <UpdateFlow initKegiatan={kegiatan} />
+      {/* <UpdateFlow initKegiatan={kegiatan} /> */}
     </div>
   );
 };
