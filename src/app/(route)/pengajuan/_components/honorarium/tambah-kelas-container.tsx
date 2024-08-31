@@ -72,7 +72,7 @@ const TambahKelasContainer = () => {
                 <FormItem>
                   <FormLabel>Kode</FormLabel>
                   <FormControl>
-                    <Input placeholder="[MPK-PDK-A001]" {...field} />
+                    <Input placeholder="[PDK-75-A]" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

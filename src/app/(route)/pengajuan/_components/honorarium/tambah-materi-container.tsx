@@ -8,13 +8,42 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Materi, materiSchema } from "@/zod/schemas/materi";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Calendar, Plus, Users } from "lucide-react";
+import { useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 const TambahMateriContainer = () => {
+  const [open, setOpen] = useState(false);
+  const form = useForm<Materi>({
+    resolver: zodResolver(materiSchema),
+  });
+
+  const {
+    handleSubmit,
+    formState: { errors },
+  } = form;
+
+  const onSubmit: SubmitHandler<Materi> = async (data) => {
+    console.log(data);
+    // Call API to save data
+    // Close dialog
+    setOpen(false);
+  };
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant={"outline"}>
           <Plus size={12} />
@@ -29,27 +58,45 @@ const TambahMateriContainer = () => {
             Isi form di bawah untuk menambahkan materi baru
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="kode" className="text-right">
-              Kode
-            </Label>
-            <Input id="kode" placeholder="[MK-01-001]" className="col-span-3" />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="nama" className="text-right">
-              Nama
-            </Label>
-            <Input
-              id="nama"
-              placeholder="Entreprenurship"
-              className="col-span-3"
+        <Form {...form}>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col gap-4"
+          >
+            <FormField
+              control={form.control}
+              name="kode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Kode</FormLabel>
+                  <FormControl>
+                    <Input placeholder="[MPU-PDK-A001]" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-        </div>
-        <DialogFooter>
-          <Button type="submit">Simpan</Button>
-        </DialogFooter>
+            <FormField
+              control={form.control}
+              name="nama"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Kode</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Entrepreurship in Digital Age"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <DialogFooter>
+              <Button type="submit">Simpan</Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
