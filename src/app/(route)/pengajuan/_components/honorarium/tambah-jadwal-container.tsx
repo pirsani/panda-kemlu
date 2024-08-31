@@ -105,6 +105,7 @@ const TambahJadwalContainer = () => {
               name="tanggal"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel htmlFor="tanggal">Materi</FormLabel>
                   <InputDatePicker
                     name={field.name}
                     error={errors.tanggal}

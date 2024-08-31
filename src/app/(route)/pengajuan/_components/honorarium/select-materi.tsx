@@ -35,6 +35,7 @@ const SelectMateri = ({ inputId, onChange, value }: SelectMateriProps) => {
   return (
     <Select
       instanceId={inputId}
+      inputId={inputId} // Pass the inputId prop here ""
       options={options}
       isClearable
       onChange={(option: SingleValue<Option>) =>
