@@ -76,6 +76,7 @@ const TambahJadwalContainer = () => {
                   <FormItem className="w-64">
                     <FormLabel htmlFor="tanggal">Tanggal</FormLabel>
                     <InputDatePicker
+                      tabIndex={0}
                       name={field.name}
                       error={errors.tanggal}
                       className="md:w-full"

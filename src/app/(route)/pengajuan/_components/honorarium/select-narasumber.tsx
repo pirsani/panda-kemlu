@@ -2,13 +2,19 @@
 
 import { getOptionsNarasumber } from "@/actions/honorarium";
 import { useEffect, useState } from "react";
-import Select, { ActionMeta, MultiValue, SingleValue } from "react-select";
+import Select, {
+  ActionMeta,
+  InputActionMeta,
+  MultiValue,
+  SingleValue,
+} from "react-select";
 
 interface SelectNarasumberProps {
   inputId: string;
   onChange: (values: string[] | string | null) => void;
   values: string[] | string | null;
   isMulti: boolean;
+  tabIndex?: number;
 }
 
 interface Option {
@@ -21,9 +27,11 @@ const SelectNarasumber = ({
   onChange,
   values,
   isMulti,
+  tabIndex = 0,
 }: SelectNarasumberProps) => {
   const [options, setOptions] = useState<Option[]>([]);
   const [inputValue, setInputValue] = useState(""); // State for managing input value
+  const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
 
   useEffect(() => {
     // Fetch options from the backend
@@ -57,15 +65,17 @@ const SelectNarasumber = ({
     onChange(newValue); // Pass the updated values to the parent component
 
     // Reset input value on select for single select mode
-    if (!isMulti) {
-      setInputValue("");
-    }
+    // if (!isMulti) {
+    //   setInputValue("");
+    // }
+    setInputValue("");
   };
 
   // Function to handle input value changes
-  const handleInputChange = (value: string, actionMeta: ActionMeta<Option>) => {
+  const handleInputChange = (value: string, actionMeta: InputActionMeta) => {
     if (actionMeta.action === "input-change") {
       setInputValue(value);
+      setMenuIsOpen(true);
     }
   };
 
@@ -88,11 +98,18 @@ const SelectNarasumber = ({
       onInputChange={handleInputChange}
       inputValue={inputValue}
       value={selectedValue}
-      filterOption={(option, inputValue) =>
-        option.label.toLowerCase().includes(inputValue.toLowerCase())
-      }
+      filterOption={(option, inputValue) => {
+        if (inputValue.trim() === "" && !menuIsOpen) {
+          return false; // Do not show any options if input is empty
+        }
+        return option.label.toLowerCase().includes(inputValue.toLowerCase());
+      }}
       onBlur={() => setInputValue("")} // Reset input when the dropdown loses focus
+      onMenuOpen={() => setMenuIsOpen(true)} // Open menu when chevron is clicked
+      onMenuClose={() => setMenuIsOpen(false)} // Close menu when it loses focus
+      tabSelectsValue={inputValue.trim() !== ""} // Prevent tab from selecting the highlighted option when input is empty
       styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }} // Ensures the dropdown menu is visible even with complex layouts
+      tabIndex={tabIndex}
     />
   );
 };

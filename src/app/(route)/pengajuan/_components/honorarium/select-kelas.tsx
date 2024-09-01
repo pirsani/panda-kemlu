@@ -19,9 +19,6 @@ const SelectKelas = ({
   onChange = () => {},
   value,
 }: SelectKelasProps) => {
-  const [menuPortalTarget, setMenuPortalTarget] = useState<HTMLElement | null>(
-    null
-  );
   const [options, setOptions] = useState<Option[]>([]);
   const [selectedOption, setSelectedOption] = useState<Option | null>(null);
 
@@ -54,10 +51,6 @@ const SelectKelas = ({
     onChange(selected ? selected.value : null);
   };
 
-  useEffect(() => {
-    // This will only run on the client side
-    setMenuPortalTarget(document.body);
-  }, []);
   return (
     <Select
       instanceId={inputId}
@@ -66,7 +59,6 @@ const SelectKelas = ({
       onChange={handleChange}
       options={options}
       isClearable
-      menuPortalTarget={menuPortalTarget} // Use state which is set after component mounts
       styles={{
         menuPortal: (base) => ({ ...base, zIndex: 9999 }),
       }}

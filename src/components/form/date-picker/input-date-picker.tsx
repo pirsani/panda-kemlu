@@ -34,6 +34,7 @@ interface DatePickerProps {
   className?: string;
   withYmPicker?: boolean;
   onSelect?: (date: Date) => void;
+  tabIndex?: number;
 }
 
 export type InputDatePickerProps = DatePickerProps & CalendarProps;
@@ -53,6 +54,7 @@ const InputDatePicker = ({
   className,
   withYmPicker = true,
   onSelect,
+  tabIndex = 0,
   ...props
 }: InputDatePickerProps) => {
   const {
@@ -65,6 +67,14 @@ const InputDatePicker = ({
   const [date, setDate] = useState<Date | undefined>(calendarOptions.date);
   const [ymDate, setYmDate] = useState<Date | undefined>(date);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+  const handleFocus = () => {
+    setIsPopoverOpen(true);
+  };
+
+  const handleBlur = () => {
+    setIsPopoverOpen(false);
+  };
 
   const handleSelect: SelectSingleEventHandler = (newDate) => {
     setDate(newDate ?? date);
@@ -98,6 +108,9 @@ const InputDatePicker = ({
                 control={control}
                 render={({ field }) => (
                   <input
+                    tabIndex={tabIndex}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
                     placeholder="yyyy-mm-dd"
                     readOnly
                     required
