@@ -19,11 +19,17 @@ import kegiatanSchema, {
   kegiatanSchemaEditMode,
 } from "@/zod/schemas/kegiatan";
 import { zodResolver } from "@hookform/resolvers/zod";
+import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import ItineraryContainer from "./itinerary-container";
 import PesertaContainer from "./peserta-container";
-import SelectSbmProvinsi from "./select-sbm-provinsi";
+//import SelectSbmProvinsi from "./select-sbm-provinsi";
+
+const SelectSbmProvinsi = dynamic(() => import("./select-sbm-provinsi"), {
+  ssr: false,
+  loading: () => <p>Loading provinsi...</p>,
+});
 
 type FormValues<T> = T extends true ? KegiatanEditMode : Kegiatan;
 
