@@ -34,7 +34,6 @@ interface DatePickerProps {
   className?: string;
   withYmPicker?: boolean;
   onSelect?: (date: Date) => void;
-  tabIndex?: number;
 }
 
 export type InputDatePickerProps = DatePickerProps & CalendarProps;
@@ -54,8 +53,6 @@ const InputDatePicker = ({
   className,
   withYmPicker = true,
   onSelect,
-  tabIndex = 0,
-  ...props
 }: InputDatePickerProps) => {
   const {
     control,
@@ -108,7 +105,6 @@ const InputDatePicker = ({
                 control={control}
                 render={({ field }) => (
                   <input
-                    tabIndex={tabIndex}
                     onFocus={handleFocus}
                     onBlur={handleBlur}
                     placeholder="yyyy-mm-dd"

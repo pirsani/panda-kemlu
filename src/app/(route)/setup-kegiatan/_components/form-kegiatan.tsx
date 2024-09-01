@@ -1,4 +1,6 @@
 "use client";
+import BasicDatePicker from "@/components/form/date-picker/basic-date-picker";
+import FocusableDatePicker from "@/components/form/date-picker/focusable-date-picker";
 import InputDatePicker from "@/components/form/date-picker/input-date-picker";
 import FormFileUpload from "@/components/form/form-file-upload";
 import { FormMultiFileUpload } from "@/components/form/form-multifile-upload";
@@ -48,6 +50,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
       lokasi: 0, // Default value for lokasi atau nantinya bisa diisi dari data yang sudah ada klo mode edit
       provinsi: 24, // Default value for provinsi atau nantinya bisa diisi dari data yang sudah ada klo mode edit
     },
+    //reValidateMode: "onChange",
   });
 
   const {
@@ -55,6 +58,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
     handleSubmit,
     formState: { errors },
     watch,
+    trigger,
   } = form;
 
   const onSubmit: SubmitHandler<FormValues<FormMode>> = async (data) => {
@@ -114,7 +118,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             <FormItem>
               <FormLabel>Nama Kegiatan</FormLabel>
               <FormControl>
-                <Input placeholder="nama kegiatan" {...field} />
+                <Input placeholder="nama kegiatan" {...field} tabIndex={0} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -126,16 +130,19 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             name="tanggalMulai"
             render={({ field }) => (
               <FormItem>
-                <label htmlFor="tanggalMulai">Tanggal Mulai</label>
-                <InputDatePicker
-                  name={field.name}
-                  error={errors.tanggalMulai}
-                  className="md:w-full"
-                  calendarOptions={{
-                    fromDate: new Date(new Date().getFullYear(), 0, 1),
-                    toDate: new Date(new Date().getFullYear(), 11, 31),
-                  }}
-                />
+                <FormLabel htmlFor="tanggalMulai">Tanggal Mulai</FormLabel>
+                <FormControl>
+                  <BasicDatePicker
+                    name={field.name}
+                    error={errors.tanggalMulai}
+                    className="md:w-full"
+                    calendarOptions={{
+                      fromDate: new Date(new Date().getFullYear(), 0, 1),
+                      toDate: new Date(new Date().getFullYear(), 11, 31),
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -144,16 +151,19 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             name="tanggalSelesai"
             render={({ field }) => (
               <FormItem>
-                <label htmlFor="tanggalSelesai">Tanggal Selesai</label>
-                <InputDatePicker
-                  name={field.name}
-                  error={errors.tanggalSelesai}
-                  className="md:w-full"
-                  calendarOptions={{
-                    fromDate: new Date(new Date().getFullYear(), 0, 1),
-                    toDate: new Date(new Date().getFullYear(), 11, 31),
-                  }}
-                />
+                <FormLabel htmlFor="tanggalSelesai">Tanggal Selesai</FormLabel>
+                <FormControl>
+                  <BasicDatePicker
+                    name={field.name}
+                    error={errors.tanggalSelesai}
+                    className="md:w-full"
+                    calendarOptions={{
+                      fromDate: new Date(new Date().getFullYear(), 0, 1),
+                      toDate: new Date(new Date().getFullYear(), 11, 31),
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -163,9 +173,9 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
           name="dokumenSurat"
           render={({ field }) => (
             <FormItem>
-              <label htmlFor="dokumenSurat">
+              <FormLabel htmlFor="dokumenSurat">
                 Upload Nota Dinas/Memorandum/SK Tim
-              </label>
+              </FormLabel>
               <FormControl>
                 <FormFileUpload
                   name={field.name}
@@ -182,9 +192,9 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
           name="dokumenJadwal"
           render={({ field }) => (
             <FormItem>
-              <label htmlFor="dokumenJadwal">
+              <FormLabel htmlFor="dokumenJadwal">
                 Upload Nota Dinas/Memorandum/SK Tim
-              </label>
+              </FormLabel>
               <FormControl>
                 <FormFileUpload
                   name={field.name}
@@ -204,7 +214,11 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
               <FormLabel htmlFor={field.name}>
                 Surat Tugas (multiple files)
               </FormLabel>
-              <FormControl>
+              <FormControl
+                onBlur={() => {
+                  trigger(field.name);
+                }}
+              >
                 <FormMultiFileUpload
                   name={field.name}
                   onFileChange={handleMultiFileChange}
@@ -220,7 +234,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
           name="lokasi"
           render={({ field }) => (
             <FormItem>
-              <label htmlFor={field.name}>Lokasi</label>
+              <FormLabel htmlFor={field.name}>Lokasi</FormLabel>
               <FormControl>
                 <select
                   id="lokasi"
@@ -249,7 +263,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             name="provinsi"
             render={({ field }) => (
               <FormItem>
-                <label htmlFor={field.name}>Provinsi</label>
+                <FormLabel htmlFor={field.name}>Provinsi</FormLabel>
                 <FormControl>
                   <SelectSbmProvinsi
                     fullKey={field.name}
