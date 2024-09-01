@@ -137,7 +137,7 @@ const FormNarasumber = ({
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} autoComplete="off" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -204,7 +204,7 @@ const FormNarasumber = ({
           control={control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>
+              <FormLabel htmlFor={field.name}>
                 Pernyataan Beda Rekening (jika nama berbeda)
               </FormLabel>
               <FormControl>
