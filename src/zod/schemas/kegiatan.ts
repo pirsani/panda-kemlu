@@ -16,6 +16,9 @@ export const baseKegiatanSchema = z.object({
   provinsi: z.number(),
   dokumenSurat: fileSchema({ required: true }),
   dokumenJadwal: fileSchema({ required: true }),
+  dokumentSuratTugas: z
+    .array(fileSchema())
+    .nonempty("At least one file is required"), // array of files
 });
 
 // Apply the refine method to add custom validation

@@ -1,6 +1,7 @@
 "use client";
 import InputDatePicker from "@/components/form/date-picker/input-date-picker";
 import FormFileUpload from "@/components/form/form-file-upload";
+import { FormMultiFileUpload } from "@/components/form/form-multifile-upload";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -70,6 +71,14 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
       setFileUrl(fileUrl);
     } else {
       setFileUrl(null);
+    }
+  };
+
+  const handleMultiFileChange = (file: File[] | null) => {
+    if (file !== null) {
+      //save to state
+    } else {
+      //setFileUrl(null);
     }
   };
 
@@ -180,6 +189,25 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
                 <FormFileUpload
                   name={field.name}
                   onFileChange={handleFileChange}
+                  className="bg-white"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="dokumentSuratTugas"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel htmlFor={field.name}>
+                Surat Tugas (multiple files)
+              </FormLabel>
+              <FormControl>
+                <FormMultiFileUpload
+                  name={field.name}
+                  onFileChange={handleMultiFileChange}
                   className="bg-white"
                 />
               </FormControl>

@@ -7,6 +7,13 @@ export const getKegiatan = async (kegiatan?: string) => {
   return dataKegiatan;
 };
 
+export const getKegiatanById = async (id: number) => {
+  const kegiatan = await dbHonorarium.kegiatan.findUnique({
+    where: { id },
+  });
+  return kegiatan;
+};
+
 export const getOptionsKegiatan = async () => {
   const dataKegiatan = await dbHonorarium.kegiatan.findMany({});
   // map dataKegiatan to options
