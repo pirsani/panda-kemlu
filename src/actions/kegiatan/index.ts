@@ -11,6 +11,8 @@ export const getKegiatanById = async (id: number) => {
   const kegiatan = await dbHonorarium.kegiatan.findUnique({
     where: { id },
   });
+
+  console.log(kegiatan);
   return kegiatan;
 };
 

@@ -21,7 +21,7 @@ const PdfViewerSkeleton = ({
   <div
     className={cn(
       "pdf-viewer-skeleton w-full bg-gray-200 ",
-      isLoading && "h-96 animate-pulse",
+      isLoading && "min-h-24 max-h-96 animate-pulse",
       className && className
     )}
   >

@@ -86,10 +86,9 @@ export const FormMultiFileUpload = ({
           type="button"
           variant={"outline"}
           className="w-60 h-12 shadow-lg border-2 border-gray-300"
+          onClick={() => inputRef.current?.click()}
         >
-          <FormLabel htmlFor={name} className="cursor-pointer">
-            <span>Add Files </span>
-          </FormLabel>
+          Add Files
         </Button>
 
         {currentFiles && currentFiles?.length > 0 && (

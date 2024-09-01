@@ -245,30 +245,32 @@ enum Lokasi {
 }
 
 model Kegiatan {
-  id                Int                   @id @default(autoincrement())
-  nama              String
-  tanggalMulai      DateTime              @map("tanggal_mulai")
-  tanggalSelesai    DateTime              @map("tanggal_selesai")
-  lokasi            Lokasi // enum 0, 1, 2
-  provinsi          String?
-  keterangan        String?
-  status            String
-  createdBy         String                @map("created_by")
-  creator           User                  @relation(fields: [createdBy], references: [id], name: "kegiatan_creator")
-  createdAt         DateTime              @default(now()) @map("created_at")
-  updatedBy         String?               @map("updated_by")
-  updater           User?                 @relation(fields: [updatedBy], references: [id], name: "kegiatan_updater")
-  updatedAt         DateTime?             @updatedAt @map("updated_at")
-  bendaharaId       Int?                  @map("bendahara_id")
-  bendahara         PejabatPenandatangan? @relation(fields: [bendaharaId], references: [id], name: "bendahara_kegiatan")
-  ppkId             Int?                  @map("ppk_id")
-  ppk               PejabatPenandatangan? @relation(fields: [ppkId], references: [id], name: "ppk_kegiatan")
-  dokumenSuratTugas DokumenSuratTugas[]
-  pesertaKegiatan   PesertaKegiatan[]
-  itinerary         Itinerary[]
-  riwayatProses     RiwayatProses[]
-  kelas             Kelas[]
-  dokumenKegiatan   DokumenKegiatan[]
+  id                 Int                   @id @default(autoincrement())
+  nama               String
+  tanggalMulai       DateTime              @map("tanggal_mulai")
+  tanggalSelesai     DateTime              @map("tanggal_selesai")
+  dokumenNodinMemoSk String                @map("dokumen_nodin_memo_sk")
+  dokumenJadwal      String                @map("dokumen_jadwal")
+  lokasi             Lokasi // enum 0, 1, 2
+  provinsi           String?
+  keterangan         String?
+  status             String
+  createdBy          String                @map("created_by")
+  creator            User                  @relation(fields: [createdBy], references: [id], name: "kegiatan_creator")
+  createdAt          DateTime              @default(now()) @map("created_at")
+  updatedBy          String?               @map("updated_by")
+  updater            User?                 @relation(fields: [updatedBy], references: [id], name: "kegiatan_updater")
+  updatedAt          DateTime?             @updatedAt @map("updated_at")
+  bendaharaId        Int?                  @map("bendahara_id")
+  bendahara          PejabatPenandatangan? @relation(fields: [bendaharaId], references: [id], name: "bendahara_kegiatan")
+  ppkId              Int?                  @map("ppk_id")
+  ppk                PejabatPenandatangan? @relation(fields: [ppkId], references: [id], name: "ppk_kegiatan")
+  dokumenSuratTugas  DokumenSuratTugas[]
+  pesertaKegiatan    PesertaKegiatan[]
+  itinerary          Itinerary[]
+  riwayatProses      RiwayatProses[]
+  kelas              Kelas[]
+  dokumenKegiatan    DokumenKegiatan[]
 
   @@map("kegiatan")
 }

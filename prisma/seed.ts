@@ -173,6 +173,36 @@ async function main() {
     ],
   });
 
+  const kegiatanLuarKota = await dbHonorarium.kegiatan.create({
+    data: {
+      nama: "Kegiatan LuarKota",
+      createdBy: "admin",
+      keterangan: "Kegiatan LuarKota",
+      tanggalMulai: new Date(),
+      tanggalSelesai: new Date(),
+      lokasi: Lokasi.LuarKota,
+      dokumenNodinMemoSk: "123456789.pdf",
+      dokumenJadwal: "123456789.pdf",
+      //unitKerjaId: "1",
+      status: "setup-kegiatan",
+    },
+  });
+
+  const kegiatanLuarNegeri = await dbHonorarium.kegiatan.create({
+    data: {
+      nama: "Kegiatan Luar Negeri",
+      createdBy: "admin",
+      keterangan: "Kegiatan Luar Negeri",
+      tanggalMulai: new Date(),
+      tanggalSelesai: new Date(),
+      lokasi: Lokasi.LuarNegeri,
+      dokumenNodinMemoSk: "123456789.pdf",
+      dokumenJadwal: "123456789.pdf",
+      //unitKerjaId: "1",
+      status: "setup-kegiatan",
+    },
+  });
+
   const kegiatan = await dbHonorarium.kegiatan.create({
     data: {
       nama: "Kegiatan DalamKota",
@@ -181,6 +211,8 @@ async function main() {
       tanggalMulai: new Date(),
       tanggalSelesai: new Date(),
       lokasi: Lokasi.DalamKota,
+      dokumenNodinMemoSk: "123456789.pdf",
+      dokumenJadwal: "123456789.pdf",
       //unitKerjaId: "1",
       status: "setup-kegiatan",
     },
