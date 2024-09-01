@@ -1,6 +1,14 @@
 import { cn } from "@/lib/utils";
-import { ChevronDown, Maximize, Minimize } from "lucide-react"; // Import icons from lucide-react
-import React, { MouseEvent, useEffect, useRef, useState } from "react";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  Maximize,
+  Minimize,
+  Minus,
+} from "lucide-react"; // Import icons from lucide-react
+import React, { MouseEvent, use, useEffect, useRef, useState } from "react";
 
 interface ResizableDraggableProps {
   children?: React.ReactNode;
@@ -11,7 +19,7 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
 }) => {
   const [position, setPosition] = useState({ x: 750, y: 100 });
   const [size, setSize] = useState({ width: 750, height: 600 });
-  const [isMaximized, setIsMaximized] = useState(false);
+  const [isFixed, setIsFixed] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const resizableRef = useRef<HTMLDivElement | null>(null);
   const isDragging = useRef(false);
@@ -36,7 +44,7 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
       const deltaX = e.clientX - initialMousePosition.current.x;
       const deltaY = e.clientY - initialMousePosition.current.y;
 
-      if (!isMaximized) {
+      if (!isFixed) {
         setPosition((prevPosition) => ({
           x: Math.max(
             0,
@@ -129,17 +137,35 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
   // Handle Minimize
   const handleMinimize = () => {
     setIsMinimized(true);
-    setIsMaximized(false);
-    setSize({ width: 600, height: 500 }); // Set minimized size
+    setIsFixed(false);
+    setSize({ width: 600, height: 750 }); // Set minimized size
     setPosition({ x: 750, y: 80 });
   };
 
   // Handle Restore to Normal Size
   const handleRestore = () => {
-    setIsMaximized(false);
+    setIsFixed(false);
     setIsMinimized(false);
-    setSize({ width: 600, height: window.innerHeight - 100 });
-    setPosition({ x: 750, y: 80 });
+    setSize({
+      width: window.innerWidth - 200,
+      height: window.innerHeight - 100,
+    });
+    setPosition({ x: 100, y: 80 });
+  };
+
+  const handleFix = () => {
+    setIsFixed(true);
+    setIsMinimized(false);
+    setSize({ width: window.innerWidth - 200, height: 350 }); // Set minimized size
+    setPosition({ x: 100, y: 80 });
+  };
+
+  const handleSmall = () => {
+    setIsFixed(false);
+    setIsMinimized(true);
+    setSize({ width: 300, height: 250 }); // Set minimized size
+
+    setPosition({ x: window.innerWidth - 350, y: 80 });
   };
 
   // Attach React event handlers
@@ -175,9 +201,13 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
     };
   }, [size, position]);
 
+  useEffect(() => {
+    handleMinimize();
+  }, []);
+
   // Determine if the component should use fixed positioning
   const shouldUseAbsolutePosition =
-    (!isMaximized && size.width >= window.innerWidth - 40) ||
+    (!isFixed && size.width >= window.innerWidth - 40) ||
     size.height >= window.innerHeight - 40;
 
   return (
@@ -220,18 +250,46 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
               <Minimize size={16} className="text-green-600" />
             )}
           </button>
+          <button
+            className="hover:bg-yellow-200 p-1 rounded-full"
+            onClick={() => (isFixed ? handleRestore() : handleFix())}
+            aria-label="Maximize"
+          >
+            <ChevronLeft
+              size={16}
+              className="transform transition-transform text-green-600"
+              style={{
+                transform: isFixed ? "rotate(180deg)" : "rotate(270deg)",
+              }}
+            />
+          </button>
+          <button
+            className="hover:bg-yellow-200 p-1 rounded-full"
+            onClick={() => (handleSmall(), console.log("small"))}
+            aria-label="Maximize"
+          >
+            <Minus
+              size={16}
+              className="transform transition-transform text-green-600"
+            />
+          </button>
         </div>
       </div>
 
       {/* Resizable Content Area */}
       <div
-        className={cn(
-          "w-full h-full overflow-hidden",
-          { "h-64": isMinimized },
-          { "flex flex-col": !isMinimized }
-        )}
+        className={cn("overflow-auto flex flex-col h-full w-full bg-gray-100")}
       >
         {children}
+        {/* <div
+          className={cn(
+            "overflow-auto bg-gray-400 h-8 text-green-400 -mt-10",
+            { " ": isMinimized },
+            { "flex flex-auto ": isFixed }
+          )}
+        >
+          {isFixed ? "fixed" : " "} {isMinimized ? "minimized" : " "}
+        </div> */}
       </div>
 
       {/* Resizers */}

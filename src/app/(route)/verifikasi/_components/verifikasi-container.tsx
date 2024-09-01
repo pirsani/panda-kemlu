@@ -24,9 +24,7 @@ const VerifikasiContainer = () => {
         <PreviewKegiatan id={kegiatan} className="w-1/2 " />
       </div>
       <FloatingComponent>
-        <div className="w-full border-2 ">
-          <PdfPreviewContainer className="border-2 border-gray-500" />
-        </div>
+        <PdfPreviewContainer className="border-2 h-full border-gray-500" />
       </FloatingComponent>
     </div>
   );
