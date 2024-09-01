@@ -147,6 +147,8 @@ async function main() {
   });
 
   // Truncate the table
+  await dbHonorarium.kelas.deleteMany({});
+  await dbHonorarium.kegiatan.deleteMany({});
   await dbHonorarium.user.deleteMany({});
   const pass = bcrypt.hashSync("123456", 10);
   const user = await dbHonorarium.user.createMany({
@@ -171,7 +173,6 @@ async function main() {
     ],
   });
 
-  await dbHonorarium.kegiatan.deleteMany({});
   const kegiatan = await dbHonorarium.kegiatan.create({
     data: {
       nama: "Kegiatan DalamKota",
@@ -185,7 +186,6 @@ async function main() {
     },
   });
 
-  await dbHonorarium.kelas.deleteMany({});
   const kelas = await dbHonorarium.kelas.createMany({
     data: [
       {
@@ -203,68 +203,234 @@ async function main() {
     ],
   });
 
+  await dbHonorarium.materi.deleteMany({});
+
   const materi = await dbHonorarium.materi.createMany({
     data: [
       {
-        kode: "MPU-PDK-A001",
+        kode: "PDK-A001",
         nama: "Entrepreurship in Digital Age",
         createdBy: "init",
       },
       {
-        kode: "MPU-PDK-A002",
+        kode: "PDK-A002",
         nama: "Digital Marketing",
         createdBy: "init",
       },
       {
-        kode: "MPU-PDK-A003",
+        kode: "PDK-A003",
         nama: "Digital Transformation",
         createdBy: "init",
       },
       {
-        kode: "MPK-PDK-A004",
+        kode: "PDK-A004",
         nama: "Digital Diplomacy",
         createdBy: "init",
       },
 
       {
-        kode: "MPK-PDK-A005",
+        kode: "PDK-A005",
         nama: "ASEAN: overview and challenges",
         createdBy: "init",
       },
       {
-        kode: "MPK-PDK-A006",
+        kode: "PDK-A006",
         nama: "OECD: cooperation and opportunities",
         createdBy: "init",
       },
       {
-        kode: "MPK-PDK-A007",
+        kode: "PDK-A007",
         nama: "ASEAN: regional security",
         createdBy: "init",
       },
       {
-        kode: "MPK-PDK-A008",
+        kode: "PDK-A008",
         nama: "ASEAN: economic integration",
         createdBy: "init",
       },
       {
-        kode: "MPU-PID-A001",
+        kode: "PID-A001",
         nama: "Digital Economy",
         createdBy: "init",
       },
       {
-        kode: "MPU-PID-A002",
+        kode: "PID-A002",
         nama: "Digital Governance",
         createdBy: "init",
       },
       {
-        kode: "MPU-PID-A003",
+        kode: "PID-A003",
         nama: "Digital Society",
         createdBy: "init",
       },
       {
-        kode: "MPU-PID-A004",
+        kode: "PID-A004",
         nama: "Digital Security",
         createdBy: "init",
+      },
+    ],
+  });
+
+  await dbHonorarium.pangkatGolongan.deleteMany({});
+  const pangkatGolongan = await dbHonorarium.pangkatGolongan.createMany({
+    data: [
+      {
+        id: "I/A",
+        pangkat: "Juru Muda",
+        golongan: "I",
+        ruang: "A",
+        createdBy: "init",
+      },
+      {
+        id: "I/B",
+        pangkat: "Juru Muda Tingkat 1",
+        golongan: "I",
+        ruang: "B",
+        createdBy: "init",
+      },
+      {
+        id: "I/C",
+        pangkat: "Juru Muda Tingkat 2",
+        golongan: "I",
+        ruang: "C",
+        createdBy: "init",
+      },
+      {
+        id: "I/D",
+        pangkat: "Juru",
+        golongan: "I",
+        ruang: "D",
+        createdBy: "init",
+      },
+      {
+        id: "II/A",
+        pangkat: "Pengatur Muda",
+        golongan: "II",
+        ruang: "A",
+        createdBy: "init",
+      },
+      {
+        id: "II/B",
+        pangkat: "Pengatur Muda Tingkat 1",
+        golongan: "II",
+        ruang: "B",
+        createdBy: "init",
+      },
+      {
+        id: "II/C",
+        pangkat: "Pengatur",
+        golongan: "II",
+        ruang: "C",
+        createdBy: "init",
+      },
+      {
+        id: "II/D",
+        pangkat: "Pengatur Tingkat 1",
+        golongan: "II",
+        ruang: "D",
+        createdBy: "init",
+      },
+      {
+        id: "III/A",
+        pangkat: "Penata Muda",
+        golongan: "III",
+        ruang: "A",
+        createdBy: "init",
+      },
+      {
+        id: "III/B",
+        pangkat: "Penata Tingkat 1",
+        golongan: "III",
+        ruang: "B",
+        createdBy: "init",
+      },
+      {
+        id: "III/C",
+        pangkat: "Penata",
+        golongan: "III",
+        ruang: "C",
+        createdBy: "init",
+      },
+      {
+        id: "III/D",
+        pangkat: "Penata Tingkat 1",
+        golongan: "III",
+        ruang: "D",
+        createdBy: "init",
+      },
+      {
+        id: "IV/A",
+        pangkat: "Pembina",
+        golongan: "IV",
+        ruang: "A",
+        createdBy: "init",
+      },
+      {
+        id: "IV/B",
+        pangkat: "Pembina Tingkat 1",
+        golongan: "IV",
+        ruang: "B",
+        createdBy: "init",
+      },
+      {
+        id: "IV/C",
+        pangkat: "Pembina Muda",
+        golongan: "IV",
+        ruang: "C",
+        createdBy: "init",
+      },
+      {
+        id: "IV/D",
+        pangkat: "Pembina Madya",
+        golongan: "IV",
+        ruang: "D",
+        createdBy: "init",
+      },
+      {
+        id: "IV/E",
+        pangkat: "Pembina Utama",
+        golongan: "IV",
+        ruang: "E",
+        createdBy: "init",
+      },
+    ],
+  });
+
+  await dbHonorarium.narasumber.deleteMany({});
+
+  const narasumber = await dbHonorarium.narasumber.createMany({
+    data: [
+      {
+        id: "1234567891234567", // ini adalah NIK 16 digit
+        nama: "Dr. Rizal Sukma",
+        NIP: "196509241992031001",
+        pangkatGolonganId: "IV/D",
+        createdBy: "init",
+        email: "",
+      },
+      {
+        id: "1234567891234568", // ini adalah NIK 16 digit
+        nama: "Dr. Bertiga",
+        NIP: "196509241992031002",
+        pangkatGolonganId: "IV/C",
+        createdBy: "init",
+        email: "",
+      },
+      {
+        id: "1234567891234569", // ini adalah NIK 16 digit
+        nama: "Dr. Madya Bendahara",
+        NIP: "197509241992031001",
+        pangkatGolonganId: "IV/B",
+        createdBy: "init",
+        email: "",
+      },
+      {
+        id: "1234567891234570", // ini adalah NIK 16 digit
+        nama: "Dr. Siapa lah",
+        NIP: "198509241992031001",
+        pangkatGolonganId: "IV/A",
+        createdBy: "init",
+        email: "",
       },
     ],
   });

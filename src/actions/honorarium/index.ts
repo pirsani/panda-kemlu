@@ -33,3 +33,20 @@ export const getOptionsMateri = async () => {
 
   return optionsMateri;
 };
+
+export const getNarasumber = async (narasumber?: string) => {
+  const dataNarasumber = await dbHonorarium.narasumber.findMany({});
+  return dataNarasumber;
+};
+
+export const getOptionsNarasumber = async () => {
+  const dataNarasumber = await dbHonorarium.narasumber.findMany({});
+  console.log("[NARASUMBER]", dataNarasumber);
+  // map dataNarasumber to options
+  const optionsNarasumber = dataNarasumber.map((narasumber) => ({
+    value: narasumber.id,
+    label: narasumber.NIP + "-" + narasumber.nama,
+  }));
+
+  return optionsNarasumber;
+};

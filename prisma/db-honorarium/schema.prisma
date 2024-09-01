@@ -91,40 +91,42 @@ model PejabatPenandatangan {
 
 model PangkatGolongan {
   id              String            @id
-  pangkat         String            @unique
-  golongan        String            @unique
+  pangkat         String
+  golongan        String
+  ruang           String
   deskripsi       String?
   pesertaKegiatan PesertaKegiatan[]
-  pengajar        Pengajar[]
+  narasumber      Narasumber[]
   createdBy       String            @map("created_by")
   createdAt       DateTime          @default(now()) @map("created_at")
   updatedBy       String?           @map("updated_by")
   updatedAt       DateTime?         @updatedAt @map("updated_at")
 
+  @@unique([golongan, ruang])
   @@map("pangkat_golongan")
 }
 
-model Pengajar {
-  id                String          @id // id pengajar adalah NIK
+model Narasumber {
+  id                String           @id // id narasumber adalah NIK
   nama              String
-  NIP               String
+  NIP               String?
   NPWP              String?
   jabatan           String?
   eselon            String?
-  pangkatGolonganId String          @map("pangkat_golongan_id")
-  pangkatGolongan   PangkatGolongan @relation(fields: [pangkatGolonganId], references: [id])
+  pangkatGolonganId String?          @map("pangkat_golongan_id")
+  pangkatGolongan   PangkatGolongan? @relation(fields: [pangkatGolonganId], references: [id])
   email             String?
-  nomorTelepon      String?         @map("nomor_telepon")
+  nomorTelepon      String?          @map("nomor_telepon")
   bank              String?
-  namaRekening      String?         @map("nama_rekening")
-  nomorRekening     String?         @map("nomor_rekening")
-  createdBy         String          @map("created_by")
-  createdAt         DateTime        @default(now()) @map("created_at")
-  updatedBy         String?         @map("updated_by")
-  updatedAt         DateTime?       @updatedAt @map("updated_at")
+  namaRekening      String?          @map("nama_rekening")
+  nomorRekening     String?          @map("nomor_rekening")
+  createdBy         String           @map("created_by")
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedBy         String?          @map("updated_by")
+  updatedAt         DateTime?        @updatedAt @map("updated_at")
   jadwal            Jadwal[]
 
-  @@map("pengajar")
+  @@map("narasumber")
 }
 
 model SBMAcuan {
@@ -434,8 +436,8 @@ model Jadwal {
   materi                            Materi                @relation(fields: [materiId], references: [id])
   kelasId                           Int                   @map("kelas_id")
   kelas                             Kelas                 @relation(fields: [kelasId], references: [id])
-  pengajarId                        String                @map("pengajar_id")
-  pengajar                          Pengajar              @relation(fields: [pengajarId], references: [id])
+  narasumberId                      String                @map("narasumber_id")
+  narasumber                        Narasumber            @relation(fields: [narasumberId], references: [id])
   tanggal                           DateTime
   jamMulai                          DateTime?             @map("jam_mulai")
   jamSelesai                        DateTime?             @map("jam_selesai")

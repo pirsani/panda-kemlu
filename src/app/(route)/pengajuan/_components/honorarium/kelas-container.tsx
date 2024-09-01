@@ -5,6 +5,7 @@ import { columns, Kelas } from "./kelas-table-columns";
 import TambahJadwalContainer from "./tambah-jadwal-container";
 import TambahKelasContainer from "./tambah-kelas-container";
 import TambahMateriContainer from "./tambah-materi-container";
+import TambahNarasumber from "./tambah-narasumber";
 
 const KelasContainer = () => {
   const data: Kelas[] = [
@@ -23,11 +24,12 @@ const KelasContainer = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-row gap-2">
+    <div className="flex flex-col gap-2 w-full">
+      <div className="flex flex-row gap-2 w-full">
         <TambahJadwalContainer />
         <TambahKelasContainer />
         <TambahMateriContainer />
+        <TambahNarasumber />
       </div>
 
       <div>

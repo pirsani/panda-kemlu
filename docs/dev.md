@@ -72,6 +72,8 @@ Later we must specify user for better security
 # pnpm prisma db pull --schema=./prisma/db-honorarium/schema.prisma
 pnpm prisma db push --schema=./prisma/db-honorarium/schema.prisma
 pnpm prisma generate --schema=./prisma/db-honorarium/schema.prisma
+# pnpm prisma migrate dev --schema=./prisma/db-honorarium/schema.prisma
+# pnpm prisma migrate reset --schema=./prisma/db-honorarium/schema.prisma
 ```
 
 ## UI
