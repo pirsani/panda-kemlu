@@ -111,7 +111,7 @@ const fillFormRampungan = async (rampunganData: RampunganData | null) => {
     const setTextField = (name: string, text: string, fontSize: number) => {
       const textField = form.getTextField(name);
       textField.setText(text);
-      textField.setFontSize(fontSize);
+      //textField.setFontSize(fontSize);
     };
 
     setTextField("namaPpk", rampunganData.namaPpk, fontsize);
