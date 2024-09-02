@@ -578,3 +578,84 @@ Here's an updated implementation in TypeScript using **PDFMake**, fulfilling you
 - Ensure that the logo path is correct and accessible when generating the PDF.
 
 This approach should meet your requirements efficiently, providing clear, well-structured, and professional PDFs with complex tabular data.
+
+# PDF OPTIONS
+
+Here is a ranking of some of the most popular Node.js libraries for generating PDFs, based on criteria such as GitHub stars, activity (frequency of updates), monthly downloads, and other relevant factors such as ease of use, feature set, and community support:
+
+### 1. **PDFKit**
+
+- **GitHub Stars**: ~9.8k
+- **Activity**: Regularly maintained, with a history of updates and active issue management.
+- **Monthly Downloads**: ~1.8 million
+- **Pros**: Highly customizable, supports text, images, SVGs, and embedded fonts. Good for complex document generation.
+- **Cons**: Requires more manual coding for layout management; lacks a high-level API compared to some other libraries.
+- **Best For**: Developers needing fine-grained control over PDF content, custom layout designs.
+
+### 2. **Puppeteer**
+
+- **GitHub Stars**: ~85k
+- **Activity**: Very actively maintained by the Google Chrome team with frequent updates.
+- **Monthly Downloads**: ~6 million
+- **Pros**: Can generate PDFs from HTML/CSS using a headless Chromium browser, making it easy to use web technologies for design.
+- **Cons**: Large dependency due to Chromium, heavier compared to other PDF-specific libraries. Not designed specifically for PDFs but for automation.
+- **Best For**: Rendering PDFs from HTML/CSS with complex designs.
+
+### 3. **jsPDF**
+
+- **GitHub Stars**: ~28k
+- **Activity**: Moderately active with community contributions and updates.
+- **Monthly Downloads**: ~1.7 million
+- **Pros**: Lightweight, great for client-side PDF generation, easy to integrate with front-end applications.
+- **Cons**: Limited support for complex layouts and large document creation. Mostly suited for simple PDF tasks.
+- **Best For**: Quick, simple PDF generation, especially in the browser.
+
+### 4. **PDFMake**
+
+- **GitHub Stars**: ~12k
+- **Activity**: Moderately active with periodic updates and fixes.
+- **Monthly Downloads**: ~480k
+- **Pros**: Declarative syntax, built-in styling, good for creating structured documents, supports tables and images.
+- **Cons**: Can be slower with large or complex documents, less flexible than low-level libraries like PDFKit.
+- **Best For**: Structured documents with a declarative approach, great for reports and invoices.
+
+### 5. **node-html-pdf (Deprecated)**
+
+- **GitHub Stars**: ~5.5k
+- **Activity**: Deprecated, no longer actively maintained.
+- **Monthly Downloads**: ~100k (still used in legacy projects)
+- **Pros**: Converts HTML to PDFs easily using PhantomJS.
+- **Cons**: Outdated, PhantomJS is no longer maintained, and lacks support for modern web standards.
+- **Best For**: Legacy projects already dependent on it.
+
+### 6. **PDF-LIB**
+
+- **GitHub Stars**: ~5.5k
+- **Activity**: Actively maintained, with consistent updates.
+- **Monthly Downloads**: ~300k
+- **Pros**: Pure JavaScript library, no external dependencies, great for manipulating existing PDFs.
+- **Cons**: More complex for generating PDFs from scratch, lacks some high-level formatting options.
+- **Best For**: Manipulating existing PDFs or creating lightweight new ones without large dependencies.
+
+### 7. **react-pdf**
+
+- **GitHub Stars**: ~13.5k
+- **Activity**: Regular updates, driven by the React community.
+- **Monthly Downloads**: ~1.1 million
+- **Pros**: Allows you to use React components to generate PDFs, good for developers familiar with React.
+- **Cons**: Less control over detailed layout without diving deep into custom styles.
+- **Best For**: Developers working in a React environment looking for seamless integration.
+
+### Summary and Recommendations:
+
+- **Most Popular and Widely Used**: Puppeteer, due to its versatility with web automation and HTML rendering capabilities.
+- **Best for Custom PDF Generation**: PDFKit for developers needing control over every detail of the PDF.
+- **Easiest for HTML to PDF**: Puppeteer, with the advantage of using modern web standards.
+- **Best Declarative Library for Structured Documents**: PDFMake, with its straightforward document definition.
+
+**Recommendation**:
+
+- If your focus is on creating structured documents with tables and summaries, **PDFMake** or **PDFKit** would be the best fits.
+- For highly complex designs leveraging HTML and CSS, **Puppeteer** offers the most flexibility, especially for web-based content.
+
+Each of these libraries has distinct strengths, so your choice will depend on the specific needs of your project, such as document complexity, required features, and ease of integration with your existing stack.
