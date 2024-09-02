@@ -107,24 +107,24 @@ model PangkatGolongan {
 }
 
 model Narasumber {
-  id                String           @id // id narasumber adalah NIK
+  id                String             @id // id narasumber adalah NIK
   nama              String
   NIP               String?
   NPWP              String?
   jabatan           String?
   eselon            String?
-  pangkatGolonganId String?          @map("pangkat_golongan_id")
-  pangkatGolongan   PangkatGolongan? @relation(fields: [pangkatGolonganId], references: [id])
+  pangkatGolonganId String?            @map("pangkat_golongan_id")
+  pangkatGolongan   PangkatGolongan?   @relation(fields: [pangkatGolonganId], references: [id])
   email             String?
-  nomorTelepon      String?          @map("nomor_telepon")
+  nomorTelepon      String?            @map("nomor_telepon")
   bank              String?
-  namaRekening      String?          @map("nama_rekening")
-  nomorRekening     String?          @map("nomor_rekening")
-  createdBy         String           @map("created_by")
-  createdAt         DateTime         @default(now()) @map("created_at")
-  updatedBy         String?          @map("updated_by")
-  updatedAt         DateTime?        @updatedAt @map("updated_at")
-  jadwal            Jadwal[]
+  namaRekening      String?            @map("nama_rekening")
+  nomorRekening     String?            @map("nomor_rekening")
+  createdBy         String             @map("created_by")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedBy         String?            @map("updated_by")
+  updatedAt         DateTime?          @updatedAt @map("updated_at")
+  JadwalNarasumber  JadwalNarasumber[]
 
   @@map("narasumber")
 }
@@ -272,6 +272,7 @@ model Kegiatan {
   riwayatProses      RiwayatProses[]
   kelas              Kelas[]
   dokumenKegiatan    DokumenKegiatan[]
+  Jadwal             Jadwal[]
 
   @@map("kegiatan")
 }
@@ -434,30 +435,50 @@ model Materi {
 }
 
 model Jadwal {
-  id                                Int                   @id @default(autoincrement())
-  materiId                          Int                   @map("materi_id")
-  materi                            Materi                @relation(fields: [materiId], references: [id])
-  kelasId                           Int                   @map("kelas_id")
-  kelas                             Kelas                 @relation(fields: [kelasId], references: [id])
-  narasumberId                      String                @map("narasumber_id")
-  narasumber                        Narasumber            @relation(fields: [narasumberId], references: [id])
-  tanggal                           DateTime
-  jamMulai                          DateTime?             @map("jam_mulai")
-  jamSelesai                        DateTime?             @map("jam_selesai")
-  ruang                             String?
-  jumlahJamPelajaran                Int?                  @map("jumlah_jam_pelajaran")
-  dokumenUndanganNarasumber         String?               @map("dokumen_undangan_narasumber")
-  dokumenKofirmasiKesediaanMengajar String?               @map("dokumen_kofirmasi_kesediaan_mengajar")
-  dokumenDaftarHadir                String?               @map("dokumen_daftar_hadir")
-  dokumenJadwalKegiatan             String?               @map("dokumen_jadwal_kegiatan")
-  tautanMaterial                    String?               @map("tautan_material")
-  createdBy                         String                @map("created_by")
-  createdAt                         DateTime              @default(now()) @map("created_at")
-  updatedBy                         String?               @map("updated_by")
-  updatedAt                         DateTime?             @updatedAt @map("updated_at")
-  nominatifHonorarium               NominatifHonorarium[]
+  id         Int      @id @default(autoincrement())
+  kegiatanId Int      @map("kegiatan_id")
+  kegiatan   Kegiatan @relation(fields: [kegiatanId], references: [id])
+  materiId   Int      @map("materi_id")
+  materi     Materi   @relation(fields: [materiId], references: [id])
+  kelasId    Int      @map("kelas_id")
+  kelas      Kelas    @relation(fields: [kelasId], references: [id])
+
+  tanggal                            DateTime
+  jamMulai                           DateTime?             @map("jam_mulai")
+  jamSelesai                         DateTime?             @map("jam_selesai")
+  ruang                              String?
+  jumlahJamPelajaran                 Int?                  @map("jumlah_jam_pelajaran")
+  dokumenUndanganNarasumber          String?               @map("dokumen_undangan_narasumber")
+  dokumenKonfirmasiKesediaanMengajar String?               @map("dokumen_konfirmasi_kesediaan_mengajar")
+  dokumenDaftarHadir                 String?               @map("dokumen_daftar_hadir")
+  dokumenJadwalKegiatan              String?               @map("dokumen_jadwal_kegiatan")
+  tautanMaterial                     String?               @map("tautan_material")
+  createdBy                          String                @map("created_by")
+  createdAt                          DateTime              @default(now()) @map("created_at")
+  updatedBy                          String?               @map("updated_by")
+  updatedAt                          DateTime?             @updatedAt @map("updated_at")
+  nominatifHonorarium                NominatifHonorarium[]
+  JadwalNarasumber                   JadwalNarasumber[]
 
   @@map("jadwal")
+}
+
+model JadwalNarasumber {
+  id                                 Int        @id @default(autoincrement())
+  jadwalId                           Int        @map("jadwal_id")
+  jadwal                             Jadwal     @relation(fields: [jadwalId], references: [id])
+  narasumberId                       String     @map("narasumber_id")
+  narasumber                         Narasumber @relation(fields: [narasumberId], references: [id])
+  jenisNarasumber                    String?    @map("jenis_narasumber") // ini bisa saja berbeda dengan jenis narasumber yang ada di tabel narasumber
+  jumlahJamPelajaran                 Decimal?   @map("jumlah_jam_pelajaran")
+  dokumenKonfirmasiKesediaanMengajar String?    @map("dokumen_konfirmasi_kesediaan_mengajar")
+  createdBy                          String     @map("created_by")
+  createdAt                          DateTime   @default(now()) @map("created_at")
+  updatedBy                          String?    @map("updated_by")
+  updatedAt                          DateTime?  @updatedAt @map("updated_at")
+
+  @@unique([jadwalId, narasumberId])
+  @@map("jadwal_narasumber")
 }
 
 model JenisDokumenKegiatan {

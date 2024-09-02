@@ -9,11 +9,11 @@ import TextDokumenMultiFile from "./text-dokumen-multi-file";
 import TextDokumenWithPreviewButton from "./text-dokumen-with-preview-button";
 
 interface PreviewKegiatanProps {
-  id?: number | null;
+  kegiatan?: Kegiatan | null;
   className?: string;
 }
-const PreviewKegiatan = ({ id, className }: PreviewKegiatanProps) => {
-  if (!id) {
+const PreviewKegiatan = ({ kegiatan, className }: PreviewKegiatanProps) => {
+  if (!kegiatan) {
     return (
       <div className="flex flex-row gap-2 w-full mt-2 p-4 border border-gray-300 rounded-sm animate-pulse">
         <span>
@@ -23,19 +23,6 @@ const PreviewKegiatan = ({ id, className }: PreviewKegiatanProps) => {
       </div>
     );
   }
-
-  const [kegiatan, setKegiatan] = useState<Kegiatan | null>(null);
-
-  // Fetch kegiatan by id
-  useEffect(() => {
-    const fetchKegiatan = async () => {
-      const kegiatan = await getKegiatanById(id);
-      setKegiatan(kegiatan);
-      console.log(kegiatan);
-    };
-
-    fetchKegiatan();
-  }, [id]);
 
   return (
     <div className={cn("rounded-sm", className)}>

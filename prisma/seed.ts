@@ -7,6 +7,13 @@ async function main() {
   console.log(routes);
 
   // Truncate the table
+  await dbHonorarium.jadwalNarasumber.deleteMany({});
+  await dbHonorarium.jadwal.deleteMany({});
+  await dbHonorarium.materi.deleteMany({});
+
+  await dbHonorarium.kelas.deleteMany({});
+
+  // Truncate the table
   await dbHonorarium.jenisDokumenKegiatan.deleteMany({});
   const dokumenKegiatan = await dbHonorarium.jenisDokumenKegiatan.createMany({
     data: [
@@ -464,6 +471,93 @@ async function main() {
         pangkatGolonganId: "IV/A",
         createdBy: "init",
         email: "",
+      },
+    ],
+  });
+
+  const materiku = await dbHonorarium.materi.findMany({
+    where: {
+      createdBy: "init",
+    },
+  });
+
+  const kelasku = await dbHonorarium.kelas.findMany({
+    where: {
+      createdBy: "init",
+    },
+  });
+
+  const narasumberku = await dbHonorarium.narasumber.findMany({
+    where: {
+      createdBy: "init",
+    },
+  });
+
+  const jadwal = await dbHonorarium.jadwal.createMany({
+    data: [
+      {
+        kegiatanId: kegiatan.id,
+        kelasId: kelasku[0].id,
+        materiId: materiku[0].id,
+        tanggal: new Date(),
+        createdBy: "init",
+      },
+      {
+        kegiatanId: kegiatan.id,
+        kelasId: kelasku[0].id,
+        materiId: materiku[1].id,
+        tanggal: new Date(),
+        createdBy: "init",
+      },
+      {
+        kegiatanId: kegiatan.id,
+        kelasId: kelasku[1].id,
+        materiId: materiku[2].id,
+        tanggal: new Date(),
+        createdBy: "init",
+      },
+      {
+        kegiatanId: kegiatan.id,
+        kelasId: kelasku[1].id,
+        materiId: materiku[3].id,
+        tanggal: new Date(),
+        createdBy: "init",
+      },
+    ],
+  });
+
+  const jadwalku = await dbHonorarium.jadwal.findMany({
+    where: {
+      createdBy: "init",
+    },
+  });
+
+  const jadwalNarasumber = await dbHonorarium.jadwalNarasumber.createMany({
+    data: [
+      {
+        jadwalId: jadwalku[0].id,
+        narasumberId: narasumberku[0].id,
+        createdBy: "init",
+      },
+      {
+        jadwalId: jadwalku[0].id,
+        narasumberId: narasumberku[1].id,
+        createdBy: "init",
+      },
+      {
+        jadwalId: jadwalku[1].id,
+        narasumberId: narasumberku[2].id,
+        createdBy: "init",
+      },
+      {
+        jadwalId: jadwalku[2].id,
+        narasumberId: narasumberku[2].id,
+        createdBy: "init",
+      },
+      {
+        jadwalId: jadwalku[2].id,
+        narasumberId: narasumberku[3].id,
+        createdBy: "init",
       },
     ],
   });

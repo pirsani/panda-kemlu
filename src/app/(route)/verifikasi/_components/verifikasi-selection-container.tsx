@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { JenisPengajuan } from "@/types";
+import { Kegiatan } from "@prisma-honorarium/client";
 import { useState } from "react";
 import ButtonsPengajuan from "./buttons-pengajuan";
+import HonorariumJadwalContainer from "./honorarium/honorarium-jadwal-container";
 import FormGenerateRampungan from "./rampungan/form-generate-rampungan";
 
 interface VerfikasiSelectionContainerProps {
-  kegiatan?: number | null;
+  kegiatan?: Kegiatan | null;
 }
 
 const VerfikasiSelectionContainer = ({
@@ -25,9 +27,11 @@ const VerfikasiSelectionContainer = ({
         />
         <div className="flex flex-row gap-2 mt-6 w-full border-gray-300 border rounded-md p-2 shadow-lg">
           {jenisPengajuan == "generate-rampungan" && (
-            <FormGenerateRampungan kegiatanId={kegiatan} />
+            <FormGenerateRampungan kegiatanId={kegiatan.id} />
           )}
-          {jenisPengajuan == "honorarium" && <div>Verifikasi Honorarium</div>}
+          {jenisPengajuan == "honorarium" && (
+            <HonorariumJadwalContainer kegiatan={kegiatan} />
+          )}
           {jenisPengajuan == "uh-dalam-negeri" && (
             <div>Verifikasi UH Dalam Negeri</div>
           )}
