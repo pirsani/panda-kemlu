@@ -18,7 +18,10 @@ interface ResizableDraggableProps {
 const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
   children,
 }) => {
-  const [position, setPosition] = useState({ x: 850, y: 100 });
+  const [position, setPosition] = useState({
+    x: 100,
+    y: 100,
+  });
   const [size, setSize] = useState({ width: 750, height: 600 });
   const [isFixed, setIsFixed] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -145,7 +148,7 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
     setIsMinimized(true);
     setIsFixed(false);
     setSize({ width: 600, height: 750 }); // Set minimized size
-    setPosition({ x: 850, y: 80 });
+    setPosition({ x: window.innerWidth - window.innerWidth / 3, y: 80 });
   };
 
   // Handle Restore to Normal Size
@@ -168,10 +171,10 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
 
   const handleSmall = () => {
     setIsFixed(false);
-    setIsMinimized(true);
+    setIsMinimized(false);
     setSize({ width: 300, height: 250 }); // Set minimized size
 
-    setPosition({ x: 850, y: 80 });
+    setPosition({ x: window.innerWidth - window.innerWidth / 3, y: 80 });
   };
 
   // Attach React event handlers
@@ -276,7 +279,7 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
           </button>
           <button
             className="hover:bg-yellow-200 p-1 rounded-full"
-            onClick={() => (handleSmall(), console.log("small"))}
+            onClick={() => (isMinimized ? handleSmall() : handleMinimize())}
             aria-label="Maximize"
           >
             <Minus
