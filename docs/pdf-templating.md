@@ -659,3 +659,173 @@ Here is a ranking of some of the most popular Node.js libraries for generating P
 - For highly complex designs leveraging HTML and CSS, **Puppeteer** offers the most flexibility, especially for web-based content.
 
 Each of these libraries has distinct strengths, so your choice will depend on the specific needs of your project, such as document complexity, required features, and ease of integration with your existing stack.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+To meet your requirements using Node.js, I'll suggest solutions with appropriate libraries for each task:
+
+### 1. Filling Form and Flatten PDF
+
+**Libraries**:
+
+- `pdf-lib`: A powerful library for working with PDFs, including filling forms.
+- `pdfkit`: Generates PDFs but isn't specifically for forms; it can complement `pdf-lib`.
+
+**Implementation**:
+
+1. Install `pdf-lib`:
+
+   ```bash
+   npm install pdf-lib
+   ```
+
+2. Sample code to fill a form and flatten it:
+
+   ```javascript
+   const fs = require("fs");
+   const { PDFDocument } = require("pdf-lib");
+
+   async function fillAndFlattenPDF() {
+     // Load an existing PDF with a form
+     const formPdfBytes = fs.readFileSync("form.pdf");
+
+     // Create a PDFDocument
+     const pdfDoc = await PDFDocument.load(formPdfBytes);
+
+     // Get the form from the PDF
+     const form = pdfDoc.getForm();
+
+     // Get fields and fill them
+     const nameField = form.getTextField("name");
+     nameField.setText("John Doe");
+
+     const ageField = form.getTextField("age");
+     ageField.setText("30");
+
+     // Flatten the form fields to prevent further editing
+     form.flatten();
+
+     // Save the PDF
+     const pdfBytes = await pdfDoc.save();
+     fs.writeFileSync("filled_form.pdf", pdfBytes);
+   }
+
+   fillAndFlattenPDF();
+   ```
+
+### 2. Generate PDF with Dynamic Tabular Data and Summary
+
+**Libraries**:
+
+- `pdfkit`: For creating PDFs and adding content dynamically.
+- `pdf-table-printer`: A simple way to create tables within PDFs.
+
+**Implementation**:
+
+1. Install `pdfkit`:
+
+   ```bash
+   npm install pdfkit
+   ```
+
+2. Sample code to generate a PDF with tables and summary:
+
+   ```javascript
+   const PDFDocument = require("pdfkit");
+   const fs = require("fs");
+
+   function generateTablePDF(data) {
+     const doc = new PDFDocument();
+     const fileName = "table_report.pdf";
+
+     doc.pipe(fs.createWriteStream(fileName));
+
+     // Headers for the table
+     const headers = ["Item", "Description", "Quantity", "Price"];
+
+     // Draw table headers
+     headers.forEach((header, i) => {
+       doc.text(header, 50 + i * 100, 50);
+     });
+
+     // Draw table rows
+     let y = 80;
+     let totalAmount = 0;
+     data.forEach((row) => {
+       row.forEach((cell, i) => {
+         doc.text(cell, 50 + i * 100, y);
+       });
+       totalAmount += parseFloat(row[3]);
+       y += 20;
+       if (y > 700) {
+         doc.addPage();
+         y = 50;
+       }
+     });
+
+     // Add summary on the last row of each page
+     doc.text(`Total: ${totalAmount.toFixed(2)}`, 50, y);
+
+     // Finalize the PDF and end the stream
+     doc.end();
+   }
+
+   const sampleData = [
+     ["Item 1", "Description 1", "2", "20.00"],
+     ["Item 2", "Description 2", "5", "50.00"],
+     ["Item 3", "Description 3", "1", "100.00"],
+     // Add more rows as needed
+   ];
+
+   generateTablePDF(sampleData);
+   ```
+
+### 3. Generate PDF Report with Attached Image
+
+**Libraries**:
+
+- `pdfkit`: Again, great for generating PDFs and handling images.
+
+**Implementation**:
+
+1. Using `pdfkit`, you can add images to the report as follows:
+
+   ```javascript
+   const PDFDocument = require("pdfkit");
+   const fs = require("fs");
+
+   function generatePDFWithImage() {
+     const doc = new PDFDocument();
+     const fileName = "report_with_image.pdf";
+
+     doc.pipe(fs.createWriteStream(fileName));
+
+     // Add title
+     doc.fontSize(20).text("Report with Image", 50, 50);
+
+     // Add some content
+     doc
+       .fontSize(12)
+       .text("This is a sample report that includes an image.", 50, 100);
+
+     // Add an image
+     doc.image("path/to/your/image.png", {
+       fit: [250, 300],
+       align: "center",
+       valign: "center",
+     });
+
+     // Finalize the PDF and end the stream
+     doc.end();
+   }
+
+   generatePDFWithImage();
+   ```
+
+### Summary of Libraries and Usage:
+
+- **`pdf-lib`**: Best for handling form fields, filling, and flattening PDFs.
+- **`pdfkit`**: Ideal for generating PDFs with dynamic content, including tables and images.
+- **`pdf-table-printer`** (optional): Simplifies table creation within PDFs.
+
+These libraries are lightweight, easy to implement, and work well together in a Node.js environment. Let me know if you need more details or further customization!
