@@ -252,7 +252,8 @@ model Kegiatan {
   dokumenNodinMemoSk String                @map("dokumen_nodin_memo_sk")
   dokumenJadwal      String                @map("dokumen_jadwal")
   lokasi             Lokasi // enum 0, 1, 2
-  provinsi           String?
+  provinsiId         Int?
+  provinsi           Provinsi?             @relation(fields: [provinsiId], references: [id])
   keterangan         String?
   status             String
   createdBy          String                @map("created_by")
@@ -523,6 +524,7 @@ model Provinsi {
   updatedBy        String?            @map("updated_by")
   updatedAt        DateTime?          @updatedAt @map("updated_at")
   SBMUHDalamNegeri SBMUHDalamNegeri[]
+  kegiatan         Kegiatan[]
 
   @@map("provinsi")
 }

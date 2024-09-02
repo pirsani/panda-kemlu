@@ -184,6 +184,7 @@ async function main() {
       dokumenNodinMemoSk: "123456789.pdf",
       dokumenJadwal: "123456789.pdf",
       //unitKerjaId: "1",
+      provinsiId: 18,
       status: "setup-kegiatan",
     },
   });

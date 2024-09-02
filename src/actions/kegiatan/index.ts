@@ -10,6 +10,10 @@ export const getKegiatan = async (kegiatan?: string) => {
 export const getKegiatanById = async (id: number) => {
   const kegiatan = await dbHonorarium.kegiatan.findUnique({
     where: { id },
+    include: {
+      itinerary: true,
+      provinsi: true,
+    },
   });
 
   console.log(kegiatan);

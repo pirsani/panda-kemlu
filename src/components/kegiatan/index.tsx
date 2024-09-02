@@ -1,6 +1,6 @@
 "use client";
 import { getKegiatanById } from "@/actions/kegiatan";
-import { Kegiatan } from "@prisma-honorarium/client";
+import { Kegiatan, Lokasi } from "@prisma-honorarium/client";
 //import { Kegiatan } from "@/zod/schemas/kegiatan";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -135,6 +135,15 @@ const PreviewKegiatan = ({ id, className }: PreviewKegiatanProps) => {
               {kegiatan.lokasi}
             </span>
           </div>
+
+          {kegiatan.lokasi == Lokasi.LuarKota && (
+            <div className="flex flex-col">
+              <span className="text-gray-700">Lokasi</span>
+              <span className=" bg-gray-100 border border-gray-300 rounded px-2 py-1 w-full">
+                {kegiatan.provinsi.nama}
+              </span>
+            </div>
+          )}
         </div>
       )}
     </div>

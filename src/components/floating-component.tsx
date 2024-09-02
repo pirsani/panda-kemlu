@@ -1,3 +1,4 @@
+"use client";
 import { cn } from "@/lib/utils";
 import {
   ChevronDown,
@@ -17,7 +18,7 @@ interface ResizableDraggableProps {
 const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
   children,
 }) => {
-  const [position, setPosition] = useState({ x: 750, y: 100 });
+  const [position, setPosition] = useState({ x: 850, y: 100 });
   const [size, setSize] = useState({ width: 750, height: 600 });
   const [isFixed, setIsFixed] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -28,6 +29,11 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
   const initialMousePosition = useRef({ x: 0, y: 0 });
   const initialSize = useRef({ width: 750, height: 600 });
   const initialPosition = useRef({ x: 500, y: 100 });
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Handle Drag Start
   const handleDragStart = (e: MouseEvent<HTMLDivElement>) => {
@@ -139,7 +145,7 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
     setIsMinimized(true);
     setIsFixed(false);
     setSize({ width: 600, height: 750 }); // Set minimized size
-    setPosition({ x: 750, y: 80 });
+    setPosition({ x: 850, y: 80 });
   };
 
   // Handle Restore to Normal Size
@@ -165,7 +171,7 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
     setIsMinimized(true);
     setSize({ width: 300, height: 250 }); // Set minimized size
 
-    setPosition({ x: window.innerWidth - 350, y: 80 });
+    setPosition({ x: 850, y: 80 });
   };
 
   // Attach React event handlers
@@ -204,6 +210,11 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
   useEffect(() => {
     handleMinimize();
   }, []);
+
+  // If not on client, don't render anything
+  if (!isClient) {
+    return null;
+  }
 
   // Determine if the component should use fixed positioning
   const shouldUseAbsolutePosition =
