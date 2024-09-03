@@ -115,6 +115,7 @@ model Narasumber {
   eselon            String?
   pangkatGolonganId String?            @map("pangkat_golongan_id")
   pangkatGolongan   PangkatGolongan?   @relation(fields: [pangkatGolonganId], references: [id])
+  jenisNarasumber   String?            @map("jenis_narasumber")
   email             String?
   nomorTelepon      String?            @map("nomor_telepon")
   bank              String?
@@ -129,35 +130,40 @@ model Narasumber {
   @@map("narasumber")
 }
 
-model SBMAcuan {
+model PmkAcuan {
   id               String             @id
   nomorPMK         String             @unique @map("nomor_pmk")
-  tmtAwal          DateTime           @map("tmt_awal")
-  tmtAkhir         DateTime           @map("tmt_akhir")
+  tmtAwal          DateTime?          @map("tmt_awal")
+  tmtAkhir         DateTime?          @map("tmt_akhir")
   tahun            Int
   aktif            Boolean
   createdBy        String             @map("created_by")
   createdAt        DateTime           @default(now()) @map("created_at")
   updatedBy        String?            @map("updated_by")
   updatedAt        DateTime?          @updatedAt @map("updated_at")
-  sbmHonorarium    SBMHonorarium[]
-  sbmUHDalamNegeri SBMUHDalamNegeri[]
-  sbmUHLuarNegeri  SBMUHLuarNegeri[]
-  uhDalamNegeri    UHDalamNegeri[]
-  uhLuarNegeri     UHLuarNegeri[]
+  sbmHonorarium    SbmHonorarium[]
+  sbmUhDalamNegeri SbmUhDalamNegeri[]
+  sbmUhLuarNegeri  SbmUhLuarNegeri[]
+  uhDalamNegeri    UhDalamNegeri[]
+  uhLuarNegeri     UhLuarNegeri[]
+  sbmPaketRapat    SbmPaketRapat[]
+  sbmUhRapat       SbmUhRapat[]
+  sbmTaksi         SbmTaksi[]
+  sbmTiketPesawat  SbmTiketPesawat[]
 
-  @@map("sbm_acuan")
+  @@map("pmk_acuan")
 }
 
-model SBMHonorarium {
+// referensi halaman 29 PMK 49/2023
+// 9. Honorarium Narasumber/Moderator/Pembawa Acara/Panitia
+model SbmHonorarium {
   id         Int      @id @default(autoincrement())
   jenis      String
-  tipe       String
   satuan     String
-  keterangan String
-  nominal    Int
-  sbmAcuanId String   @map("sbm_acuan_id")
-  sbmAcuan   SBMAcuan @relation(fields: [sbmAcuanId], references: [id])
+  besaran    Int
+  uraian     String?
+  pmkAcuanId String   @map("sbm_acuan_id")
+  pmkAcuan   PmkAcuan @relation(fields: [pmkAcuanId], references: [id])
 
   createdBy String    @map("created_by")
   createdAt DateTime  @default(now()) @map("created_at")
@@ -167,18 +173,20 @@ model SBMHonorarium {
   @@map("sbm_honorarium")
 }
 
-model SBMUHDalamNegeri {
-  id             Int      @id @default(autoincrement())
-  provinsiId     Int      @map("provinsi_id")
-  provinsi       Provinsi @relation(fields: [provinsiId], references: [id])
-  satuan         String
-  fullboard      Int
-  fulldayHalfday String   @map("full_day_half_day")
-  luarKota       Int      @map("luar_kota")
-  dalamKota      Int      @map("dalam_kota")
-  diklat         Int
-  sbmAcuanId     String   @map("sbm_acuan_id")
-  sbmAcuan       SBMAcuan @relation(fields: [sbmAcuanId], references: [id])
+model SbmUhDalamNegeri {
+  id         Int      @id @default(autoincrement())
+  provinsiId Int      @map("provinsi_id")
+  provinsi   Provinsi @relation(fields: [provinsiId], references: [id])
+  satuan     String
+  halfday    Int
+  fullday    Int
+  fullboard  Int
+  // fulldayHalfday String   @map("full_day_half_day")
+  luarKota   Int      @map("luar_kota")
+  dalamKota  Int      @map("dalam_kota")
+  diklat     Int
+  pmkAcuanId String   @map("sbm_acuan_id")
+  pmkAcuan   PmkAcuan @relation(fields: [pmkAcuanId], references: [id])
 
   createdBy String    @map("created_by")
   createdAt DateTime  @default(now()) @map("created_at")
@@ -188,7 +196,110 @@ model SBMUHDalamNegeri {
   @@map("sbm_uh_dalam_negeri")
 }
 
-model SBMUHLuarNegeri {
+// referensi halaman 23 PMK 49/2023
+// 31 Satuan Biaya Rapat/ Pertemuan di Luar Kantor
+// 31.1 Paket Kegiatan Rapat/Pertemuan di Luar Kantor
+// tingkat [a,b,c] [menteri dan setingkat menteri; eselon I, eselon II; eselon III kebawah]
+// Define the enum
+enum TingkatPaketRapat {
+  a
+  b
+  c
+}
+
+model SbmPaketRapat {
+  id         Int               @id @default(autoincrement())
+  provinsiId Int               @map("provinsi_id")
+  provinsi   Provinsi          @relation(fields: [provinsiId], references: [id])
+  tingkat    TingkatPaketRapat // enum a, b, c
+  halfday    Int
+  fullday    Int
+  fullboard  Int
+  pmkAcuanId String            @map("sbm_acuan_id")
+  pmkAcuan   PmkAcuan          @relation(fields: [pmkAcuanId], references: [id])
+
+  createdBy String    @map("created_by")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedBy String?   @map("updated_by")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+
+  @@map("sbm_rapat")
+}
+
+// referensi halaman 26 PMK 49/2023
+// 31.2 Uang Harian Kegiatan Rapat/Pertemuan di Luar Kantor
+model SbmUhRapat {
+  id             Int      @id @default(autoincrement())
+  provinsiId     Int      @map("provinsi_id")
+  provinsi       Provinsi @relation(fields: [provinsiId], references: [id])
+  satuan         String
+  fullboard      Int
+  fulldayHalfday Int      @map("fullday_halfday")
+  pmkAcuanId     String   @map("sbm_acuan_id")
+  pmkAcuan       PmkAcuan @relation(fields: [pmkAcuanId], references: [id])
+
+  createdBy String    @map("created_by")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedBy String?   @map("updated_by")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+
+  @@map("sbm_uh_rapat")
+}
+
+model SbmTaksi {
+  id         Int      @id @default(autoincrement())
+  provinsiId Int      @map("provinsi_id")
+  provinsi   Provinsi @relation(fields: [provinsiId], references: [id])
+  satuan     String
+  besaran    Int
+  pmkAcuanId String   @map("sbm_acuan_id")
+  pmkAcuan   PmkAcuan @relation(fields: [pmkAcuanId], references: [id])
+
+  createdBy String    @map("created_by")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedBy String?   @map("updated_by")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+
+  @@map("sbm_taksi")
+}
+
+model Kota {
+  id             Int               @id @default(autoincrement())
+  provinsiId     Int               @map("provinsi_id")
+  provinsi       Provinsi          @relation(fields: [provinsiId], references: [id])
+  nama           String
+  aktif          Boolean           @default(true) // bisa saja nama kota berubah, maka aktif di nonaktifkan
+  createdBy      String            @map("created_by")
+  createdAt      DateTime          @default(now()) @map("created_at")
+  updatedBy      String?           @map("updated_by")
+  updatedAt      DateTime?         @updatedAt @map("updated_at")
+  sbmTiketAsal   SbmTiketPesawat[] @relation("KotaAsal")
+  SbmTiketTujuan SbmTiketPesawat[] @relation("KotaTujuan")
+
+  @@map("kota")
+}
+
+model SbmTiketPesawat {
+  id           Int      @id @default(autoincrement())
+  kotaAsalId   Int      @map("kota_asal_id")
+  kotaAsal     Kota     @relation("KotaAsal", fields: [kotaAsalId], references: [id])
+  kotaTujuanId Int      @map("kota_tujuan_id")
+  kotaTujuan   Kota     @relation("KotaTujuan", fields: [kotaTujuanId], references: [id])
+  tiketBisnis  Int      @map("tiket_bisnis")
+  tiketEkonomi Int      @map("tiket_ekonomi")
+  besaran      Int
+  pmkAcuanId   String   @map("sbm_acuan_id")
+  pmkAcuan     PmkAcuan @relation(fields: [pmkAcuanId], references: [id])
+
+  createdBy String    @map("created_by")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedBy String?   @map("updated_by")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+
+  @@map("sbm_tiket_pesawat")
+}
+
+model SbmUhLuarNegeri {
   id           Int            @id @default(autoincrement())
   negaraId     Int            @map("negara_id")
   negara       Negara         @relation(fields: [negaraId], references: [id])
@@ -197,19 +308,19 @@ model SBMUHLuarNegeri {
   golonganB    Int            @map("golongan_b")
   golonganC    Int            @map("golongan_c")
   golonganD    Int            @map("golongan_d")
-  sbmAcuanId   String         @map("sbm_acuan_id")
-  sbmAcuan     SBMAcuan       @relation(fields: [sbmAcuanId], references: [id])
+  pmkAcuanId   String         @map("sbm_acuan_id")
+  pmkAcuan     PmkAcuan       @relation(fields: [pmkAcuanId], references: [id])
   createdBy    String         @map("created_by")
   createdAt    DateTime       @default(now()) @map("created_at")
   updatedBy    String?        @map("updated_by")
   updatedAt    DateTime?      @updatedAt @map("updated_at")
   itinerary    Itinerary[]
-  uhLuarNegeri UHLuarNegeri[]
+  uhLuarNegeri UhLuarNegeri[]
 
   @@map("sbm_uh_luar_negeri")
 }
 
-model SBMUangRepresentasi {
+model SbmUangRepresentasi {
   id        Int       @id @default(autoincrement())
   pejabat   String
   satuan    String
@@ -312,17 +423,17 @@ model PesertaKegiatan {
   createdAt                       DateTime        @default(now()) @map("created_at")
   updatedBy                       String?         @map("updated_by")
   updatedAt                       DateTime?       @updatedAt @map("updated_at")
-  uhDalamNegeri                   UHDalamNegeri[]
-  uhLuarNegeri                    UHLuarNegeri[]
+  uhDalamNegeri                   UhDalamNegeri[]
+  uhLuarNegeri                    UhLuarNegeri[]
 
   @@unique([kegiatanId, NIP])
   @@map("peserta_kegiatan")
 }
 
-model UHDalamNegeri {
+model UhDalamNegeri {
   id                     Int             @id @default(autoincrement())
-  sbmAcuanId             String          @map("sbm_acuan_id")
-  sbmAcuan               SBMAcuan        @relation(fields: [sbmAcuanId], references: [id])
+  pmkAcuanId             String          @map("sbm_acuan_id")
+  pmkAcuan               PmkAcuan        @relation(fields: [pmkAcuanId], references: [id])
   pesertaKegiatanId      Int             @map("peserta_kegiatan_id")
   pesertaKegiatan        PesertaKegiatan @relation(fields: [pesertaKegiatanId], references: [id])
   jumlahHari             Int             @map("jumlah_hari")
@@ -347,19 +458,19 @@ model UHDalamNegeri {
   @@map("uh_dalam_negeri")
 }
 
-model UHLuarNegeri {
+model UhLuarNegeri {
   id                     Int             @id @default(autoincrement())
-  sbmAcuanId             String          @map("sbm_acuan_id")
-  sbmAcuan               SBMAcuan        @relation(fields: [sbmAcuanId], references: [id])
+  pmkAcuanId             String          @map("sbm_acuan_id")
+  pmkAcuan               PmkAcuan        @relation(fields: [pmkAcuanId], references: [id])
   pesertaKegiatanId      Int             @map("peserta_kegiatan_id")
   pesertaKegiatan        PesertaKegiatan @relation(fields: [pesertaKegiatanId], references: [id])
   tanggalMulai           DateTime        @map("tanggal_mulai")
   tanggalSelesai         DateTime        @map("tanggal_selesai")
   jumlahHari             Int             @map("jumlah_hari") // harus di kasih trigger biar otomatis dihitung dari tanggal mulai dan selesai
   sbmUhLuarNegeriId      Int             @map("sbm_uh_luar_negeri_id") // akan mengacu ke id yg pencariannya berdasarkan negara dan golongan
-  sbmUhLuarNegeri        SBMUHLuarNegeri @relation(fields: [sbmUhLuarNegeriId], references: [id])
+  sbmUhLuarNegeri        SbmUhLuarNegeri @relation(fields: [sbmUhLuarNegeriId], references: [id])
   golonganUh             String          @map("golongan_uh") // enum A, B, C, D
-  nominalGolonganUh      Int             @map("nominal_golongan_uh") // sesuai dengan golongan yg ada di SBMUHLuarNegeri, karena bersifat historis maka diambil dari SBMUHLuarNegeri, resiko perubahan nilai nominal golongan di SBMUHLuarNegeri harus dihandle di aplikasi
+  nominalGolonganUh      Int             @map("nominal_golongan_uh") // sesuai dengan golongan yg ada di SbmUhLuarNegeri, karena bersifat historis maka diambil dari SbmUhLuarNegeri, resiko perubahan nilai nominal golongan di SbmUhLuarNegeri harus dihandle di aplikasi
   hPerjalanan            Int             @map("h_perjalanan")
   uhPerjalanan           Int             @map("uh_perjalanan")
   hUangHarian            Int             @map("h_uang_harian")
@@ -378,7 +489,7 @@ model UHLuarNegeri {
 model Itinerary {
   id                Int             @id @default(autoincrement())
   sbmUhLuarNegeriId Int             @map("sbm_uh_luar_negeri_id")
-  lokasi            SBMUHLuarNegeri @relation(fields: [sbmUhLuarNegeriId], references: [id])
+  lokasi            SbmUhLuarNegeri @relation(fields: [sbmUhLuarNegeriId], references: [id])
   tanggalMulai      DateTime
   tanggalSelesai    DateTime
   kegiatanId        Int             @map("kegiatan_id")
@@ -458,7 +569,7 @@ model Jadwal {
   updatedBy                          String?               @map("updated_by")
   updatedAt                          DateTime?             @updatedAt @map("updated_at")
   nominatifHonorarium                NominatifHonorarium[]
-  JadwalNarasumber                   JadwalNarasumber[]
+  jadwalNarasumber                   JadwalNarasumber[]
 
   @@map("jadwal")
 }
@@ -544,8 +655,12 @@ model Provinsi {
   createdAt        DateTime           @default(now()) @map("created_at")
   updatedBy        String?            @map("updated_by")
   updatedAt        DateTime?          @updatedAt @map("updated_at")
-  SBMUHDalamNegeri SBMUHDalamNegeri[]
+  SbmUhDalamNegeri SbmUhDalamNegeri[]
   kegiatan         Kegiatan[]
+  SbmPaketRapat    SbmPaketRapat[]
+  SbmUhRapat       SbmUhRapat[]
+  SbmTaksi         SbmTaksi[]
+  Kota             Kota[]
 
   @@map("provinsi")
 }
@@ -561,7 +676,7 @@ model Negara {
   createdAt       DateTime          @default(now()) @map("created_at")
   updatedBy       String?           @map("updated_by")
   updatedAt       DateTime?         @updatedAt @map("updated_at")
-  SBMUHLuarNegeri SBMUHLuarNegeri[]
+  SbmUhLuarNegeri SbmUhLuarNegeri[]
 
   @@map("negara")
 }

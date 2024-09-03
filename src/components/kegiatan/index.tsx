@@ -127,7 +127,7 @@ const PreviewKegiatan = ({ kegiatan, className }: PreviewKegiatanProps) => {
             <div className="flex flex-col">
               <span className="text-gray-700">Lokasi</span>
               <span className=" bg-gray-100 border border-gray-300 rounded px-2 py-1 w-full">
-                {kegiatan.provinsi.nama}
+                {kegiatan.lokasi}
               </span>
             </div>
           )}

@@ -1,20 +1,100 @@
 import { dbHonorarium } from "@/lib/db-honorarium";
-import { Lokasi } from "@prisma-honorarium/client";
+import { Lokasi, Provinsi } from "@prisma-honorarium/client";
 import bcrypt from "bcryptjs"; // Import bcrypt for password hashing and comparison
+import csv from "csv-parser";
+import { tr } from "date-fns/locale";
+import fs from "fs";
+import path, { resolve } from "path";
+
+interface ProvinsiRow {
+  id: string;
+  tahun: string;
+  kode: string;
+  nama: string;
+  nama_singkatan: string | null;
+  aktif: string;
+  created_by: string;
+  created_at: string;
+  updated_by: string | null;
+  updated_at: string | null;
+}
+
+const seedProvinsi = async (): Promise<void> => {
+  console.log("Seeding provinsi data");
+  const results: ProvinsiRow[] = [];
+
+  const csvPath = "docs/data-referensi/provinsi.csv";
+  const provinsiDataPath = path.resolve(process.cwd(), csvPath);
+  return new Promise((resolve, reject) => {
+    fs.createReadStream(provinsiDataPath)
+      .pipe(csv({ separator: ";" }))
+      .on("data", (data) => results.push(data))
+      .on("end", async () => {
+        try {
+          for (const row of results) {
+            //console.log(row);
+            await dbHonorarium.provinsi.create({
+              data: {
+                id: parseInt(row.id),
+                tahun: parseInt(row.tahun),
+                kode: parseInt(row.kode),
+                nama: row.nama,
+                namaSingkatan: row.nama_singkatan || null,
+                aktif: row.aktif === "true",
+                createdBy: row.created_by,
+                createdAt: new Date(row.created_at),
+                updatedBy: row.updated_by || null,
+                updatedAt: row.updated_at ? new Date(row.updated_at) : null,
+              },
+            });
+          }
+          console.log("Data seeded successfully");
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      })
+      .on("error", (error) => reject(error));
+  });
+};
+const deleteExisting = async (): Promise<void> => {
+  // Truncate the table
+  try {
+    console.log("Deleting existing data");
+
+    await dbHonorarium.kota.deleteMany({});
+    await dbHonorarium.provinsi.deleteMany({});
+    await dbHonorarium.jadwalNarasumber.deleteMany({});
+    await dbHonorarium.jadwal.deleteMany({});
+    await dbHonorarium.materi.deleteMany({});
+    await dbHonorarium.kelas.deleteMany({});
+    await dbHonorarium.kegiatan.deleteMany({});
+    await dbHonorarium.sbmHonorarium.deleteMany({});
+    await dbHonorarium.unitKerja.deleteMany({});
+    await dbHonorarium.jenisDokumenKegiatan.deleteMany({});
+    await dbHonorarium.materi.deleteMany({});
+    await dbHonorarium.narasumber.deleteMany({});
+    await dbHonorarium.pangkatGolongan.deleteMany({});
+    await dbHonorarium.sbmHonorarium.deleteMany({});
+    await dbHonorarium.pmkAcuan.deleteMany({});
+    await dbHonorarium.user.deleteMany({});
+    await dbHonorarium.userRole.deleteMany({});
+    await dbHonorarium.role.deleteMany({});
+
+    console.log("Existing data deleted successfully");
+  } catch (error) {
+    console.error("Error deleting existing data:", error);
+    throw error;
+  }
+};
 
 async function main() {
+  await deleteExisting();
+  await seedProvinsi();
+
   const routes = await dbHonorarium.jadwal.findMany({});
   console.log(routes);
 
-  // Truncate the table
-  await dbHonorarium.jadwalNarasumber.deleteMany({});
-  await dbHonorarium.jadwal.deleteMany({});
-  await dbHonorarium.materi.deleteMany({});
-
-  await dbHonorarium.kelas.deleteMany({});
-
-  // Truncate the table
-  await dbHonorarium.jenisDokumenKegiatan.deleteMany({});
   const dokumenKegiatan = await dbHonorarium.jenisDokumenKegiatan.createMany({
     data: [
       {
@@ -90,7 +170,6 @@ async function main() {
   });
 
   // Truncate the table
-  await dbHonorarium.unitKerja.deleteMany({});
   const unitKerja = await dbHonorarium.unitKerja.createMany({
     data: [
       {
@@ -122,7 +201,6 @@ async function main() {
   });
 
   // Truncate the table
-  await dbHonorarium.role.deleteMany({});
   const role = await dbHonorarium.role.createMany({
     data: [
       {
@@ -153,10 +231,6 @@ async function main() {
     ],
   });
 
-  // Truncate the table
-  await dbHonorarium.kelas.deleteMany({});
-  await dbHonorarium.kegiatan.deleteMany({});
-  await dbHonorarium.user.deleteMany({});
   const pass = bcrypt.hashSync("123456", 10);
   const user = await dbHonorarium.user.createMany({
     data: [
@@ -169,8 +243,6 @@ async function main() {
     ],
   });
 
-  // Truncate the table
-  await dbHonorarium.userRole.deleteMany({});
   const userRole = await dbHonorarium.userRole.createMany({
     data: [
       {
@@ -243,8 +315,6 @@ async function main() {
     ],
   });
 
-  await dbHonorarium.materi.deleteMany({});
-
   const materi = await dbHonorarium.materi.createMany({
     data: [
       {
@@ -311,7 +381,6 @@ async function main() {
     ],
   });
 
-  await dbHonorarium.pangkatGolongan.deleteMany({});
   const pangkatGolongan = await dbHonorarium.pangkatGolongan.createMany({
     data: [
       {
@@ -436,8 +505,6 @@ async function main() {
     ],
   });
 
-  await dbHonorarium.narasumber.deleteMany({});
-
   const narasumber = await dbHonorarium.narasumber.createMany({
     data: [
       {
@@ -557,6 +624,124 @@ async function main() {
       {
         jadwalId: jadwalku[2].id,
         narasumberId: narasumberku[3].id,
+        createdBy: "init",
+      },
+    ],
+  });
+
+  const kota = await dbHonorarium.kota.createMany({
+    data: [
+      {
+        nama: "Jakarta",
+        provinsiId: 31,
+        createdBy: "init",
+      },
+      {
+        nama: "Bandung",
+        provinsiId: 32,
+        createdBy: "init",
+      },
+      {
+        nama: "Surabaya",
+        provinsiId: 35,
+        createdBy: "init",
+      },
+    ],
+  });
+
+  const pmkAcuan = await dbHonorarium.pmkAcuan.createMany({
+    data: [
+      {
+        id: "2024",
+        nomorPMK: "49/2023",
+        tahun: 2024,
+        aktif: true,
+        createdBy: "init",
+      },
+    ],
+  });
+
+  const sbmHonorarium = await dbHonorarium.sbmHonorarium.createMany({
+    data: [
+      {
+        pmkAcuanId: "2024",
+        jenis: " Narasumber",
+        satuan: "OJ",
+        besaran: 1700000,
+        uraian:
+          "Menteri/Pejabat Setingkat Menteri/Pejabat Negara Lainnya/yang disetarakan",
+        createdBy: "init",
+      },
+      {
+        pmkAcuanId: "2024",
+        jenis: " Narasumber",
+        satuan: "OJ",
+        besaran: 1400000,
+        uraian: "Pejabat Eselon I/yang disetarakan",
+        createdBy: "init",
+      },
+      {
+        pmkAcuanId: "2024",
+        jenis: " Narasumber",
+        satuan: "OJ",
+        besaran: 1000000,
+        uraian: "Pejabat Eselon II/yang disetarakan",
+        createdBy: "init",
+      },
+      {
+        pmkAcuanId: "2024",
+        jenis: " Narasumber",
+        satuan: "OJ",
+        besaran: 1000000,
+        uraian: "Pejabat Eselon III ke bawah/yang disetarakan",
+        createdBy: "init",
+      },
+      {
+        pmkAcuanId: "2024",
+        jenis: " Moderator",
+        satuan: "Orang/kali",
+        besaran: 700000,
+        uraian: "Pejabat Eselon III ke bawah/yang disetarakan",
+        createdBy: "init",
+      },
+      {
+        pmkAcuanId: "2024",
+        jenis: " Pembawa Acara",
+        satuan: "OK",
+        besaran: 400000,
+        uraian: "Pejabat Eselon III ke bawah/yang disetarakan",
+        createdBy: "init",
+      },
+      {
+        pmkAcuanId: "2024",
+        jenis: "Panitia",
+        satuan: "OK",
+        besaran: 450000,
+        uraian: "Penanggung Jawab",
+        createdBy: "init",
+      },
+      {
+        pmkAcuanId: "2024",
+        jenis: "Panitia",
+        satuan: "OK",
+        besaran: 400000,
+        uraian: "Ketua/Wakil Ketua",
+        createdBy: "init",
+      },
+      {
+        pmkAcuanId: "2024",
+        jenis: "Panitia",
+        satuan: "OK",
+        besaran: 300000,
+        uraian: "Sekretaris",
+        createdBy: "init",
+      },
+      {
+        pmkAcuanId: "2024",
+        jenis: "Panitia",
+        satuan: "OK",
+        besaran: 300000,
+        uraian: "Anggota",
         createdBy: "init",
       },
     ],

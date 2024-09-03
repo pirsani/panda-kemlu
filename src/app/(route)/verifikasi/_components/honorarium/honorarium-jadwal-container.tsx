@@ -1,6 +1,7 @@
 "use client";
 import { Kegiatan } from "@prisma-honorarium/client";
 import { useEffect, useState } from "react";
+import DaftarJadwal from "./daftar-jadwal";
 interface HonorariumJadwalContainerProps {
   kegiatan: Kegiatan;
 }
@@ -15,8 +16,9 @@ const HonorariumJadwalContainer = ({
     getJadwal();
   }, [kegiatan]);
   return (
-    <div>
-      <div>Data Jadwal {kegiatan.nama}</div>
+    <div className="flex flex-col w-full gap-2">
+      <h2 className="font-semibold">Jadwal Narasumber</h2>
+      <DaftarJadwal kegiatanId={kegiatan.id} />
       <div>Data pengajar untuk setiap jadwal</div>
     </div>
   );
