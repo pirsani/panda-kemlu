@@ -1,10 +1,11 @@
 "use client";
 
+import { getOptionsSbmHonorarium, OptionSbm } from "@/actions/sbm";
 import { getJadwalByKegiatanId, JadwalKelasNarasumber } from "@/data/jadwal";
 import { cn } from "@/lib/utils";
 import { formatHariTanggal } from "@/utils/date-format";
 import { ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import NarasumberListItem from "./narasumber-list-item";
 
 interface DaftarJadwalProps {
@@ -19,6 +20,20 @@ const DaftarJadwal = ({ kegiatanId }: DaftarJadwalProps) => {
     };
     getJadwal();
   }, [kegiatanId]);
+
+  const [optionsSbmHonorarium, setOptionsSbmHonorarium] = useState<OptionSbm[]>(
+    []
+  );
+
+  useEffect(() => {
+    const fetchOptionsSbmHonorarium = async () => {
+      const optionsSbm = await getOptionsSbmHonorarium();
+      if (optionsSbm) {
+        setOptionsSbmHonorarium(optionsSbm);
+      }
+    };
+    fetchOptionsSbmHonorarium();
+  }, []);
 
   return (
     <>
@@ -43,6 +58,7 @@ const DaftarJadwal = ({ kegiatanId }: DaftarJadwalProps) => {
                   const jumlahNarsum = jadwal.jadwalNarasumber.length;
                   return (
                     <NarasumberListItem
+                      optionsSbmHonorarium={optionsSbmHonorarium}
                       index={index}
                       jadwal={jadwalNarsum}
                       totalNarsum={jumlahNarsum}

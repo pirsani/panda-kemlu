@@ -39,6 +39,7 @@
     "clsx": "^2.1.1",
     "csv-parser": "^3.0.0",
     "date-fns": "^3.6.0",
+    "decimal.js": "^10.4.3",
     "docxtemplater": "^3.50.0",
     "lodash": "^4.17.21",
     "lucide-react": "^0.436.0",

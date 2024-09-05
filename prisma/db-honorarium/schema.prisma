@@ -115,7 +115,8 @@ model Narasumber {
   eselon            String?
   pangkatGolonganId String?            @map("pangkat_golongan_id")
   pangkatGolongan   PangkatGolongan?   @relation(fields: [pangkatGolonganId], references: [id])
-  jenisNarasumber   String?            @map("jenis_narasumber")
+  jenisHonorariumId Int?               @map("jenis_honorarium_id") // ini hanya jadi catatan jenis yang sekarang saat pengajuan,bisa saja berubah krn kenaikan pangkat dll,  sehingga ketika pencatatan transaksi honorarium harus diacu ke jenis honorarium yg ada di sbm_honorarium dan dicatat di tabel jadwal_narasumber
+  jenisHonorarium   SbmHonorarium?     @relation(fields: [jenisHonorariumId], references: [id])
   email             String?
   nomorTelepon      String?            @map("nomor_telepon")
   bank              String?
@@ -131,25 +132,26 @@ model Narasumber {
 }
 
 model PmkAcuan {
-  id               String             @id
-  nomorPMK         String             @unique @map("nomor_pmk")
-  tmtAwal          DateTime?          @map("tmt_awal")
-  tmtAkhir         DateTime?          @map("tmt_akhir")
-  tahun            Int
-  aktif            Boolean
-  createdBy        String             @map("created_by")
-  createdAt        DateTime           @default(now()) @map("created_at")
-  updatedBy        String?            @map("updated_by")
-  updatedAt        DateTime?          @updatedAt @map("updated_at")
-  sbmHonorarium    SbmHonorarium[]
-  sbmUhDalamNegeri SbmUhDalamNegeri[]
-  sbmUhLuarNegeri  SbmUhLuarNegeri[]
-  uhDalamNegeri    UhDalamNegeri[]
-  uhLuarNegeri     UhLuarNegeri[]
-  sbmPaketRapat    SbmPaketRapat[]
-  sbmUhRapat       SbmUhRapat[]
-  sbmTaksi         SbmTaksi[]
-  sbmTiketPesawat  SbmTiketPesawat[]
+  id                        String                      @id
+  nomorPMK                  String                      @unique @map("nomor_pmk")
+  tmtAwal                   DateTime?                   @map("tmt_awal")
+  tmtAkhir                  DateTime?                   @map("tmt_akhir")
+  tahun                     Int
+  aktif                     Boolean
+  createdBy                 String                      @map("created_by")
+  createdAt                 DateTime                    @default(now()) @map("created_at")
+  updatedBy                 String?                     @map("updated_by")
+  updatedAt                 DateTime?                   @updatedAt @map("updated_at")
+  sbmHonorarium             SbmHonorarium[]
+  sbmUhDalamNegeri          SbmUhDalamNegeri[]
+  sbmUhLuarNegeri           SbmUhLuarNegeri[]
+  uhDalamNegeri             UhDalamNegeri[]
+  uhLuarNegeri              UhLuarNegeri[]
+  sbmPaketRapat             SbmPaketRapat[]
+  sbmUhRapat                SbmUhRapat[]
+  sbmTaksi                  SbmTaksi[]
+  sbmTiketPesawat           SbmTiketPesawat[]
+  SbmTiketPesawatLuarNegeri SbmTiketPesawatLuarNegeri[]
 
   @@map("pmk_acuan")
 }
@@ -160,15 +162,17 @@ model SbmHonorarium {
   id         Int      @id @default(autoincrement())
   jenis      String
   satuan     String
-  besaran    Int
+  besaran    Decimal  @db.Decimal(10, 0)
   uraian     String?
   pmkAcuanId String   @map("sbm_acuan_id")
   pmkAcuan   PmkAcuan @relation(fields: [pmkAcuanId], references: [id])
 
-  createdBy String    @map("created_by")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedBy String?   @map("updated_by")
-  updatedAt DateTime? @updatedAt @map("updated_at")
+  createdBy        String             @map("created_by")
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedBy        String?            @map("updated_by")
+  updatedAt        DateTime?          @updatedAt @map("updated_at")
+  JadwalNarasumber JadwalNarasumber[]
+  Narasumber       Narasumber[]
 
   @@map("sbm_honorarium")
 }
@@ -178,13 +182,13 @@ model SbmUhDalamNegeri {
   provinsiId Int      @map("provinsi_id")
   provinsi   Provinsi @relation(fields: [provinsiId], references: [id])
   satuan     String
-  halfday    Int
-  fullday    Int
-  fullboard  Int
+  halfday    Decimal  @db.Decimal(10, 0)
+  fullday    Decimal  @db.Decimal(10, 0)
+  fullboard  Decimal  @db.Decimal(10, 0)
   // fulldayHalfday String   @map("full_day_half_day")
-  luarKota   Int      @map("luar_kota")
-  dalamKota  Int      @map("dalam_kota")
-  diklat     Int
+  luarKota   Decimal  @map("luar_kota") @db.Decimal(10, 0)
+  dalamKota  Decimal  @map("dalam_kota") @db.Decimal(10, 0)
+  diklat     Decimal  @db.Decimal(10, 0)
   pmkAcuanId String   @map("sbm_acuan_id")
   pmkAcuan   PmkAcuan @relation(fields: [pmkAcuanId], references: [id])
 
@@ -212,9 +216,9 @@ model SbmPaketRapat {
   provinsiId Int               @map("provinsi_id")
   provinsi   Provinsi          @relation(fields: [provinsiId], references: [id])
   tingkat    TingkatPaketRapat // enum a, b, c
-  halfday    Int
-  fullday    Int
-  fullboard  Int
+  halfday    Decimal           @db.Decimal(10, 0)
+  fullday    Decimal           @db.Decimal(10, 0)
+  fullboard  Decimal           @db.Decimal(10, 0)
   pmkAcuanId String            @map("sbm_acuan_id")
   pmkAcuan   PmkAcuan          @relation(fields: [pmkAcuanId], references: [id])
 
@@ -233,8 +237,8 @@ model SbmUhRapat {
   provinsiId     Int      @map("provinsi_id")
   provinsi       Provinsi @relation(fields: [provinsiId], references: [id])
   satuan         String
-  fullboard      Int
-  fulldayHalfday Int      @map("fullday_halfday")
+  fullboard      Decimal  @db.Decimal(10, 0)
+  fulldayHalfday Decimal  @map("fullday_halfday") @db.Decimal(10, 0)
   pmkAcuanId     String   @map("sbm_acuan_id")
   pmkAcuan       PmkAcuan @relation(fields: [pmkAcuanId], references: [id])
 
@@ -251,7 +255,7 @@ model SbmTaksi {
   provinsiId Int      @map("provinsi_id")
   provinsi   Provinsi @relation(fields: [provinsiId], references: [id])
   satuan     String
-  besaran    Int
+  besaran    Decimal  @db.Decimal(10, 0)
   pmkAcuanId String   @map("sbm_acuan_id")
   pmkAcuan   PmkAcuan @relation(fields: [pmkAcuanId], references: [id])
 
@@ -285,9 +289,8 @@ model SbmTiketPesawat {
   kotaAsal     Kota     @relation("KotaAsal", fields: [kotaAsalId], references: [id])
   kotaTujuanId Int      @map("kota_tujuan_id")
   kotaTujuan   Kota     @relation("KotaTujuan", fields: [kotaTujuanId], references: [id])
-  tiketBisnis  Int      @map("tiket_bisnis")
-  tiketEkonomi Int      @map("tiket_ekonomi")
-  besaran      Int
+  tiketBisnis  Decimal  @map("tiket_bisnis") @db.Decimal(10, 0)
+  tiketEkonomi Decimal  @map("tiket_ekonomi") @db.Decimal(10, 0)
   pmkAcuanId   String   @map("sbm_acuan_id")
   pmkAcuan     PmkAcuan @relation(fields: [pmkAcuanId], references: [id])
 
@@ -299,15 +302,34 @@ model SbmTiketPesawat {
   @@map("sbm_tiket_pesawat")
 }
 
+model SbmTiketPesawatLuarNegeri {
+  id             Int      @id @default(autoincrement())
+  kotaAsalId     Int      @map("kota_asal_id")
+  negaraId       Int      @map("negara_id")
+  negara         Negara   @relation(fields: [negaraId], references: [id])
+  tiketEksekutif Decimal  @map("tiket_eksekutif") @db.Decimal(5, 0)
+  tiketBisnis    Decimal  @map("tiket_bisnis") @db.Decimal(5, 0)
+  tiketEkonomi   Decimal  @map("tiket_ekonomi") @db.Decimal(5, 0)
+  pmkAcuanId     String   @map("sbm_acuan_id")
+  pmkAcuan       PmkAcuan @relation(fields: [pmkAcuanId], references: [id])
+
+  createdBy String    @map("created_by")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedBy String?   @map("updated_by")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+
+  @@map("sbm_tiket_pesawat_luar_negeri")
+}
+
 model SbmUhLuarNegeri {
   id           Int            @id @default(autoincrement())
   negaraId     Int            @map("negara_id")
   negara       Negara         @relation(fields: [negaraId], references: [id])
   satuan       String
-  golonganA    Int            @map("golongan_a")
-  golonganB    Int            @map("golongan_b")
-  golonganC    Int            @map("golongan_c")
-  golonganD    Int            @map("golongan_d")
+  golonganA    Decimal        @map("golongan_a") @db.Decimal(4, 0)
+  golonganB    Decimal        @map("golongan_b") @db.Decimal(4, 0)
+  golonganC    Decimal        @map("golongan_c") @db.Decimal(4, 0)
+  golonganD    Decimal        @map("golongan_d") @db.Decimal(4, 0)
   pmkAcuanId   String         @map("sbm_acuan_id")
   pmkAcuan     PmkAcuan       @relation(fields: [pmkAcuanId], references: [id])
   createdBy    String         @map("created_by")
@@ -575,18 +597,19 @@ model Jadwal {
 }
 
 model JadwalNarasumber {
-  id                                 Int        @id @default(autoincrement())
-  jadwalId                           Int        @map("jadwal_id")
-  jadwal                             Jadwal     @relation(fields: [jadwalId], references: [id])
-  narasumberId                       String     @map("narasumber_id")
-  narasumber                         Narasumber @relation(fields: [narasumberId], references: [id])
-  jenisNarasumber                    String?    @map("jenis_narasumber") // ini bisa saja berbeda dengan jenis narasumber yang ada di tabel narasumber
-  jumlahJamPelajaran                 Decimal?   @map("jumlah_jam_pelajaran")
-  dokumenKonfirmasiKesediaanMengajar String?    @map("dokumen_konfirmasi_kesediaan_mengajar")
-  createdBy                          String     @map("created_by")
-  createdAt                          DateTime   @default(now()) @map("created_at")
-  updatedBy                          String?    @map("updated_by")
-  updatedAt                          DateTime?  @updatedAt @map("updated_at")
+  id                                 Int            @id @default(autoincrement())
+  jadwalId                           Int            @map("jadwal_id")
+  jadwal                             Jadwal         @relation(fields: [jadwalId], references: [id])
+  narasumberId                       String         @map("narasumber_id")
+  narasumber                         Narasumber     @relation(fields: [narasumberId], references: [id])
+  jenisHonorariumId                  Int?           @map("jenis_honorarium_id") // ini bisa saja berbeda dengan jenis narasumber yang ada di tabel narasumber
+  jenisHonorarium                    SbmHonorarium? @relation(fields: [jenisHonorariumId], references: [id])
+  jumlahJamPelajaran                 Decimal?       @map("jumlah_jam_pelajaran") @db.Decimal(5, 2) // bisa saja berbeda dengan jumlah jam pelajaran yang ada di tabel jadwal
+  dokumenKonfirmasiKesediaanMengajar String?        @map("dokumen_konfirmasi_kesediaan_mengajar")
+  createdBy                          String         @map("created_by")
+  createdAt                          DateTime       @default(now()) @map("created_at")
+  updatedBy                          String?        @map("updated_by")
+  updatedAt                          DateTime?      @updatedAt @map("updated_at")
 
   @@unique([jadwalId, narasumberId])
   @@map("jadwal_narasumber")
@@ -630,12 +653,12 @@ model NominatifHonorarium {
   id                     Int     @id @default(autoincrement())
   jadwalId               Int     @unique @map("jadwal_id")
   jadwal                 Jadwal  @relation(fields: [jadwalId], references: [id])
-  besaran                Int
+  besaran                Decimal @db.Decimal(10, 0)
   jumlah                 Int
-  pajakDPP               Int     @map("pajak_dpp")
-  pajakTarif             Int     @map("pajak_tarif")
-  pph21                  Int     @map("pph_21")
-  jumlahDiterima         Int     @map("jumlah_diterima")
+  pajakDPP               Decimal @map("pajak_dpp") @db.Decimal(10, 0)
+  pajakTarif             Decimal @map("pajak_tarif") @db.Decimal(5, 2)
+  pph21                  Decimal @map("pph_21") @db.Decimal(5, 2)
+  jumlahDiterima         Decimal @map("jumlah_diterima") @db.Decimal(10, 2)
   namaRekening           String? @map("nama_rekening")
   nomorRekening          String? @map("nomor_rekening")
   dokumenBuktiPembayaran String? @map("dokumen_bukti_pembayaran")
@@ -672,11 +695,12 @@ model Negara {
   kodeAlpha3  String @map("kode_alpha_3") // ISO 3166-1 alpha-3 code
   kodeNumeric String @map("kode_numeric") // ISO 3166-1 numeric code
 
-  createdBy       String            @default("init") @map("created_by")
-  createdAt       DateTime          @default(now()) @map("created_at")
-  updatedBy       String?           @map("updated_by")
-  updatedAt       DateTime?         @updatedAt @map("updated_at")
-  SbmUhLuarNegeri SbmUhLuarNegeri[]
+  createdBy                 String                      @default("init") @map("created_by")
+  createdAt                 DateTime                    @default(now()) @map("created_at")
+  updatedBy                 String?                     @map("updated_by")
+  updatedAt                 DateTime?                   @updatedAt @map("updated_at")
+  SbmUhLuarNegeri           SbmUhLuarNegeri[]
+  SbmTiketPesawatLuarNegeri SbmTiketPesawatLuarNegeri[]
 
   @@map("negara")
 }
