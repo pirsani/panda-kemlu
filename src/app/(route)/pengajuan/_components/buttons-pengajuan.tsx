@@ -1,8 +1,24 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { JenisPengajuan } from "@/types";
-import { Kegiatan, LOKASI, RiwayatProses } from "@prisma-honorarium/client";
+import {
+  JENIS_PENGAJUAN,
+  Kegiatan,
+  LOKASI,
+  RiwayatProses,
+} from "@prisma-honorarium/client";
 import { useEffect, useState } from "react";
+
+// generate rampungan, uh dalam negeri, uh luar negeri hanya dapat di ajukan sekali
+// honorarium, penggantian reimbursement, pembayaran pihak ke-3 dapat di ajukan berkali-kali
+interface MapRiwayatProses {
+  [JENIS_PENGAJUAN.GENERATE_RAMPUNGAN]: RiwayatProses | null;
+  [JENIS_PENGAJUAN.HONORARIUM]: RiwayatProses[];
+  [JENIS_PENGAJUAN.UH_DALAM_NEGERI]: RiwayatProses | null;
+  [JENIS_PENGAJUAN.UH_LUAR_NEGERI]: RiwayatProses | null;
+  [JENIS_PENGAJUAN.PENGGANTIAN_REINBURSEMENT]: RiwayatProses[];
+  [JENIS_PENGAJUAN.PEMBAYARAN_PIHAK_KETIGA]: RiwayatProses[];
+}
 
 interface ButtonsPengajuanProps {
   kegiatan: Kegiatan | null;
@@ -19,9 +35,45 @@ const ButtonsPengajuan = ({
   const [existingRampungan, setExistingRampungan] =
     useState<RiwayatProses | null>(null);
 
+  const [mapRiwayatProses, setMapRiwayatProses] =
+    useState<MapRiwayatProses | null>(null);
+
   const handleOnClick = (jenis: JenisPengajuan) => {
     setJenisPengajuan(jenis);
     handleSelection(jenis);
+  };
+
+  const mappingRiwayatProses = (riwayatProses: RiwayatProses[]) => {
+    const mapped: MapRiwayatProses = {
+      [JENIS_PENGAJUAN.GENERATE_RAMPUNGAN]: null,
+      [JENIS_PENGAJUAN.HONORARIUM]: [],
+      [JENIS_PENGAJUAN.UH_DALAM_NEGERI]: null,
+      [JENIS_PENGAJUAN.UH_LUAR_NEGERI]: null,
+      [JENIS_PENGAJUAN.PENGGANTIAN_REINBURSEMENT]: [],
+      [JENIS_PENGAJUAN.PEMBAYARAN_PIHAK_KETIGA]: [],
+    };
+
+    riwayatProses.forEach((proses) => {
+      const jenis = proses.jenis;
+
+      // Handle single object types
+      if (
+        jenis === JENIS_PENGAJUAN.GENERATE_RAMPUNGAN ||
+        jenis === JENIS_PENGAJUAN.UH_DALAM_NEGERI ||
+        jenis === JENIS_PENGAJUAN.UH_LUAR_NEGERI
+      ) {
+        mapped[jenis] = proses; // Directly assign the object
+      } else if (
+        // Handle array types
+        jenis === JENIS_PENGAJUAN.HONORARIUM ||
+        jenis === JENIS_PENGAJUAN.PENGGANTIAN_REINBURSEMENT ||
+        jenis === JENIS_PENGAJUAN.PEMBAYARAN_PIHAK_KETIGA
+      ) {
+        (mapped[jenis] as RiwayatProses[]).push(proses); // Push to the array
+      }
+    });
+
+    setMapRiwayatProses(mapped);
   };
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -31,22 +83,18 @@ const ButtonsPengajuan = ({
 
   useEffect(() => {
     console.log("riwayatProses", riwayatProses);
-    const prosesRampungan = riwayatProses.find(
-      (r) => r.jenis === "GENERATE_RAMPUNGAN"
-    );
-    if (prosesRampungan) {
-      console.log("prosesRampungan", prosesRampungan);
-      setExistingRampungan(prosesRampungan);
-    }
+    mappingRiwayatProses(riwayatProses);
   }, [riwayatProses]);
 
   if (!kegiatan) return null;
+
+  if (!mapRiwayatProses) return null;
 
   return (
     <div className="flex flex-wrap gap-2">
       {/* jika sudah ada generate rampungan, tidak bisa generate rampungan lagi */}
       <ButtonRiwayatRampungan
-        existingRampungan={existingRampungan}
+        existingRampungan={mapRiwayatProses[JENIS_PENGAJUAN.GENERATE_RAMPUNGAN]}
         jenisPengajuan="GENERATE_RAMPUNGAN"
         handleOnClick={handleOnClick}
       />
@@ -123,7 +171,35 @@ const ButtonRiwayatRampungan = ({
 }: ButtonRiwayatRampunganProps) => {
   if (existingRampungan && existingRampungan.status == "terverifikasi")
     return null;
-  if (!existingRampungan || existingRampungan.status !== "terverifikasi")
+  if (!existingRampungan || existingRampungan.status === "pengajuan")
+    return (
+      <Button
+        variant="outline"
+        onClick={() => handleOnClick("GENERATE_RAMPUNGAN")}
+        className={cn(
+          "hover:bg-blue-400 hover:text-white",
+          jenisPengajuan == "GENERATE_RAMPUNGAN" && "bg-blue-500 text-white"
+        )}
+      >
+        Ajukan Generate Rampungan {existingRampungan?.status}
+      </Button>
+    );
+};
+
+interface ButtonAjukanUhDalamNegeriProps {
+  handleOnClick: (jenis: JenisPengajuan) => void;
+  jenisPengajuan: JenisPengajuan;
+  existingRampungan: RiwayatProses | null;
+}
+
+const ButtonAjukanUhDalamNegeri = ({
+  handleOnClick,
+  jenisPengajuan,
+  existingRampungan,
+}: ButtonAjukanUhDalamNegeriProps) => {
+  if (!existingRampungan || existingRampungan.status != "terverifikasi")
+    return null;
+  if (!existingRampungan || existingRampungan.status === "pengajuan")
     return (
       <Button
         variant="outline"

@@ -44,28 +44,21 @@ const PengajuanContainer = () => {
     const getKegiatan = async () => {
       if (kegiatanId) {
         const data = await getKegiatanById(kegiatanId);
-        setKegiatan(data);
-      }
-    };
-    const getRiwayat = async () => {
-      if (kegiatanId) {
         const riwayat = await getRiwayatProses(kegiatanId);
+        setKegiatan(data);
         setRiwayatProses(riwayat);
+        const prosesRampungan = riwayat.find(
+          (r) => r.jenis === "GENERATE_RAMPUNGAN"
+        );
+        if (prosesRampungan) {
+          setExistingRampungan(prosesRampungan);
+        } else {
+          setExistingRampungan(null);
+        }
       }
     };
     getKegiatan();
-    getRiwayat();
   }, [kegiatanId]);
-
-  // check if there is already a generate rampungan pengajuan
-  useEffect(() => {
-    const prosesRampungan = riwayatProses.find(
-      (r) => r.jenis === "GENERATE_RAMPUNGAN"
-    );
-    if (prosesRampungan) {
-      setExistingRampungan(prosesRampungan);
-    }
-  }, [riwayatProses]);
 
   return (
     <div className="relative flex flex-col w-full gap-6 pb-20">
@@ -91,7 +84,8 @@ const PengajuanContainer = () => {
           existingRampungan &&
           existingRampungan.status !== "terverifikasi" && (
             <span className="text-red-500">
-              Pengajuan Generate Rampungan sudah diajukan dan belum diverifikasi
+              Pengajuan Generate Rampungan sudah diajukan dan belum diverifikasi{" "}
+              {existingRampungan.kegiatanId}
             </span>
           )}
 
