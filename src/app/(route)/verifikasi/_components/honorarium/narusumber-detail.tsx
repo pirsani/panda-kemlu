@@ -1,8 +1,12 @@
 import { OptionSbm } from "@/actions/sbm";
+import ButtonEye from "@/components/button-eye-open-document";
+import TextDokumenWithPreviewButton from "@/components/kegiatan/text-dokumen-with-preview-button";
+import { Button } from "@/components/ui/button";
 import formatCurrency from "@/utils/format-currency";
 import { JadwalNarasumber, Narasumber } from "@prisma-honorarium/client";
 import Decimal from "decimal.js";
-import { use, useEffect, useState } from "react";
+import { Eye } from "lucide-react";
+import { use, useEffect, useMemo, useState } from "react";
 import Select, { ActionMeta, Options, SingleValue } from "react-select";
 
 interface PerkiraanPembayaran {
@@ -44,7 +48,7 @@ const NarasumberDetail = ({
   }, []);
 
   //const sbm: Decimal = new Decimal(1700000); // dari tabel referensi sbm_honorarium
-  const besaranPajak: Decimal = new Decimal(0.05);
+  const besaranPajak = useMemo(() => new Decimal(0.05), []);
 
   const handleJpChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -72,7 +76,7 @@ const NarasumberDetail = ({
         honorarium: JumlahJP.times(sbm),
       });
     }
-  }, [JumlahJP, selectedSbmHonorarium]);
+  }, [JumlahJP, selectedSbmHonorarium, besaranPajak]);
 
   return (
     <div>
@@ -90,6 +94,12 @@ const NarasumberDetail = ({
       <RowNarasumber text="Nomor Rekening" value={narasumber.nomorRekening} />
       <RowNarasumber text="Kelas" value={`Kelas X`} />
       <RowNarasumber text="Materi" value={`Materi Y`} />
+      <RowNarasumberWithInput text="lembar konfirmasi">
+        <div className="w-full flex justify-between">
+          <span>nama file</span>
+          <ButtonEye url="/templates/pdf-placeholder.pdf" />
+        </div>
+      </RowNarasumberWithInput>
       <RowNarasumberWithInput text="Jenis Honorarium">
         <SelectSbmHonorarium
           optionsSbmHonorarium={optionsSbmHonorarium}
@@ -139,9 +149,9 @@ const RowNarasumberWithInput = ({
   children: React.ReactNode;
 }) => {
   return (
-    <div className="flex flex-row w-full border border-blue-200 h-12 bg-blue-100 p-2">
+    <div className="flex flex-row w-full border border-blue-200 h-12 bg-blue-100 p-1">
       <div className="w-1/3">{text}</div>
-      <div className="w-2/3">{children}</div>
+      <div className="w-2/3 flex">{children}</div>
     </div>
   );
 };
@@ -190,6 +200,7 @@ const SelectSbmHonorarium = ({
         </div>
       )}
       getOptionValue={(option: OptionSbm) => option.value.toString()}
+      className="w-full"
     />
   );
 };
