@@ -1,15 +1,12 @@
 "use client";
+import { getKegiatanById } from "@/actions/kegiatan";
 import FloatingComponent from "@/components/floating-component";
 import PreviewKegiatan from "@/components/kegiatan";
 import PdfPreviewContainer from "@/components/pdf-preview-container";
-import { Kegiatan } from "@prisma-honorarium/client";
-//import SelectKegiatan from "@/components/form/select-kegiatan";
-import { getKegiatanById } from "@/actions/kegiatan";
-import { Button } from "@/components/ui/button";
 import { JenisPengajuan } from "@/types";
+import { Kegiatan } from "@prisma-honorarium/client";
 import dynamic from "next/dynamic";
-import { use, useEffect, useState } from "react";
-import ButtonsPengajuan from "./buttons-pengajuan";
+import { useEffect, useState } from "react";
 import VerfikasiSelectionContainer from "./verifikasi-selection-container";
 const SelectKegiatan = dynamic(
   () => import("@/components/form/select-kegiatan"),
@@ -25,9 +22,6 @@ const VerifikasiContainer = () => {
     setKegiatanId(value); // after this set, it will trigger re-render PreviewKegiatan
   };
   const [jenisPengajuan, setJenisPengajuan] = useState<JenisPengajuan | null>();
-  const handleSelection = (jenis: JenisPengajuan) => {
-    setJenisPengajuan(jenis);
-  };
 
   useEffect(() => {
     console.log("kegiatanId", kegiatanId);

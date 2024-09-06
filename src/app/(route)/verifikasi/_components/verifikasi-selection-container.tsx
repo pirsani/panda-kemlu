@@ -1,3 +1,4 @@
+import DaftarJadwal from "@/components/kegiatan/honorarium/daftar-jadwal";
 import { Button } from "@/components/ui/button";
 import { JenisPengajuan } from "@/types";
 import { Kegiatan } from "@prisma-honorarium/client";
@@ -25,12 +26,12 @@ const VerfikasiSelectionContainer = ({
           statusRampungan="belum-ada"
           handleSelection={handleSelection}
         />
-        <div className="flex flex-row gap-2 mt-6 w-full border-gray-300 border rounded-md p-2 shadow-lg">
+        <div className="flex flex-col gap-2 mt-6 w-full border-gray-300 border rounded-md p-2 shadow-lg">
           {jenisPengajuan == "generate-rampungan" && (
             <FormGenerateRampungan kegiatanId={kegiatan.id} />
           )}
           {jenisPengajuan == "honorarium" && (
-            <HonorariumJadwalContainer kegiatan={kegiatan} />
+            <DaftarJadwal kegiatanId={kegiatan.id} proses="verfikasi" />
           )}
           {jenisPengajuan == "uh-dalam-negeri" && (
             <div>Verifikasi UH Dalam Negeri</div>

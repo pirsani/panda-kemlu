@@ -11,10 +11,12 @@ import { ChevronRight } from "lucide-react";
 import { use, useEffect, useState } from "react";
 import NarasumberListItem from "./narasumber-list-item";
 
+export type Proses = "pengajuan" | "verfikasi" | "pembayaran";
 interface DaftarJadwalProps {
   kegiatanId: number;
+  proses: Proses;
 }
-const DaftarJadwal = ({ kegiatanId }: DaftarJadwalProps) => {
+const DaftarJadwal = ({ kegiatanId, proses }: DaftarJadwalProps) => {
   const [dataJadwal, setDataJadwal] = useState<JadwalKelasNarasumber[]>([]);
   useEffect(() => {
     const getJadwal = async () => {
@@ -56,7 +58,10 @@ const DaftarJadwal = ({ kegiatanId }: DaftarJadwalProps) => {
       {dataJadwal &&
         dataJadwal.map((jadwal, index) => {
           return (
-            <div key={index} className="w-full border border-gray-300">
+            <div
+              key={index}
+              className="w-full border border-gray-300 focus-within:ring-1 focus-within:ring-blue-500 rounded-md"
+            >
               <div className="flex flex-row w-full ">
                 <div className="px-4 w-1/3 py-2  border-b border-gray-300">
                   {jadwal.kelas.nama}
@@ -99,37 +104,47 @@ const DaftarJadwal = ({ kegiatanId }: DaftarJadwalProps) => {
                     </div>
                   </div>
                 </div>
-                <div className="flex flex-col px-4 py-2 w-full border-t border-gray-300 gap-2">
-                  <div>
-                    <Textarea
-                      placeholder="Catatan"
-                      className="w-full border-blue-500"
-                    />
-                  </div>
-                  <div className="flex flex-row justify-start gap-4">
-                    <Button
-                      className={cn(
-                        "bg-red-500 text-white",
-                        "hover:bg-green-600"
-                      )}
-                    >
-                      Revisi
-                    </Button>
-                    <Button
-                      className={cn(
-                        "bg-blue-500 text-white",
-                        "hover:bg-blue-600"
-                      )}
-                    >
-                      Setuju
-                    </Button>
-                  </div>
-                </div>
+                {proses == "pengajuan" && <FormProsesPengajuan />}
+                {proses == "verfikasi" && <FormProsesVerifikasi />}
               </div>
             </div>
           );
         })}
     </>
+  );
+};
+
+const FormProsesPengajuan = () => {
+  return (
+    <div className="flex flex-col px-4 py-2 w-full border-t border-gray-300 gap-2">
+      <div>
+        <Textarea placeholder="Catatan" className="w-full" />
+      </div>
+      <div className="flex flex-row justify-between">
+        <Button className="bg-blue-500 text-white">Ajukan</Button>
+      </div>
+    </div>
+  );
+};
+
+const FormProsesVerifikasi = () => {
+  return (
+    <div className="flex flex-col px-4 py-2 w-full border-t border-gray-300 gap-2">
+      <div>
+        <Textarea
+          placeholder="Catatan"
+          className="w-full focus:border-none focus-visible:outline-none focus-visible:ring-blue-300 focus-visible:ring-1  focus-visible:ring-offset-1"
+        />
+      </div>
+      <div className="flex flex-row gap-2 justify-between">
+        <Button className="bg-red-500 text-white hover:bg-red-600">
+          Revisi
+        </Button>
+        <Button className="bg-blue-500 text-white hover:bg-blue-600">
+          Setuju
+        </Button>
+      </div>
+    </div>
   );
 };
 
