@@ -53,6 +53,11 @@ export const getSbmHonorarium = async (pmkAcuan: string = currentYear) => {
   return dataSbm;
 };
 
+//FIX Warning: Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+//  {value: 30, label: ..., besaran: Decimal, satuan: ...}
+// convert Decimal to plain number
+// and then return converted data
+// on client side, convert it back to Decimal
 export const getOptionsSbmHonorarium = async () => {
   const dataSbm = await dbHonorarium.sbmHonorarium.findMany({});
   // map dataSbm to options
@@ -63,5 +68,10 @@ export const getOptionsSbmHonorarium = async () => {
     satuan: sbm.satuan,
   }));
 
-  return optionsSbm;
+  const convertedData = optionsSbm.map((item) => ({
+    ...item,
+    besaran: item.besaran?.toNumber(), // Convert Decimal to plain number
+  }));
+
+  return convertedData;
 };
