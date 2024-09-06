@@ -1,7 +1,7 @@
 export type JenisPengajuan =
-  | "generate-rampungan"
-  | "honorarium"
-  | "uh-dalam-negeri"
-  | "uh-luar-negeri"
-  | "penggantian-reinbursement"
-  | "pembayaran-pihak-ke-3";
+  | "GENERATE_RAMPUNGAN"
+  | "HONORARIUM"
+  | "UH_DALAM_NEGERI"
+  | "UH_LUAR_NEGERI"
+  | "PENGGANTIAN_REINBURSEMENT"
+  | "PEMBAYARAN_PIHAK_KETIGA";

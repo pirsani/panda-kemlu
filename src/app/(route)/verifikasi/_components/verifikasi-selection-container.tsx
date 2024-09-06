@@ -1,10 +1,8 @@
 import DaftarJadwal from "@/components/kegiatan/honorarium/daftar-jadwal";
-import { Button } from "@/components/ui/button";
 import { JenisPengajuan } from "@/types";
 import { Kegiatan } from "@prisma-honorarium/client";
 import { useState } from "react";
 import ButtonsPengajuan from "./buttons-pengajuan";
-import HonorariumJadwalContainer from "./honorarium/honorarium-jadwal-container";
 import FormGenerateRampungan from "./rampungan/form-generate-rampungan";
 
 interface VerfikasiSelectionContainerProps {
@@ -27,22 +25,22 @@ const VerfikasiSelectionContainer = ({
           handleSelection={handleSelection}
         />
         <div className="flex flex-col gap-2 mt-6 w-full border-gray-300 border rounded-md p-2 shadow-lg">
-          {jenisPengajuan == "generate-rampungan" && (
+          {jenisPengajuan == "GENERATE_RAMPUNGAN" && (
             <FormGenerateRampungan kegiatanId={kegiatan.id} />
           )}
-          {jenisPengajuan == "honorarium" && (
+          {jenisPengajuan == "HONORARIUM" && (
             <DaftarJadwal kegiatanId={kegiatan.id} proses="verfikasi" />
           )}
-          {jenisPengajuan == "uh-dalam-negeri" && (
+          {jenisPengajuan == "UH_DALAM_NEGERI" && (
             <div>Verifikasi UH Dalam Negeri</div>
           )}
-          {jenisPengajuan == "uh-luar-negeri" && (
+          {jenisPengajuan == "UH_LUAR_NEGERI" && (
             <div>Verifikasi UH Luar Negeri</div>
           )}
-          {jenisPengajuan == "penggantian-reinbursement" && (
+          {jenisPengajuan == "PENGGANTIAN_REINBURSEMENT" && (
             <div>Verifikasi Penggantian Reinbursement</div>
           )}
-          {jenisPengajuan == "pembayaran-pihak-ke-3" && (
+          {jenisPengajuan == "PEMBAYARAN_PIHAK_KETIGA" && (
             <div>Verifikasi Pembayaran Pihak Ke-3</div>
           )}
         </div>

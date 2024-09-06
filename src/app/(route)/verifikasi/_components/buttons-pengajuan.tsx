@@ -25,21 +25,21 @@ const ButtonsPengajuan = ({
     <div className="flex flex-wrap gap-2">
       <Button
         variant="outline"
-        onClick={() => handleOnClick("generate-rampungan")}
+        onClick={() => handleOnClick("GENERATE_RAMPUNGAN")}
         disabled={statusRampungan == "sudah-ada"}
         className={cn(
           "hover:bg-blue-400 hover:text-white",
-          jenisPengajuan == "generate-rampungan" && "bg-blue-500 text-white"
+          jenisPengajuan == "GENERATE_RAMPUNGAN" && "bg-blue-500 text-white"
         )}
       >
         Generate Rampungan
       </Button>
       <Button
         variant="outline"
-        onClick={() => handleOnClick("honorarium")}
+        onClick={() => handleOnClick("HONORARIUM")}
         className={cn(
           "hover:bg-blue-400 hover:text-white",
-          jenisPengajuan == "honorarium" && "bg-blue-500 text-white"
+          jenisPengajuan == "HONORARIUM" && "bg-blue-500 text-white"
         )}
       >
         Verifikasi Honorarium
@@ -47,11 +47,11 @@ const ButtonsPengajuan = ({
       {lokasi != 2 && (
         <Button
           variant="outline"
-          onClick={() => handleOnClick("uh-dalam-negeri")}
+          onClick={() => handleOnClick("UH_DALAM_NEGERI")}
           disabled={statusRampungan == "belum-ada"}
           className={cn(
             "hover:bg-blue-400 hover:text-white",
-            jenisPengajuan == "uh-dalam-negeri" && "bg-blue-500 text-white"
+            jenisPengajuan == "UH_DALAM_NEGERI" && "bg-blue-500 text-white"
           )}
         >
           Verifikasi UH Dalam Negeri
@@ -60,11 +60,11 @@ const ButtonsPengajuan = ({
       {lokasi == 2 && (
         <Button
           variant="outline"
-          onClick={() => handleOnClick("uh-luar-negeri")}
+          onClick={() => handleOnClick("UH_LUAR_NEGERI")}
           disabled={statusRampungan == "belum-ada"}
           className={cn(
             "hover:bg-blue-400 hover:text-white",
-            jenisPengajuan == "uh-luar-negeri" && "bg-blue-500 text-white"
+            jenisPengajuan == "UH_LUAR_NEGERI" && "bg-blue-500 text-white"
           )}
         >
           Verifikasi UH Luar Negeri
@@ -73,10 +73,10 @@ const ButtonsPengajuan = ({
 
       <Button
         variant="outline"
-        onClick={() => handleOnClick("penggantian-reinbursement")}
+        onClick={() => handleOnClick("PENGGANTIAN_REINBURSEMENT")}
         className={cn(
           "hover:bg-blue-400 hover:text-white",
-          jenisPengajuan == "penggantian-reinbursement" &&
+          jenisPengajuan == "PENGGANTIAN_REINBURSEMENT" &&
             "bg-blue-500 text-white"
         )}
       >
@@ -84,10 +84,11 @@ const ButtonsPengajuan = ({
       </Button>
       <Button
         variant="outline"
-        onClick={() => handleOnClick("pembayaran-pihak-ke-3")}
+        onClick={() => handleOnClick("PEMBAYARAN_PIHAK_KETIGA")}
         className={cn(
           "hover:bg-blue-400 hover:text-white",
-          jenisPengajuan == "pembayaran-pihak-ke-3" && "bg-blue-500 text-white"
+          jenisPengajuan == "PEMBAYARAN_PIHAK_KETIGA" &&
+            "bg-blue-500 text-white"
         )}
       >
         Verifikasi Pembayaran Pihak Ke-3

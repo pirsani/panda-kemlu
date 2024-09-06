@@ -2,15 +2,15 @@
 import { getKegiatanById } from "@/actions/kegiatan";
 import FloatingComponent from "@/components/floating-component";
 import PreviewKegiatan from "@/components/kegiatan";
-import DaftarJadwal from "@/components/kegiatan/honorarium/daftar-jadwal";
 import PdfPreviewContainer from "@/components/pdf-preview-container";
-import { Button } from "@/components/ui/button";
 import { JenisPengajuan } from "@/types";
-import { Kegiatan } from "@prisma-honorarium/client";
+import { Kegiatan, RiwayatProses } from "@prisma-honorarium/client";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
+import { getRiwayatProses } from "@/actions/kegiatan/proses";
 import ButtonsPengajuan from "./buttons-pengajuan";
+import FormPengajuanGenerateRampungan from "./form-pengajuan-generate-rampungan";
 import HonorariumContainer from "./honorarium/honorarium-container";
 import PenggantianContainer from "./penggantian-container";
 import PihakKe3Container from "./pihak-ke3-container";
@@ -25,6 +25,9 @@ const SelectKegiatan = dynamic(
 const PengajuanContainer = () => {
   const [kegiatanId, setKegiatanId] = useState<number | null>(null);
   const [kegiatan, setKegiatan] = useState<Kegiatan | null>(null);
+  const [riwayatProses, setRiwayatProses] = useState<RiwayatProses[]>([]);
+  const [existingRampungan, setExistingRampungan] =
+    useState<RiwayatProses | null>(null);
 
   const handleKegiatanChange = (value: number | null) => {
     console.log(value);
@@ -44,8 +47,25 @@ const PengajuanContainer = () => {
         setKegiatan(data);
       }
     };
+    const getRiwayat = async () => {
+      if (kegiatanId) {
+        const riwayat = await getRiwayatProses(kegiatanId);
+        setRiwayatProses(riwayat);
+      }
+    };
     getKegiatan();
+    getRiwayat();
   }, [kegiatanId]);
+
+  // check if there is already a generate rampungan pengajuan
+  useEffect(() => {
+    const prosesRampungan = riwayatProses.find(
+      (r) => r.jenis === "GENERATE_RAMPUNGAN"
+    );
+    if (prosesRampungan) {
+      setExistingRampungan(prosesRampungan);
+    }
+  }, [riwayatProses]);
 
   return (
     <div className="relative flex flex-col w-full gap-6 pb-20">
@@ -58,18 +78,32 @@ const PengajuanContainer = () => {
       <div className="w-1/2 flex flex-col gap-2 ">
         <ButtonsPengajuan
           handleSelection={handleSelection}
-          lokasi={2}
-          statusRampungan="sudah-ada"
+          kegiatan={kegiatan}
+          riwayatProses={riwayatProses}
         />
-        {jenisPengajuan == "honorarium" && kegiatan && (
+
+        {jenisPengajuan == "GENERATE_RAMPUNGAN" &&
+          existingRampungan === null && (
+            <FormPengajuanGenerateRampungan kegiatanId={kegiatanId} />
+          )}
+
+        {jenisPengajuan == "GENERATE_RAMPUNGAN" &&
+          existingRampungan &&
+          existingRampungan.status !== "terverifikasi" && (
+            <span className="text-red-500">
+              Pengajuan Generate Rampungan sudah diajukan dan belum diverifikasi
+            </span>
+          )}
+
+        {jenisPengajuan == "HONORARIUM" && kegiatan && (
           <HonorariumContainer kegiatan={kegiatan} />
         )}
-        {jenisPengajuan == "uh-dalam-negeri" && <UhDalamNegeriContainer />}
-        {jenisPengajuan == "uh-luar-negeri" && <UhLuarNegeriContainer />}
-        {jenisPengajuan == "penggantian-reinbursement" && (
+        {jenisPengajuan == "UH_DALAM_NEGERI" && <UhDalamNegeriContainer />}
+        {jenisPengajuan == "UH_LUAR_NEGERI" && <UhLuarNegeriContainer />}
+        {jenisPengajuan == "PENGGANTIAN_REINBURSEMENT" && (
           <PenggantianContainer />
         )}
-        {jenisPengajuan == "pembayaran-pihak-ke-3" && <PihakKe3Container />}
+        {jenisPengajuan == "PEMBAYARAN_PIHAK_KETIGA" && <PihakKe3Container />}
       </div>
 
       <FloatingComponent>
