@@ -284,10 +284,10 @@ const ButtonAjukanUhDalamNegeri = ({
     return (
       <Button
         variant="outline"
-        onClick={() => handleOnClick("GENERATE_RAMPUNGAN")}
+        onClick={() => handleOnClick("UH_DALAM_NEGERI")}
         className={cn(
           "hover:bg-blue-400 hover:text-white",
-          jenisPengajuan == "GENERATE_RAMPUNGAN" && "bg-blue-500 text-white"
+          jenisPengajuan == "UH_DALAM_NEGERI" && "bg-blue-500 text-white"
         )}
       >
         Ajukan UH Dalam Negeri

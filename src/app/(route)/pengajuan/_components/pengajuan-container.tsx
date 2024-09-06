@@ -69,6 +69,7 @@ const PengajuanContainer = () => {
         </div>
       </div>
       <div className="w-1/2 flex flex-col gap-2 ">
+        <span>{jenisPengajuan}</span>
         <ButtonsPengajuan
           handleSelection={handleSelection}
           kegiatan={kegiatan}
