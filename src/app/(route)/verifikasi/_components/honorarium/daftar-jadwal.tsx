@@ -54,9 +54,9 @@ const DaftarJadwal = ({ kegiatanId }: DaftarJadwalProps) => {
   return (
     <>
       {dataJadwal &&
-        dataJadwal.map((jadwal) => {
+        dataJadwal.map((jadwal, index) => {
           return (
-            <div className="w-full border border-gray-300">
+            <div key={index} className="w-full border border-gray-300">
               <div className="flex flex-row w-full ">
                 <div className="px-4 w-1/3 py-2  border-b border-gray-300">
                   {jadwal.kelas.nama}
@@ -74,6 +74,7 @@ const DaftarJadwal = ({ kegiatanId }: DaftarJadwalProps) => {
                   const jumlahNarsum = jadwal.jadwalNarasumber.length;
                   return (
                     <NarasumberListItem
+                      key={index}
                       optionsSbmHonorarium={optionsSbmHonorarium}
                       index={index}
                       jadwal={jadwalNarsum}

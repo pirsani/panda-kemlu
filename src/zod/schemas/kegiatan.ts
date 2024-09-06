@@ -2,6 +2,9 @@ import { isValid, parseISO } from "date-fns";
 import { z } from "zod";
 import { fileSchema } from "./file-schema";
 
+// Define the enum values as a Zod enum
+const LokasiEnum = z.enum(["DALAM_KOTA", "LUAR_KOTA", "LUAR_NEGERI"]);
+
 // Custom validation function to check if the input is a valid date string
 const isValidDateString = (value: string) => {
   const parsedDate = parseISO(value);
@@ -32,7 +35,7 @@ export const baseKegiatanSchema = z.object({
     }),
   tanggalMulai: tanggalSchema,
   tanggalSelesai: tanggalSchema,
-  lokasi: z.coerce.number().min(0).max(2), // Coerce lokasi to number dalam kota, luar kota, luar negeri
+  lokasi: LokasiEnum, // Use the Zod enum schema for lokasi
   provinsi: z.number(),
   dokumenSurat: fileSchema({ required: true }),
   dokumenJadwal: fileSchema({ required: true }),

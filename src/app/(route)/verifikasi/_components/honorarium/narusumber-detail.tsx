@@ -37,6 +37,8 @@ const NarasumberDetail = ({
   const [selectedSbmHonorarium, setSelectedSbmHonorarium] =
     useState<OptionSbm | null>(null);
 
+  // ignore react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (jadwalNarasumber.jenisHonorariumId !== null) {
       const defaultOption =
@@ -45,6 +47,7 @@ const NarasumberDetail = ({
         ) || null;
       setSelectedSbmHonorarium(defaultOption);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   //const sbm: Decimal = new Decimal(1700000); // dari tabel referensi sbm_honorarium

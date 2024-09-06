@@ -370,11 +370,11 @@ model UnitKerja {
   @@map("unit_kerja")
 }
 
-// enum 0, 1, 2 as Dalam Kota, Luar Kota, Luar Negeri
-enum Lokasi {
-  DalamKota
-  LuarKota
-  LuarNegeri
+// enum 0, 1, 2 as DALAM_KOTA, LUAR_KOTA, LUAR_NEGERI
+enum LOKASI {
+  DALAM_KOTA
+  LUAR_KOTA
+  LUAR_NEGERI
 }
 
 model Kegiatan {
@@ -384,7 +384,7 @@ model Kegiatan {
   tanggalSelesai     DateTime              @map("tanggal_selesai")
   dokumenNodinMemoSk String                @map("dokumen_nodin_memo_sk")
   dokumenJadwal      String                @map("dokumen_jadwal")
-  lokasi             Lokasi // enum 0, 1, 2
+  lokasi             LOKASI // enum 0, 1, 2
   provinsiId         Int?
   provinsi           Provinsi?             @relation(fields: [provinsiId], references: [id])
   keterangan         String?
@@ -522,19 +522,29 @@ model Itinerary {
   @@map("itinerary")
 }
 
+enum JENIS_PENGAJUAN {
+  GENERATE_RAMPUNGAN
+  HONORARIUM
+  UH_DALAM_NEGERI
+  UH_LUAR_NEGERI
+  PENGGANTIAN_REINBURSEMENT
+  PEMBAYARAN_PIHAK_KETIGA
+}
+
 model RiwayatProses {
-  id         Int       @id @default(autoincrement())
+  id         Int             @id @default(autoincrement())
+  jenis      JENIS_PENGAJUAN // enum GenerateRampunga, Honorarium, UhDalamNegeri, UhLuarNegeri, Reimbursement, PihakKetiga
   status     String
   keterangan String
-  tglStatus  DateTime  @map("tgl_status")
-  kegiatanId Int       @map("kegiatan_id")
-  kegiatan   Kegiatan  @relation(fields: [kegiatanId], references: [id])
-  createdBy  String    @map("created_by")
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedBy  String?   @map("updated_by")
-  updatedAt  DateTime? @updatedAt @map("updated_at")
-  creator    User?     @relation(fields: [createdBy], references: [id], name: "riwayat_proses_creator")
-  updater    User?     @relation(fields: [updatedBy], references: [id], name: "riwayat_proses_updater")
+  tglStatus  DateTime        @map("tgl_status")
+  kegiatanId Int             @map("kegiatan_id")
+  kegiatan   Kegiatan        @relation(fields: [kegiatanId], references: [id])
+  createdBy  String          @map("created_by")
+  createdAt  DateTime        @default(now()) @map("created_at")
+  updatedBy  String?         @map("updated_by")
+  updatedAt  DateTime?       @updatedAt @map("updated_at")
+  creator    User?           @relation(fields: [createdBy], references: [id], name: "riwayat_proses_creator")
+  updater    User?           @relation(fields: [updatedBy], references: [id], name: "riwayat_proses_updater")
 
   @@map("riwayat_proses")
 }

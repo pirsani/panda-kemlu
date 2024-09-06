@@ -1,5 +1,5 @@
 import { dbHonorarium } from "@/lib/db-honorarium";
-import { Lokasi, Provinsi } from "@prisma-honorarium/client";
+import { LOKASI, Provinsi } from "@prisma-honorarium/client";
 import bcrypt from "bcryptjs"; // Import bcrypt for password hashing and comparison
 import csv from "csv-parser";
 import { tr } from "date-fns/locale";
@@ -259,7 +259,7 @@ async function main() {
       keterangan: "Kegiatan LuarKota",
       tanggalMulai: new Date(),
       tanggalSelesai: new Date(),
-      lokasi: Lokasi.LuarKota,
+      lokasi: LOKASI.LUAR_KOTA,
       dokumenNodinMemoSk: "123456789.pdf",
       dokumenJadwal: "123456789.pdf",
       //unitKerjaId: "1",
@@ -275,7 +275,7 @@ async function main() {
       keterangan: "Kegiatan Luar Negeri",
       tanggalMulai: new Date(),
       tanggalSelesai: new Date(),
-      lokasi: Lokasi.LuarNegeri,
+      lokasi: LOKASI.LUAR_NEGERI,
       dokumenNodinMemoSk: "123456789.pdf",
       dokumenJadwal: "123456789.pdf",
       //unitKerjaId: "1",
@@ -290,7 +290,7 @@ async function main() {
       keterangan: "Kegiatan DalamKota",
       tanggalMulai: new Date(),
       tanggalSelesai: new Date(),
-      lokasi: Lokasi.DalamKota,
+      lokasi: LOKASI.DALAM_KOTA,
       dokumenNodinMemoSk: "123456789.pdf",
       dokumenJadwal: "123456789.pdf",
       //unitKerjaId: "1",

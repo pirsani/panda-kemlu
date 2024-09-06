@@ -28,6 +28,7 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import ItineraryContainer from "./itinerary-container";
 import PesertaContainer from "./peserta-container";
 //import SelectSbmProvinsi from "./select-sbm-provinsi";
+import { LOKASI } from "@prisma-honorarium/client";
 
 const SelectSbmProvinsi = dynamic(() => import("./select-sbm-provinsi"), {
   ssr: false,
@@ -47,7 +48,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
     resolver: zodResolver(isEditMode ? kegiatanSchemaEditMode : kegiatanSchema),
     defaultValues: {
       nama: "",
-      lokasi: 0, // Default value for lokasi atau nantinya bisa diisi dari data yang sudah ada klo mode edit
+      lokasi: LOKASI.DALAM_KOTA, // Default value for lokasi atau nantinya bisa diisi dari data yang sudah ada klo mode edit
       provinsi: 24, // Default value for provinsi atau nantinya bisa diisi dari data yang sudah ada klo mode edit
     },
     //reValidateMode: "onChange",
@@ -241,13 +242,13 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
                   {...field}
                   className="border-2 border-gray-300 p-2 rounded w-full"
                 >
-                  <option value={0} className="p-2">
+                  <option value={LOKASI.DALAM_KOTA} className="p-2">
                     Dalam Kota
                   </option>
-                  <option value={1} className="p-2">
+                  <option value={LOKASI.LUAR_KOTA} className="p-2">
                     Luar Kota
                   </option>
-                  <option value={2} className="p-2">
+                  <option value={LOKASI.LUAR_NEGERI} className="p-2">
                     Luar Negeri
                   </option>
                 </select>
@@ -256,8 +257,8 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             </FormItem>
           )}
         />
-        {lokasi == 2 && <ItineraryContainer />}
-        {lokasi != 2 && (
+        {lokasi == LOKASI.LUAR_NEGERI && <ItineraryContainer />}
+        {lokasi != LOKASI.LUAR_NEGERI && (
           <FormField
             control={form.control}
             name="provinsi"

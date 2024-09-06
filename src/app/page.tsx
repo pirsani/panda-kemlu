@@ -1,5 +1,6 @@
 import LoginForm from "@/components/form/login";
 import Image from "next/image";
+import { Suspense } from "react";
 
 export default function Home() {
   return (
@@ -25,7 +26,9 @@ export default function Home() {
             </div>
 
             <div className="w-1/2 h-auto flex flex-grow">
-              <LoginForm />
+              <Suspense>
+                <LoginForm />
+              </Suspense>
             </div>
           </div>
         </div>

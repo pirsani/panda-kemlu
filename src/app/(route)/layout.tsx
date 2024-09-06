@@ -1,4 +1,3 @@
-import LoadingIndicator from "@/components/loading";
 import SidebarContariner from "@/components/navigation/sidebar-container";
 import TopBar from "@/components/navigation/top-bar";
 import { Suspense } from "react";

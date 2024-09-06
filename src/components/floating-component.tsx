@@ -208,6 +208,7 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
         handleDocumentMouseUp as unknown as EventListener
       );
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [size, position]);
 
   useEffect(() => {
