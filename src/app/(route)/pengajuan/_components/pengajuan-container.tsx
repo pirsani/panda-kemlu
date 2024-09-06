@@ -9,7 +9,7 @@ import { JenisPengajuan } from "@/types";
 import { Kegiatan } from "@prisma-honorarium/client";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import HonorariumJadwalContainer from "../../verifikasi/_components/honorarium/honorarium-jadwal-container";
+
 import ButtonsPengajuan from "./buttons-pengajuan";
 import HonorariumContainer from "./honorarium/honorarium-container";
 import PenggantianContainer from "./penggantian-container";
@@ -62,7 +62,7 @@ const PengajuanContainer = () => {
           statusRampungan="sudah-ada"
         />
         {jenisPengajuan == "honorarium" && kegiatan && (
-          <DaftarJadwal kegiatanId={kegiatan.id} proses={"pengajuan"} />
+          <HonorariumContainer kegiatan={kegiatan} />
         )}
         {jenisPengajuan == "uh-dalam-negeri" && <UhDalamNegeriContainer />}
         {jenisPengajuan == "uh-luar-negeri" && <UhLuarNegeriContainer />}
