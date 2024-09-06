@@ -2,6 +2,7 @@
 import { dbHonorarium } from "@/lib/db-honorarium";
 
 import { JENIS_PENGAJUAN } from "@prisma-honorarium/client";
+import { revalidatePath } from "next/cache";
 
 export const getStatusPengajuanGenerateRampungan = async (
   kegiatanId: number
@@ -47,6 +48,8 @@ export const pengajuanGenerateRampungan = async (kegiatanId: number) => {
       },
     });
     console.log("[updateRiwayatProses]", updateRiwayatProses);
+
+    revalidatePath("/pengajuan");
     return updateRiwayatProses;
   }
 
@@ -61,5 +64,6 @@ export const pengajuanGenerateRampungan = async (kegiatanId: number) => {
     },
   });
   console.log("[createRiwayatProses]", createRiwayatProses);
+  revalidatePath("/pengajuan");
   return createRiwayatProses;
 };

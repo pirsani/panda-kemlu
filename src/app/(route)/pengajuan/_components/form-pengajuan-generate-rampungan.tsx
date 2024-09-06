@@ -2,6 +2,8 @@ import { pengajuanGenerateRampungan } from "@/actions/kegiatan/proses";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { RiwayatProses } from "@prisma-honorarium/client";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -17,10 +19,12 @@ type FormData = z.infer<typeof schema>;
 interface FormPengajuanGenerateRampunganProps {
   kegiatanId: number | null;
   className?: string;
+  handleSuccess?: (riwayat: RiwayatProses) => void;
 }
 const FormPengajuanGenerateRampungan = ({
   className,
   kegiatanId,
+  handleSuccess = () => {},
 }: FormPengajuanGenerateRampunganProps) => {
   const {
     register,
@@ -34,6 +38,8 @@ const FormPengajuanGenerateRampungan = ({
     if (!kegiatanId) return;
     console.log("Form submitted:", data);
     const pengajuan = await pengajuanGenerateRampungan(kegiatanId);
+    console.log("Pengajuan:", pengajuan);
+    handleSuccess(pengajuan);
   };
   return (
     <div

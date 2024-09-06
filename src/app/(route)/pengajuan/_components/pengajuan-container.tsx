@@ -75,20 +75,6 @@ const PengajuanContainer = () => {
           riwayatProses={riwayatProses}
         />
 
-        {jenisPengajuan == "GENERATE_RAMPUNGAN" &&
-          existingRampungan === null && (
-            <FormPengajuanGenerateRampungan kegiatanId={kegiatanId} />
-          )}
-
-        {jenisPengajuan == "GENERATE_RAMPUNGAN" &&
-          existingRampungan &&
-          existingRampungan.status !== "terverifikasi" && (
-            <span className="text-red-500">
-              Pengajuan Generate Rampungan sudah diajukan dan belum diverifikasi{" "}
-              {existingRampungan.kegiatanId}
-            </span>
-          )}
-
         {jenisPengajuan == "HONORARIUM" && kegiatan && (
           <HonorariumContainer kegiatan={kegiatan} />
         )}

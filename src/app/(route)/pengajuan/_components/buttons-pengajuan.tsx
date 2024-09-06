@@ -8,6 +8,7 @@ import {
   RiwayatProses,
 } from "@prisma-honorarium/client";
 import { useEffect, useState } from "react";
+import FormPengajuanGenerateRampungan from "./form-pengajuan-generate-rampungan";
 
 // generate rampungan, uh dalam negeri, uh luar negeri hanya dapat di ajukan sekali
 // honorarium, penggantian reimbursement, pembayaran pihak ke-3 dapat di ajukan berkali-kali
@@ -76,6 +77,10 @@ const ButtonsPengajuan = ({
     setMapRiwayatProses(mapped);
   };
 
+  const handleSuccessPengajuanRampungan = (riwayat: RiwayatProses) => {
+    setExistingRampungan(riwayat);
+  };
+
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     console.log("kegiatan", kegiatan);
@@ -91,77 +96,88 @@ const ButtonsPengajuan = ({
   if (!mapRiwayatProses) return null;
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {/* jika sudah ada generate rampungan, tidak bisa generate rampungan lagi */}
-      <ButtonRiwayatRampungan
-        existingRampungan={mapRiwayatProses[JENIS_PENGAJUAN.GENERATE_RAMPUNGAN]}
-        jenisPengajuan="GENERATE_RAMPUNGAN"
-        handleOnClick={handleOnClick}
-      />
-      <Button
-        variant="outline"
-        onClick={() => handleOnClick("HONORARIUM")}
-        className={cn(
-          "hover:bg-blue-400 hover:text-white",
-          jenisPengajuan == "HONORARIUM" && "bg-blue-500 text-white"
+    <>
+      <div className="flex flex-wrap gap-2">
+        {/* jika sudah ada generate rampungan, tidak bisa generate rampungan lagi */}
+        <ButtonRiwayatRampungan
+          existingRampungan={
+            mapRiwayatProses[JENIS_PENGAJUAN.GENERATE_RAMPUNGAN]
+          }
+          jenisPengajuan={jenisPengajuan}
+          handleOnClick={handleOnClick}
+        />
+        <Button
+          variant="outline"
+          onClick={() => handleOnClick("HONORARIUM")}
+          className={cn(
+            "hover:bg-blue-400 hover:text-white",
+            jenisPengajuan == "HONORARIUM" && "bg-blue-500 text-white"
+          )}
+        >
+          Ajukan Honorarium
+        </Button>
+        {kegiatan.lokasi != LOKASI.LUAR_NEGERI && (
+          <ButtonAjukanUhDalamNegeri
+            existingRampungan={
+              mapRiwayatProses[JENIS_PENGAJUAN.GENERATE_RAMPUNGAN]
+            }
+            existingPengajuan={
+              mapRiwayatProses[JENIS_PENGAJUAN.UH_DALAM_NEGERI]
+            }
+            jenisPengajuan={jenisPengajuan}
+            handleOnClick={handleOnClick}
+          />
         )}
-      >
-        Ajukan Honorarium
-      </Button>
-      {kegiatan.lokasi != LOKASI.LUAR_NEGERI && (
-        <Button
-          variant="outline"
-          onClick={() => handleOnClick("UH_DALAM_NEGERI")}
-          className={cn(
-            "hover:bg-blue-400 hover:text-white",
-            jenisPengajuan == "UH_DALAM_NEGERI" && "bg-blue-500 text-white"
-          )}
-        >
-          Ajukan UH Dalam Negeri
-        </Button>
-      )}
-      {kegiatan.lokasi == LOKASI.LUAR_NEGERI && (
-        <Button
-          variant="outline"
-          onClick={() => handleOnClick("UH_LUAR_NEGERI")}
-          className={cn(
-            "hover:bg-blue-400 hover:text-white",
-            jenisPengajuan == "UH_LUAR_NEGERI" && "bg-blue-500 text-white"
-          )}
-        >
-          Ajukan UH Luar Negeri
-        </Button>
-      )}
+        {kegiatan.lokasi == LOKASI.LUAR_NEGERI && (
+          <Button
+            variant="outline"
+            onClick={() => handleOnClick("UH_LUAR_NEGERI")}
+            className={cn(
+              "hover:bg-blue-400 hover:text-white",
+              jenisPengajuan == "UH_LUAR_NEGERI" && "bg-blue-500 text-white"
+            )}
+          >
+            Ajukan UH Luar Negeri
+          </Button>
+        )}
 
-      <Button
-        variant="outline"
-        onClick={() => handleOnClick("PENGGANTIAN_REINBURSEMENT")}
-        className={cn(
-          "hover:bg-blue-400 hover:text-white",
-          jenisPengajuan == "PENGGANTIAN_REINBURSEMENT" &&
-            "bg-blue-500 text-white"
-        )}
-      >
-        Ajukan Penggantian/Reinbursement
-      </Button>
-      <Button
-        variant="outline"
-        onClick={() => handleOnClick("PEMBAYARAN_PIHAK_KETIGA")}
-        className={cn(
-          "hover:bg-blue-400 hover:text-white",
-          jenisPengajuan == "PEMBAYARAN_PIHAK_KETIGA" &&
-            "bg-blue-500 text-white"
-        )}
-      >
-        Ajukan Pembayaran Pihak Ke-3
-      </Button>
-    </div>
+        <Button
+          variant="outline"
+          onClick={() => handleOnClick("PENGGANTIAN_REINBURSEMENT")}
+          className={cn(
+            "hover:bg-blue-400 hover:text-white",
+            jenisPengajuan == "PENGGANTIAN_REINBURSEMENT" &&
+              "bg-blue-500 text-white"
+          )}
+        >
+          Ajukan Penggantian/Reinbursement
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => handleOnClick("PEMBAYARAN_PIHAK_KETIGA")}
+          className={cn(
+            "hover:bg-blue-400 hover:text-white",
+            jenisPengajuan == "PEMBAYARAN_PIHAK_KETIGA" &&
+              "bg-blue-500 text-white"
+          )}
+        >
+          Ajukan Pembayaran Pihak Ke-3
+        </Button>
+      </div>
+
+      <DisplayFormPengajuanGenerateRampungan
+        jenisPengajuan={jenisPengajuan}
+        existingRampungan={mapRiwayatProses[JENIS_PENGAJUAN.GENERATE_RAMPUNGAN]}
+        kegiatan={kegiatan}
+        handleSuccessPengajuanRampungan={handleSuccessPengajuanRampungan}
+      />
+    </>
   );
 };
 
 interface ButtonRiwayatRampunganProps {
   handleOnClick: (jenis: JenisPengajuan) => void;
-  jenisPengajuan: JenisPengajuan;
+  jenisPengajuan?: JenisPengajuan | null;
   existingRampungan: RiwayatProses | null;
 }
 const ButtonRiwayatRampungan = ({
@@ -181,25 +197,90 @@ const ButtonRiwayatRampungan = ({
           jenisPengajuan == "GENERATE_RAMPUNGAN" && "bg-blue-500 text-white"
         )}
       >
-        Ajukan Generate Rampungan {existingRampungan?.status}
+        Ajukan Generate Rampungan
       </Button>
     );
 };
 
+interface DisplayFormPengajuanGenerateRampunganProps {
+  jenisPengajuan?: JenisPengajuan | null;
+  existingRampungan: RiwayatProses | null;
+  kegiatan: Kegiatan;
+  handleSuccessPengajuanRampungan: (riwayat: RiwayatProses) => void;
+}
+const DisplayFormPengajuanGenerateRampungan = ({
+  jenisPengajuan,
+  existingRampungan,
+  kegiatan,
+  handleSuccessPengajuanRampungan,
+}: DisplayFormPengajuanGenerateRampunganProps) => {
+  const [currentRampungan, setCurrentRampungan] =
+    useState<RiwayatProses | null>(null);
+
+  // Success handler to update the state and call the parent success handler
+  const handleSuccess = (riwayat: RiwayatProses) => {
+    setCurrentRampungan(riwayat);
+    handleSuccessPengajuanRampungan(riwayat);
+  };
+
+  useEffect(() => {
+    setCurrentRampungan(existingRampungan);
+  }, [existingRampungan]);
+
+  // Render the form if GENERATE_RAMPUNGAN is selected and there's no existing rampungan
+  if (jenisPengajuan === "GENERATE_RAMPUNGAN" && !currentRampungan) {
+    return (
+      <FormPengajuanGenerateRampungan
+        kegiatanId={kegiatan.id}
+        handleSuccess={handleSuccess}
+      />
+    );
+  }
+
+  // Render the status message if GENERATE_RAMPUNGAN is selected, rampungan exists, and is not verified
+  const shouldShowStatusMessage =
+    jenisPengajuan === "GENERATE_RAMPUNGAN" &&
+    currentRampungan &&
+    currentRampungan.status !== "terverifikasi";
+
+  if (shouldShowStatusMessage) {
+    const updatedAt = currentRampungan.updatedAt;
+    const createdAt = currentRampungan.createdAt;
+
+    return (
+      <p className="text-red-500 ring-1 rounded-md p-2 mt-2 bg-green-200">
+        <span>
+          Pengajuan Generate Rampungan{" "}
+          {currentRampungan.kegiatanId + " " + currentRampungan.jenis} berhasil
+          diajukan pada tanggal {(updatedAt ?? createdAt).toLocaleDateString()}{" "}
+          {(updatedAt ?? createdAt).toLocaleTimeString()}
+          {","}
+        </span>
+        <span> status: {currentRampungan.status}</span>
+      </p>
+    );
+  }
+
+  // Default return, you can add any fallback UI if needed
+  return null;
+};
+
 interface ButtonAjukanUhDalamNegeriProps {
   handleOnClick: (jenis: JenisPengajuan) => void;
-  jenisPengajuan: JenisPengajuan;
+  jenisPengajuan?: JenisPengajuan | null;
   existingRampungan: RiwayatProses | null;
+  existingPengajuan: RiwayatProses | null;
 }
 
 const ButtonAjukanUhDalamNegeri = ({
   handleOnClick,
   jenisPengajuan,
   existingRampungan,
+  existingPengajuan,
 }: ButtonAjukanUhDalamNegeriProps) => {
   if (!existingRampungan || existingRampungan.status != "terverifikasi")
     return null;
-  if (!existingRampungan || existingRampungan.status === "pengajuan")
+  if (!existingPengajuan || existingPengajuan.status === "pengajuan")
     return (
       <Button
         variant="outline"
@@ -209,7 +290,7 @@ const ButtonAjukanUhDalamNegeri = ({
           jenisPengajuan == "GENERATE_RAMPUNGAN" && "bg-blue-500 text-white"
         )}
       >
-        Ajukan Generate Rampungan {existingRampungan?.status}
+        Ajukan UH Dalam Negeri
       </Button>
     );
 };
