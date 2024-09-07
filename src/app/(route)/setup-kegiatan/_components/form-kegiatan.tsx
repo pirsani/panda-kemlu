@@ -38,11 +38,11 @@ const SelectSbmProvinsi = dynamic(() => import("./select-sbm-provinsi"), {
 type FormValues<T> = T extends true ? KegiatanEditMode : Kegiatan;
 
 interface FormKegiatanProps {
-  editId?: string | null;
+  editId?: number | null;
 }
 
 export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
-  const isEditMode = editId !== null;
+  const isEditMode = editId != null;
   type FormMode = typeof isEditMode;
   const form = useForm<FormValues<FormMode>>({
     resolver: zodResolver(isEditMode ? kegiatanSchemaEditMode : kegiatanSchema),

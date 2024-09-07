@@ -31,10 +31,10 @@ type FormValues<T> = T extends true
   : DokumenUhLuarNegeri;
 
 interface UhLuarNegeriContainerProps {
-  editId?: string | null;
+  editId?: number | null;
 }
 const UhLuarNegeriContainer = ({ editId }: UhLuarNegeriContainerProps) => {
-  const isEditMode = editId !== null;
+  const isEditMode = editId != null;
   type FormMode = typeof isEditMode;
   const form = useForm<FormValues<FormMode>>({
     resolver: zodResolver(

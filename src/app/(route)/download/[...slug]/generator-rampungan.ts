@@ -149,6 +149,12 @@ const fillFormRampungan = async (rampunganData: RampunganData | null) => {
 };
 
 export async function downloadDokumenRampungan(req: Request, slug: string[]) {
+  // slug[0] is the document type, slug[1] is the kegiatanId
+  // check if slug[1] is exist and is a number
+  if (!slug[1] || isNaN(parseInt(slug[1]))) {
+    return new NextResponse("Invalid request", { status: 400 });
+  }
+
   const kegiatanId = parseInt(slug[1]);
   //const kegiatan = await getKegiatanById(kegiatanId);
   const dataRampungan = await getDataRampungan(kegiatanId);

@@ -2,10 +2,17 @@
 
 import { dbHonorarium } from "@/lib/db-honorarium";
 
+import { Itinerary, Kegiatan, Provinsi } from "@prisma-honorarium/client";
+
 export const getKegiatan = async (kegiatan?: string) => {
   const dataKegiatan = await dbHonorarium.kegiatan.findMany({});
   return dataKegiatan;
 };
+
+export interface KegiatanWithDetail extends Kegiatan {
+  itinerary: Itinerary[];
+  provinsi: Provinsi;
+}
 
 export const getKegiatanById = async (id: number) => {
   const kegiatan = await dbHonorarium.kegiatan.findUnique({

@@ -1,3 +1,4 @@
+import ajukanUhDalamNegeri from "@/actions/kegiatan/uang-harian/dalam-negeri";
 import ButtonEye from "@/components/button-eye-open-document";
 import FormFileUpload from "@/components/form/form-file-upload";
 import PdfPreview from "@/components/pdf-preview";
@@ -31,10 +32,15 @@ type FormValues<T> = T extends true
   : DokumenUhDalamNegeri;
 
 interface UhDalamNegeriContainerProps {
-  editId?: string | null;
+  kegiatanId: number;
+  editId?: number | null;
 }
-const UhDalamNegeriContainer = ({ editId }: UhDalamNegeriContainerProps) => {
-  const isEditMode = editId !== null;
+const UhDalamNegeriContainer = ({
+  kegiatanId,
+  editId,
+}: UhDalamNegeriContainerProps) => {
+  //this ensures that isEditMode will be false if editId is null or undefined
+  const isEditMode = editId != null;
   type FormMode = typeof isEditMode;
   const form = useForm<FormValues<FormMode>>({
     resolver: zodResolver(
@@ -42,7 +48,9 @@ const UhDalamNegeriContainer = ({ editId }: UhDalamNegeriContainerProps) => {
         ? DokumenUhDalamNegeriSchemaEditMode
         : DokumenUhDalamNegeriSchema
     ),
-    defaultValues: {},
+    defaultValues: {
+      kegiatanId,
+    },
   });
 
   const {
@@ -53,7 +61,17 @@ const UhDalamNegeriContainer = ({ editId }: UhDalamNegeriContainerProps) => {
   } = form;
 
   const onSubmit: SubmitHandler<FormValues<FormMode>> = async (data) => {
-    console.log(data);
+    console.log(data, isEditMode);
+    // extraction of zod schema to be used in the action
+    const formData = new FormData();
+    formData.append("kegiatanId", data.kegiatanId.toString());
+    formData.append("laporanKegiatan", data.laporanKegiatan as File);
+    formData.append("daftarHadir", data.daftarHadir as File);
+    formData.append("dokumentasi", data.dokumentasi as File);
+    formData.append("rampungan", data.rampungan as File);
+
+    const ajukan = await ajukanUhDalamNegeri(formData);
+    console.log("[response]", ajukan);
   };
 
   const [fileUrls, setFileUrls] = useState<{ [key: string]: string | null }>(
@@ -185,13 +203,16 @@ const UhDalamNegeriContainer = ({ editId }: UhDalamNegeriContainerProps) => {
                   </FormItem>
                 )}
               />
+              <div className="w-full">
+                <Button
+                  className="w-full bg-blue-500 hover:bg-blue-600"
+                  type="submit"
+                >
+                  Ajukan
+                </Button>
+              </div>
             </form>
           </Form>
-        </div>
-        <div className="w-full">
-          <Button className="w-full bg-blue-500 hover:bg-blue-600">
-            Ajukan
-          </Button>
         </div>
       </div>
     </div>

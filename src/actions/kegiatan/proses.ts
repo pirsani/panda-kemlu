@@ -1,8 +1,9 @@
 "use server";
 import { dbHonorarium } from "@/lib/db-honorarium";
 
-import { JENIS_PENGAJUAN } from "@prisma-honorarium/client";
+import { JENIS_PENGAJUAN, Kegiatan } from "@prisma-honorarium/client";
 import { revalidatePath } from "next/cache";
+import { ActionResponse } from "../response";
 
 export const getStatusPengajuanGenerateRampungan = async (
   kegiatanId: number
@@ -53,4 +54,43 @@ export const pengajuanGenerateRampungan = async (kegiatanId: number) => {
   console.log("[createRiwayatProses]", createRiwayatProses);
   revalidatePath("/pengajuan");
   return updateStatusRampungan;
+};
+
+export type StatusRampungan =
+  | "pengajuan"
+  | "terverifikasi"
+  | "revisi"
+  | "ditolak"
+  | "selesai";
+export const updateStatusRampungan = async (
+  kegiatanId: number,
+  statusRampunganBaru: StatusRampungan
+): Promise<ActionResponse<Kegiatan>> => {
+  // TODO check permission disini untuk update status rampungan
+  // allowed status: pengajuan, terverifikasi, revisi, ditolak, selesai
+
+  let updateStatusRampungan;
+  try {
+    updateStatusRampungan = await dbHonorarium.kegiatan.update({
+      where: {
+        id: kegiatanId,
+      },
+      data: {
+        statusRampungan: statusRampunganBaru,
+      },
+    });
+  } catch (error) {
+    console.error("Error updateStatusRampungan", error);
+    return {
+      success: false,
+      error: "Error updateStatusRampungan",
+      message: "Error updateStatusRampungan",
+    };
+  }
+
+  console.log("[updateStatusRampungan]", updateStatusRampungan);
+  return {
+    success: true,
+    data: updateStatusRampungan,
+  };
 };

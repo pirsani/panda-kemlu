@@ -84,7 +84,9 @@ const PengajuanContainer = () => {
         {jenisPengajuan == "HONORARIUM" && kegiatan && (
           <HonorariumContainer kegiatan={kegiatan} />
         )}
-        {jenisPengajuan == "UH_DALAM_NEGERI" && <UhDalamNegeriContainer />}
+        {jenisPengajuan == "UH_DALAM_NEGERI" && kegiatan && (
+          <UhDalamNegeriContainer kegiatanId={kegiatan.id} />
+        )}
         {jenisPengajuan == "UH_LUAR_NEGERI" && <UhLuarNegeriContainer />}
         {jenisPengajuan == "PENGGANTIAN_REINBURSEMENT" && (
           <PenggantianContainer />

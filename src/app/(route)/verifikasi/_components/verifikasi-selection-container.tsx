@@ -6,12 +6,13 @@ import ButtonsVerifikasi from "./buttons-verifikasi";
 import FormGenerateRampungan from "./rampungan/form-generate-rampungan";
 
 interface VerfikasiSelectionContainerProps {
-  kegiatan?: Kegiatan | null;
+  kegiatan: Kegiatan | null;
 }
 
 const VerfikasiSelectionContainer = ({
-  kegiatan,
+  kegiatan: initialKegiatan,
 }: VerfikasiSelectionContainerProps) => {
+  const [kegiatan, setKegiatan] = useState<Kegiatan | null>(initialKegiatan);
   const [jenisPengajuan, setJenisPengajuan] = useState<JenisPengajuan | null>(
     null
   );
@@ -19,9 +20,18 @@ const VerfikasiSelectionContainer = ({
     setJenisPengajuan(jenis);
   };
 
+  const handleSelesaiRampungan = (kegiatan: Kegiatan) => {
+    setKegiatan(kegiatan);
+  };
+
   useEffect(() => {
     setJenisPengajuan(null);
   }, [kegiatan]);
+
+  useEffect(() => {
+    setKegiatan(initialKegiatan);
+  }, [initialKegiatan]);
+
   return (
     kegiatan && (
       <>
@@ -32,7 +42,10 @@ const VerfikasiSelectionContainer = ({
         />
         <div className="flex flex-col gap-2 mt-6 w-full border-gray-300 border rounded-md p-2 shadow-lg">
           {jenisPengajuan == "GENERATE_RAMPUNGAN" && (
-            <FormGenerateRampungan kegiatanId={kegiatan.id} />
+            <FormGenerateRampungan
+              kegiatanId={kegiatan.id}
+              handleSelesai={handleSelesaiRampungan}
+            />
           )}
           {jenisPengajuan == "HONORARIUM" && (
             <DaftarJadwal kegiatanId={kegiatan.id} proses="verfikasi" />

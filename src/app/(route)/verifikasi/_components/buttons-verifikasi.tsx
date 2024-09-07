@@ -112,7 +112,7 @@ const ButtonRiwayatRampungan = ({
         jenisPengajuan == "GENERATE_RAMPUNGAN" && "bg-blue-500 text-white"
       )}
     >
-      Ajukan Generate Rampungan
+      Verifikasi Generate Rampungan
     </Button>
   );
 };
