@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { getRiwayatProses } from "@/actions/kegiatan/proses";
 import ButtonsPengajuan from "./buttons-pengajuan";
 import FormPengajuanGenerateRampungan from "./form-pengajuan-generate-rampungan";
+import { DisplayFormPengajuanGenerateRampungan } from "./honorarium/display-form-pengajuan-generate-rampungan";
 import HonorariumContainer from "./honorarium/honorarium-container";
 import PenggantianContainer from "./penggantian-container";
 import PihakKe3Container from "./pihak-ke3-container";
@@ -37,6 +38,11 @@ const PengajuanContainer = () => {
     setKegiatanId(value); // after this set, it will trigger re-render PreviewKegiatan
   };
 
+  const handleSuccessPengajuanRampungan = (kegiatan: Kegiatan) => {
+    // update existing kegiatan
+    setKegiatan(kegiatan);
+  };
+
   useEffect(() => {
     console.log("kegiatanId", kegiatanId);
     const getKegiatan = async () => {
@@ -61,9 +67,16 @@ const PengajuanContainer = () => {
       <div className="w-1/2 flex flex-col gap-2 ">
         <span>{jenisPengajuan}</span>
         <ButtonsPengajuan
+          jenisPengajuan={jenisPengajuan}
           handleSelection={handleSelection}
           kegiatan={kegiatan}
           riwayatProses={riwayatProses}
+        />
+
+        <DisplayFormPengajuanGenerateRampungan
+          jenisPengajuan={jenisPengajuan}
+          kegiatan={kegiatan}
+          handleSuccess={handleSuccessPengajuanRampungan}
         />
 
         {jenisPengajuan == "HONORARIUM" && kegiatan && (

@@ -30,28 +30,15 @@ export const getRiwayatProses = async (kegiatanId: number) => {
 export const pengajuanGenerateRampungan = async (kegiatanId: number) => {
   //jika sudah ada pengajuan generate rampungan, maka update status pengajuannya dan tanggal statusnya
 
-  const existingRiwayatProses = await dbHonorarium.riwayatProses.findFirst({
+  const updateStatusRampungan = await dbHonorarium.kegiatan.update({
     where: {
-      kegiatanId,
-      jenis: JENIS_PENGAJUAN.GENERATE_RAMPUNGAN,
+      id: kegiatanId,
+    },
+    data: {
+      statusRampungan: "pengajuan",
     },
   });
-
-  if (existingRiwayatProses) {
-    const updateRiwayatProses = await dbHonorarium.riwayatProses.update({
-      where: {
-        id: existingRiwayatProses.id,
-      },
-      data: {
-        status: "pengajuan",
-        tglStatus: new Date(),
-      },
-    });
-    console.log("[updateRiwayatProses]", updateRiwayatProses);
-
-    revalidatePath("/pengajuan");
-    return updateRiwayatProses;
-  }
+  console.log("[createRiwayatProses]", updateStatusRampungan);
 
   const createRiwayatProses = await dbHonorarium.riwayatProses.create({
     data: {
@@ -65,5 +52,5 @@ export const pengajuanGenerateRampungan = async (kegiatanId: number) => {
   });
   console.log("[createRiwayatProses]", createRiwayatProses);
   revalidatePath("/pengajuan");
-  return createRiwayatProses;
+  return updateStatusRampungan;
 };

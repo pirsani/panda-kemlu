@@ -2,8 +2,7 @@ import { pengajuanGenerateRampungan } from "@/actions/kegiatan/proses";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { RiwayatProses } from "@prisma-honorarium/client";
-import { useRouter } from "next/navigation";
+import { Kegiatan } from "@prisma-honorarium/client";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -19,7 +18,7 @@ type FormData = z.infer<typeof schema>;
 interface FormPengajuanGenerateRampunganProps {
   kegiatanId: number | null;
   className?: string;
-  handleSuccess?: (riwayat: RiwayatProses) => void;
+  handleSuccess?: (kegiatan: Kegiatan) => void;
 }
 const FormPengajuanGenerateRampungan = ({
   className,
