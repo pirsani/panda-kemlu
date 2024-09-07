@@ -98,6 +98,7 @@ const InputDatePicker = ({
       );
       setValue(name, newDateStr, { shouldValidate: true });
       onSelect && onSelect(newDate);
+      field.onChange(newDateStr);
     }
   };
 
@@ -117,7 +118,7 @@ const InputDatePicker = ({
         placeholder="yyyy-mm-dd"
         type={"text"}
         id={name}
-        value={field.value}
+        value={field.value ?? ""}
         onChange={field.onChange}
         className={cn(
           "form-control block w-full px-1 pl-10 py-2 text-sm font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none peer"
@@ -146,7 +147,7 @@ const InputDatePicker = ({
           <Calendar
             mode="single"
             locale={calendarOptions.locale}
-            selected={date}
+            selected={field.value}
             onSelect={handleSelect}
             fromDate={calendarOptions.fromDate}
             toDate={calendarOptions.toDate}
