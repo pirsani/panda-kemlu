@@ -1,12 +1,20 @@
 import { cn } from "@/lib/utils";
 import { useRef } from "react";
-import { Controller, useFormContext } from "react-hook-form";
+import {
+  Controller,
+  ControllerRenderProps,
+  FieldValues,
+  useFormContext,
+} from "react-hook-form";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 
 interface FormFileUploadProps {
   name: string;
-  onFileChange?: (file: File | null) => void;
+  onFileChange?: (
+    file: File | null,
+    field: ControllerRenderProps<FieldValues, string>
+  ) => void;
   className?: string;
   //ref?: React.RefObject<HTMLInputElement>;
 }
@@ -24,7 +32,7 @@ FormFileUploadProps) => {
   const currentFile = watch(name) as File | undefined;
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 w-full">
       <Controller
         name={name}
         control={control}
@@ -55,7 +63,7 @@ FormFileUploadProps) => {
               onChange={(e) => {
                 const selectedFile = e.target.files?.[0] || null;
                 field.onChange(selectedFile);
-                onFileChange && onFileChange(selectedFile);
+                onFileChange && onFileChange(selectedFile, field);
               }}
             />
           </>

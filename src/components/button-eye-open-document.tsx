@@ -1,17 +1,31 @@
 import useFileStore from "@/hooks/use-file-store";
+import { cn } from "@/lib/utils";
 import { Eye } from "lucide-react";
 import { Button } from "./ui/button";
 
 interface ButtonEyeProps {
-  url: string;
+  url: string | null;
 }
 const ButtonEye = ({ url }: ButtonEyeProps) => {
   const setUrl = () => {
+    if (url === "") return;
     useFileStore.setState({ fileUrl: url });
   };
+
+  const { fileUrl } = useFileStore();
+
+  if (!url) return null;
+  if (url === "") return null;
   return (
-    <Button variant={"outline"} className="border-blue-500" onClick={setUrl}>
-      <Eye size={16} className="text-blue-900" />
+    <Button
+      variant={"outline"}
+      className={cn(
+        "border-blue-500 h-11 w-11 p-0 hover:bg-blue-300",
+        fileUrl === url && "bg-blue-500 text-white"
+      )}
+      onClick={setUrl}
+    >
+      <Eye size={18} />
     </Button>
   );
 };

@@ -96,16 +96,12 @@ const ButtonsPengajuan = ({
           />
         )}
         {kegiatan.lokasi == LOKASI.LUAR_NEGERI && (
-          <Button
-            variant="outline"
-            onClick={() => handleOnClick("UH_LUAR_NEGERI")}
-            className={cn(
-              "hover:bg-blue-400 hover:text-white",
-              jenisPengajuan == "UH_LUAR_NEGERI" && "bg-blue-500 text-white"
-            )}
-          >
-            Ajukan UH Luar Negeri
-          </Button>
+          <ButtonAjukanUhLuarNegeri
+            statusRampungan={kegiatan.statusRampungan}
+            statusUhLuarNegeri={kegiatan.statusUhLuarNegeri}
+            jenisPengajuan={jenisPengajuan}
+            handleOnClick={handleOnClick}
+          />
         )}
 
         <Button
@@ -199,6 +195,34 @@ const ButtonAjukanUhDalamNegeri = ({
       )}
     >
       Ajukan UH Dalam Negeri
+    </Button>
+  );
+};
+
+interface ButtonAjukanUhLuarNegeriProps {
+  handleOnClick: (jenis: JenisPengajuan) => void;
+  jenisPengajuan?: JenisPengajuan | null;
+  statusRampungan: string | null;
+  statusUhLuarNegeri: string | null;
+}
+
+const ButtonAjukanUhLuarNegeri = ({
+  handleOnClick,
+  jenisPengajuan,
+  statusRampungan,
+  statusUhLuarNegeri,
+}: ButtonAjukanUhLuarNegeriProps) => {
+  if (!statusRampungan || statusRampungan !== "terverifikasi") return null;
+  return (
+    <Button
+      variant="outline"
+      onClick={() => handleOnClick("UH_LUAR_NEGERI")}
+      className={cn(
+        "hover:bg-blue-400 hover:text-white",
+        jenisPengajuan == "UH_LUAR_NEGERI" && "bg-blue-500 text-white"
+      )}
+    >
+      Ajukan UH Luar Negeri
     </Button>
   );
 };

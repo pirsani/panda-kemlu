@@ -27,7 +27,9 @@ const PengajuanContainer = () => {
   const [kegiatanId, setKegiatanId] = useState<number | null>(null);
   const [kegiatan, setKegiatan] = useState<Kegiatan | null>(null);
   const [riwayatProses, setRiwayatProses] = useState<RiwayatProses[]>([]);
-  const [jenisPengajuan, setJenisPengajuan] = useState<JenisPengajuan | null>();
+  const [jenisPengajuan, setJenisPengajuan] = useState<JenisPengajuan | null>(
+    null
+  );
   const handleSelection = (jenis: JenisPengajuan) => {
     setJenisPengajuan(jenis);
   };
@@ -90,9 +92,9 @@ const PengajuanContainer = () => {
         {jenisPengajuan == "PEMBAYARAN_PIHAK_KETIGA" && <PihakKe3Container />}
       </div>
 
-      {/* <FloatingComponent>
+      <FloatingComponent>
         <PdfPreviewContainer className="border-2 h-full border-gray-500" />
-      </FloatingComponent> */}
+      </FloatingComponent>
     </div>
   );
 };

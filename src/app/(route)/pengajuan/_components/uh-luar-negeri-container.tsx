@@ -1,3 +1,4 @@
+import ButtonEye from "@/components/button-eye-open-document";
 import FormFileUpload from "@/components/form/form-file-upload";
 import PdfPreview from "@/components/pdf-preview";
 import PdfPreviewContainer from "@/components/pdf-preview-container";
@@ -17,7 +18,13 @@ import {
   DokumenUhLuarNegeriSchemaEditMode,
 } from "@/zod/schemas/dokumen-uh-luar-negeri";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useState } from "react";
+import {
+  ControllerRenderProps,
+  FieldValues,
+  SubmitHandler,
+  useForm,
+} from "react-hook-form";
 
 type FormValues<T> = T extends true
   ? DokumenUhLuarNegeriEditMode
@@ -43,26 +50,46 @@ const UhLuarNegeriContainer = ({ editId }: UhLuarNegeriContainerProps) => {
     watch,
   } = form;
 
+  const [fileUrls, setFileUrls] = useState<{ [key: string]: string | null }>(
+    {}
+  );
+
   const onSubmit: SubmitHandler<FormValues<FormMode>> = async (data) => {
     console.log(data);
   };
 
   const setFileUrl = useFileStore((state) => state.setFileUrl);
 
-  const handleFileChange = (file: File | null) => {
+  const handleFileChange = (
+    file: File | null,
+    field: ControllerRenderProps<FieldValues, string>
+  ) => {
     if (file !== null) {
       const fileUrl = URL.createObjectURL(file);
       setFileUrl(fileUrl);
+
+      // Update the fileUrls state
+      setFileUrls((prevUrls) => ({
+        ...prevUrls,
+        [field.name]: fileUrl,
+      }));
     } else {
       setFileUrl(null);
+      // Update the fileUrls state
+      setFileUrls((prevUrls) => ({
+        ...prevUrls,
+        [field.name]: null,
+      }));
     }
   };
 
   return (
-    <div>
-      <h1>Uang Harian Luar Negeri</h1>
-      <div className="flex flex-row border p-2 gap-2">
-        <div className="w-1/2">
+    <div className="mt-6 border border-blue-500 rounded-lg">
+      <h1 className="font-semibold text-lg py-2 p-2 border-b border-blue-600">
+        Data Dukung Pengajuan Uang Harian Luar Negeri
+      </h1>
+      <div className="flex flex-col gap-8 p-2 pb-8">
+        <div className="w-full">
           <Form {...form}>
             <form
               onSubmit={handleSubmit(onSubmit)}
@@ -73,14 +100,19 @@ const UhLuarNegeriContainer = ({ editId }: UhLuarNegeriContainerProps) => {
                 name="laporanKegiatan"
                 render={({ field }) => (
                   <FormItem>
-                    <label htmlFor="laporanKegiatan">laporan Kegiatan</label>
-                    <FormControl>
-                      <FormFileUpload
-                        name={field.name}
-                        onFileChange={handleFileChange}
-                        className="bg-white"
-                      />
-                    </FormControl>
+                    <label htmlFor="laporanKegiatan" className=" font-semibold">
+                      laporan Kegiatan
+                    </label>
+                    <div className="flex flex-row gap-2 items-center">
+                      <FormControl>
+                        <FormFileUpload
+                          name={field.name}
+                          onFileChange={handleFileChange}
+                          className="bg-white w-full border-2"
+                        />
+                      </FormControl>
+                      <ButtonEye url={fileUrls[field.name]} />
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -91,13 +123,16 @@ const UhLuarNegeriContainer = ({ editId }: UhLuarNegeriContainerProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <label htmlFor="daftarHadir">Daftar Hadir</label>
-                    <FormControl>
-                      <FormFileUpload
-                        name={field.name}
-                        onFileChange={handleFileChange}
-                        className="bg-white"
-                      />
-                    </FormControl>
+                    <div className="flex flex-row gap-2 items-center">
+                      <FormControl>
+                        <FormFileUpload
+                          name={field.name}
+                          onFileChange={handleFileChange}
+                          className="bg-white"
+                        />
+                      </FormControl>
+                      <ButtonEye url={fileUrls[field.name]} />
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -108,13 +143,17 @@ const UhLuarNegeriContainer = ({ editId }: UhLuarNegeriContainerProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <label htmlFor="dokumentasi">Dokumentasi</label>
-                    <FormControl>
-                      <FormFileUpload
-                        name={field.name}
-                        onFileChange={handleFileChange}
-                        className="bg-white"
-                      />
-                    </FormControl>
+                    <div className="flex flex-row gap-2 items-center">
+                      <FormControl>
+                        <FormFileUpload
+                          name={field.name}
+                          onFileChange={handleFileChange}
+                          className="bg-white"
+                        />
+                      </FormControl>
+                      <ButtonEye url={fileUrls[field.name]} />
+                    </div>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -125,13 +164,16 @@ const UhLuarNegeriContainer = ({ editId }: UhLuarNegeriContainerProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <label htmlFor="rampungan">Rampungan yang distempel</label>
-                    <FormControl>
-                      <FormFileUpload
-                        name={field.name}
-                        onFileChange={handleFileChange}
-                        className="bg-white"
-                      />
-                    </FormControl>
+                    <div className="flex flex-row gap-2 items-center">
+                      <FormControl>
+                        <FormFileUpload
+                          name={field.name}
+                          onFileChange={handleFileChange}
+                          className="bg-white"
+                        />
+                      </FormControl>
+                      <ButtonEye url={fileUrls[field.name]} />
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -144,13 +186,16 @@ const UhLuarNegeriContainer = ({ editId }: UhLuarNegeriContainerProps) => {
                     <label htmlFor="suratSetneg">
                       Rampungan yang distempel
                     </label>
-                    <FormControl>
-                      <FormFileUpload
-                        name={field.name}
-                        onFileChange={handleFileChange}
-                        className="bg-white"
-                      />
-                    </FormControl>
+                    <div className="flex flex-row gap-2 items-center">
+                      <FormControl>
+                        <FormFileUpload
+                          name={field.name}
+                          onFileChange={handleFileChange}
+                          className="bg-white"
+                        />
+                      </FormControl>
+                      <ButtonEye url={fileUrls[field.name]} />
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -163,13 +208,16 @@ const UhLuarNegeriContainer = ({ editId }: UhLuarNegeriContainerProps) => {
                     <label htmlFor="paspor">
                       paspor(ID,Exit Permit, Stempel Imigrasi)
                     </label>
-                    <FormControl>
-                      <FormFileUpload
-                        name={field.name}
-                        onFileChange={handleFileChange}
-                        className="bg-white"
-                      />
-                    </FormControl>
+                    <div className="flex flex-row gap-2 items-center">
+                      <FormControl>
+                        <FormFileUpload
+                          name={field.name}
+                          onFileChange={handleFileChange}
+                          className="bg-white"
+                        />
+                      </FormControl>
+                      <ButtonEye url={fileUrls[field.name]} />
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -182,13 +230,16 @@ const UhLuarNegeriContainer = ({ editId }: UhLuarNegeriContainerProps) => {
                     <label htmlFor="tiketBoardingPass">
                       Tiket atau Boarding Pass
                     </label>
-                    <FormControl>
-                      <FormFileUpload
-                        name={field.name}
-                        onFileChange={handleFileChange}
-                        className="bg-white"
-                      />
-                    </FormControl>
+                    <div className="flex flex-row gap-2 items-center">
+                      <FormControl>
+                        <FormFileUpload
+                          name={field.name}
+                          onFileChange={handleFileChange}
+                          className="bg-white"
+                        />
+                      </FormControl>
+                      <ButtonEye url={fileUrls[field.name]} />
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -196,12 +247,11 @@ const UhLuarNegeriContainer = ({ editId }: UhLuarNegeriContainerProps) => {
             </form>
           </Form>
         </div>
-        <div className="w-1/2">
-          <PdfPreviewContainer className="w-full h-full" />
+        <div className="w-full">
+          <Button className="w-full bg-blue-500 hover:bg-blue-600">
+            Ajukan
+          </Button>
         </div>
-      </div>
-      <div>
-        <Button>Ajukan</Button>
       </div>
     </div>
   );

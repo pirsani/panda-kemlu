@@ -1,10 +1,5 @@
 import { JenisPengajuan } from "@/types";
-import {
-  JENIS_PENGAJUAN,
-  Kegiatan,
-  LOKASI,
-  RiwayatProses,
-} from "@prisma-honorarium/client";
+import { Kegiatan } from "@prisma-honorarium/client";
 import FormPengajuanGenerateRampungan from "../form-pengajuan-generate-rampungan";
 
 interface DisplayFormPengajuanGenerateRampunganProps {
