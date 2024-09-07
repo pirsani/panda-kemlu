@@ -122,7 +122,9 @@ const UhLuarNegeriContainer = ({ editId }: UhLuarNegeriContainerProps) => {
                 name="daftarHadir"
                 render={({ field }) => (
                   <FormItem>
-                    <label htmlFor="daftarHadir">Daftar Hadir</label>
+                    <label htmlFor="daftarHadir" className=" font-semibold">
+                      Daftar Hadir
+                    </label>{" "}
                     <div className="flex flex-row gap-2 items-center">
                       <FormControl>
                         <FormFileUpload
@@ -142,7 +144,9 @@ const UhLuarNegeriContainer = ({ editId }: UhLuarNegeriContainerProps) => {
                 name="dokumentasi"
                 render={({ field }) => (
                   <FormItem>
-                    <label htmlFor="dokumentasi">Dokumentasi</label>
+                    <label htmlFor="dokumentasi" className="font-semibold">
+                      Dokumentasi
+                    </label>{" "}
                     <div className="flex flex-row gap-2 items-center">
                       <FormControl>
                         <FormFileUpload
@@ -153,7 +157,6 @@ const UhLuarNegeriContainer = ({ editId }: UhLuarNegeriContainerProps) => {
                       </FormControl>
                       <ButtonEye url={fileUrls[field.name]} />
                     </div>
-
                     <FormMessage />
                   </FormItem>
                 )}
@@ -163,7 +166,9 @@ const UhLuarNegeriContainer = ({ editId }: UhLuarNegeriContainerProps) => {
                 name="rampungan"
                 render={({ field }) => (
                   <FormItem>
-                    <label htmlFor="rampungan">Rampungan yang distempel</label>
+                    <label htmlFor="rampungan" className=" font-semibold">
+                      Rampungan yang distempel
+                    </label>{" "}
                     <div className="flex flex-row gap-2 items-center">
                       <FormControl>
                         <FormFileUpload
