@@ -33,8 +33,6 @@ const ButtonsPengajuan = ({
   riwayatProses,
 }: ButtonsPengajuanProps) => {
   const [jenisPengajuan, setJenisPengajuan] = useState<JenisPengajuan | null>();
-  const [existingRampungan, setExistingRampungan] =
-    useState<RiwayatProses | null>(null);
 
   const [mapRiwayatProses, setMapRiwayatProses] =
     useState<MapRiwayatProses | null>(null);
@@ -42,53 +40,27 @@ const ButtonsPengajuan = ({
   const handleOnClick = (jenis: JenisPengajuan) => {
     setJenisPengajuan(jenis);
     handleSelection(jenis);
-  };
-
-  const mappingRiwayatProses = (riwayatProses: RiwayatProses[]) => {
-    const mapped: MapRiwayatProses = {
-      [JENIS_PENGAJUAN.GENERATE_RAMPUNGAN]: null,
-      [JENIS_PENGAJUAN.HONORARIUM]: [],
-      [JENIS_PENGAJUAN.UH_DALAM_NEGERI]: null,
-      [JENIS_PENGAJUAN.UH_LUAR_NEGERI]: null,
-      [JENIS_PENGAJUAN.PENGGANTIAN_REINBURSEMENT]: [],
-      [JENIS_PENGAJUAN.PEMBAYARAN_PIHAK_KETIGA]: [],
-    };
-
-    riwayatProses.forEach((proses) => {
-      const jenis = proses.jenis;
-
-      // Handle single object types
-      if (
-        jenis === JENIS_PENGAJUAN.GENERATE_RAMPUNGAN ||
-        jenis === JENIS_PENGAJUAN.UH_DALAM_NEGERI ||
-        jenis === JENIS_PENGAJUAN.UH_LUAR_NEGERI
-      ) {
-        mapped[jenis] = proses; // Directly assign the object
-      } else if (
-        // Handle array types
-        jenis === JENIS_PENGAJUAN.HONORARIUM ||
-        jenis === JENIS_PENGAJUAN.PENGGANTIAN_REINBURSEMENT ||
-        jenis === JENIS_PENGAJUAN.PEMBAYARAN_PIHAK_KETIGA
-      ) {
-        (mapped[jenis] as RiwayatProses[]).push(proses); // Push to the array
-      }
-    });
-
-    setMapRiwayatProses(mapped);
+    console.log("[riwayatProses]", riwayatProses);
   };
 
   const handleSuccessPengajuanRampungan = (riwayat: RiwayatProses) => {
-    setExistingRampungan(riwayat);
+    setMapRiwayatProses((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        [JENIS_PENGAJUAN.GENERATE_RAMPUNGAN]: riwayat,
+      };
+    });
   };
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
-    console.log("kegiatan", kegiatan);
+    setJenisPengajuan(null);
   }, [kegiatan]);
 
   useEffect(() => {
-    console.log("riwayatProses", riwayatProses);
-    mappingRiwayatProses(riwayatProses);
+    console.log("[useEffect][riwayatProses]", riwayatProses);
+    setMapRiwayatProses(mappingRiwayatProses(riwayatProses));
   }, [riwayatProses]);
 
   if (!kegiatan) return null;
@@ -169,10 +141,43 @@ const ButtonsPengajuan = ({
         jenisPengajuan={jenisPengajuan}
         existingRampungan={mapRiwayatProses[JENIS_PENGAJUAN.GENERATE_RAMPUNGAN]}
         kegiatan={kegiatan}
-        handleSuccessPengajuanRampungan={handleSuccessPengajuanRampungan}
+        handleSuccess={handleSuccessPengajuanRampungan}
       />
     </>
   );
+};
+
+const mappingRiwayatProses = (riwayatProses: RiwayatProses[]) => {
+  const mapped: MapRiwayatProses = {
+    [JENIS_PENGAJUAN.GENERATE_RAMPUNGAN]: null,
+    [JENIS_PENGAJUAN.HONORARIUM]: [],
+    [JENIS_PENGAJUAN.UH_DALAM_NEGERI]: null,
+    [JENIS_PENGAJUAN.UH_LUAR_NEGERI]: null,
+    [JENIS_PENGAJUAN.PENGGANTIAN_REINBURSEMENT]: [],
+    [JENIS_PENGAJUAN.PEMBAYARAN_PIHAK_KETIGA]: [],
+  };
+
+  riwayatProses.forEach((proses) => {
+    const jenis = proses.jenis;
+
+    // Handle single object types
+    if (
+      jenis === JENIS_PENGAJUAN.GENERATE_RAMPUNGAN ||
+      jenis === JENIS_PENGAJUAN.UH_DALAM_NEGERI ||
+      jenis === JENIS_PENGAJUAN.UH_LUAR_NEGERI
+    ) {
+      mapped[jenis] = proses; // Directly assign the object
+    } else if (
+      // Handle array types
+      jenis === JENIS_PENGAJUAN.HONORARIUM ||
+      jenis === JENIS_PENGAJUAN.PENGGANTIAN_REINBURSEMENT ||
+      jenis === JENIS_PENGAJUAN.PEMBAYARAN_PIHAK_KETIGA
+    ) {
+      (mapped[jenis] as RiwayatProses[]).push(proses); // Push to the array
+    }
+  });
+  console.log("[mapped]", mapped);
+  return mapped;
 };
 
 interface ButtonRiwayatRampunganProps {
@@ -206,29 +211,33 @@ interface DisplayFormPengajuanGenerateRampunganProps {
   jenisPengajuan?: JenisPengajuan | null;
   existingRampungan: RiwayatProses | null;
   kegiatan: Kegiatan;
-  handleSuccessPengajuanRampungan: (riwayat: RiwayatProses) => void;
+  handleSuccess: (riwayat: RiwayatProses) => void; // harusnya update ke atas
 }
 const DisplayFormPengajuanGenerateRampungan = ({
   jenisPengajuan,
   existingRampungan,
   kegiatan,
-  handleSuccessPengajuanRampungan,
+  handleSuccess,
 }: DisplayFormPengajuanGenerateRampunganProps) => {
   const [currentRampungan, setCurrentRampungan] =
-    useState<RiwayatProses | null>(null);
+    useState<RiwayatProses | null>(existingRampungan);
 
   // Success handler to update the state and call the parent success handler
-  const handleSuccess = (riwayat: RiwayatProses) => {
-    setCurrentRampungan(riwayat);
-    handleSuccessPengajuanRampungan(riwayat);
-  };
+  // disini harusnya update ke atas
+  // const handleSuccess = (riwayat: RiwayatProses) => {
+  //   setCurrentRampungan(riwayat);
+  // };
 
   useEffect(() => {
     setCurrentRampungan(existingRampungan);
   }, [existingRampungan]);
 
+  console.log("[jenisPengajuan]", currentRampungan);
+  console.log("[currentRampungan]", currentRampungan);
+  console.log("[existingRampungan]", existingRampungan);
+
   // Render the form if GENERATE_RAMPUNGAN is selected and there's no existing rampungan
-  if (jenisPengajuan === "GENERATE_RAMPUNGAN" && !currentRampungan) {
+  if (jenisPengajuan === "GENERATE_RAMPUNGAN" && !existingRampungan) {
     return (
       <FormPengajuanGenerateRampungan
         kegiatanId={kegiatan.id}
@@ -240,23 +249,24 @@ const DisplayFormPengajuanGenerateRampungan = ({
   // Render the status message if GENERATE_RAMPUNGAN is selected, rampungan exists, and is not verified
   const shouldShowStatusMessage =
     jenisPengajuan === "GENERATE_RAMPUNGAN" &&
-    currentRampungan &&
-    currentRampungan.status !== "terverifikasi";
+    existingRampungan &&
+    existingRampungan.status !== "terverifikasi";
 
   if (shouldShowStatusMessage) {
-    const updatedAt = currentRampungan.updatedAt;
-    const createdAt = currentRampungan.createdAt;
+    const updatedAt = existingRampungan.updatedAt;
+    const createdAt = existingRampungan.createdAt;
 
     return (
       <p className="text-red-500 ring-1 rounded-md p-2 mt-2 bg-green-200">
         <span>
           Pengajuan Generate Rampungan{" "}
-          {currentRampungan.kegiatanId + " " + currentRampungan.jenis} berhasil
-          diajukan pada tanggal {(updatedAt ?? createdAt).toLocaleDateString()}{" "}
+          {existingRampungan.kegiatanId + " " + existingRampungan.jenis}{" "}
+          berhasil diajukan pada tanggal{" "}
+          {(updatedAt ?? createdAt).toLocaleDateString()}{" "}
           {(updatedAt ?? createdAt).toLocaleTimeString()}
           {","}
         </span>
-        <span> status: {currentRampungan.status}</span>
+        <span> status: {existingRampungan.status}</span>
       </p>
     );
   }
