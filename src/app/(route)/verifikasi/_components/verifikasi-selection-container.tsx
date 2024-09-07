@@ -20,8 +20,11 @@ const VerfikasiSelectionContainer = ({
     setJenisPengajuan(jenis);
   };
 
-  const handleSelesaiRampungan = (kegiatan: Kegiatan) => {
-    setKegiatan(kegiatan);
+  const handleSelesaiRampungan = (kegiatanUpdated: Kegiatan) => {
+    setKegiatan((kegiatan) => ({
+      ...kegiatan,
+      ...kegiatanUpdated,
+    }));
   };
 
   useEffect(() => {

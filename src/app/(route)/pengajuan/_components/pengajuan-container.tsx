@@ -40,9 +40,11 @@ const PengajuanContainer = () => {
     setKegiatanId(value); // after this set, it will trigger re-render PreviewKegiatan
   };
 
-  const handleSuccessPengajuanRampungan = (kegiatan: Kegiatan) => {
-    // update existing kegiatan
-    setKegiatan(kegiatan);
+  const handleSuccessPengajuanRampungan = (kegiatanUpdated: Kegiatan) => {
+    setKegiatan((kegiatan) => ({
+      ...kegiatan,
+      ...kegiatanUpdated,
+    }));
   };
 
   useEffect(() => {
@@ -84,6 +86,11 @@ const PengajuanContainer = () => {
         {jenisPengajuan == "HONORARIUM" && kegiatan && (
           <HonorariumContainer kegiatan={kegiatan} />
         )}
+
+        {/* 
+        TODO: jika sudah diajukan maka tampilkan form pengajuan view only
+        tidak bisa update dokumen sampai pengajuan di minta untuk revisi dengan status revisi di kolom statusUhDalamNegeri
+         */}
         {jenisPengajuan == "UH_DALAM_NEGERI" && kegiatan && (
           <UhDalamNegeriContainer kegiatanId={kegiatan.id} />
         )}
