@@ -155,7 +155,7 @@ const ButtonRiwayatRampungan = ({
   jenisPengajuan,
   statusRampungan,
 }: ButtonRiwayatRampunganProps) => {
-  if (statusRampungan && statusRampungan === "terverifikasi") return null;
+  if (statusRampungan && statusRampungan !== "pengajuan") return null;
 
   return (
     <Button
@@ -177,14 +177,23 @@ interface ButtonAjukanUhDalamNegeriProps {
   statusRampungan: string | null;
   statusUhDalamNegeri: string | null;
 }
-
+// button ini hanya untuk menampilkan button ajukan UH dalam negeri, , BUKAN pengajuan itu sendiri,
+// setelah diklik akan mengubah state jenisPengajuan menjadi UH_DALAM_NEGERI
+// akan ada komponen yang lain yang akan memunculkan formulir UH dalam negeri jika status jenisPengajuan adalah UH_DALAM_NEGERI
+// sebenernya ini lebih tepat disebut sebagai menu, bukan button
 const ButtonAjukanUhDalamNegeri = ({
   handleOnClick,
   jenisPengajuan,
   statusRampungan,
   statusUhDalamNegeri,
 }: ButtonAjukanUhDalamNegeriProps) => {
-  if (!statusRampungan || statusRampungan !== "terverifikasi") return null;
+  // jika belum ada generate rampungan, tidak bisa ajukan UH dalam negeri
+  if (
+    !statusRampungan ||
+    (statusRampungan !== "terverifikasi" && statusRampungan !== "selesai")
+  )
+    return null;
+
   return (
     <Button
       variant="outline"
@@ -212,7 +221,11 @@ const ButtonAjukanUhLuarNegeri = ({
   statusRampungan,
   statusUhLuarNegeri,
 }: ButtonAjukanUhLuarNegeriProps) => {
-  if (!statusRampungan || statusRampungan !== "terverifikasi") return null;
+  if (
+    !statusRampungan ||
+    (statusRampungan !== "terverifikasi" && statusRampungan !== "selesai")
+  )
+    return null;
   return (
     <Button
       variant="outline"
