@@ -38,27 +38,34 @@ FormFileUploadProps) => {
         control={control}
         render={({ field }) => (
           <>
-            {currentFile && (
-              <div className="flex flex-row gap-1">
-                <Input type="text" readOnly value={currentFile.name} />
-                <Button
-                  variant={"outline"}
-                  type="button"
-                  onClick={() => inputRef.current?.click()}
-                >
-                  Change File
-                </Button>
-              </div>
-            )}
+            <div className="flex flex-row gap-1">
+              <Input
+                type="text"
+                readOnly
+                value={currentFile?.name ?? ""}
+                placeholder="No file selected, please choose a file"
+                onClick={() =>
+                  !currentFile ? inputRef.current?.click() : null
+                }
+              />
+              <Button
+                variant={"outline"}
+                type="button"
+                onClick={() => inputRef.current?.click()}
+              >
+                {currentFile ? "Change" : "Choose File"}
+              </Button>
+            </div>
+
             <input
               ref={inputRef}
               id={name}
               type="file"
               accept=".pdf"
               className={cn(
-                "border-2 border-gray-300 p-2 rounded w-full",
-                className,
-                currentFile && "hidden"
+                "border-2 border-gray-300 p-2 rounded w-full hidden",
+                className
+                // currentFile && "hidden"
               )}
               onChange={(e) => {
                 const selectedFile = e.target.files?.[0] || null;

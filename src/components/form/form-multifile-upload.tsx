@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { CircleX, Eye } from "lucide-react";
+import { CircleX, Eye, List, Minimize2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Button } from "../ui/button";
@@ -9,12 +9,16 @@ interface FormMultiFileUploadProps {
   name: string;
   onFileChange?: (files: File[] | null) => void;
   className?: string;
+  classNameEyeButton?: string;
+  text?: string;
 }
 
 export const FormMultiFileUpload = ({
   name,
   onFileChange,
   className,
+  classNameEyeButton,
+  text = "Add Files",
 }: FormMultiFileUploadProps) => {
   const { control, watch, setValue, trigger } = useFormContext();
   const [showFiles, setShowFiles] = useState(false);
@@ -69,6 +73,7 @@ export const FormMultiFileUpload = ({
       <input
         id={name}
         type="file"
+        accept="image/*, application/pdf"
         multiple
         ref={inputRef}
         className="hidden"
@@ -82,10 +87,10 @@ export const FormMultiFileUpload = ({
         <Button
           type="button"
           variant={"outline"}
-          className="w-60 h-12 shadow-lg border-2 border-gray-300"
+          className={cn("shadow-lg border-2 border-gray-300", className)}
           onClick={() => inputRef.current?.click()}
         >
-          Add Files
+          {text}
         </Button>
 
         {currentFiles && currentFiles?.length > 0 && (
@@ -94,13 +99,20 @@ export const FormMultiFileUpload = ({
             variant={
               showFiles && currentFiles && currentFiles.length > 0
                 ? "outline"
-                : "default"
+                : "outline"
             }
             onClick={() => setShowFiles(!showFiles)}
-            className="h-12 shadow-lg border-2 border-gray-300"
+            className={cn(
+              "shadow-lg border-2 border-gray-300",
+              classNameEyeButton
+            )}
           >
-            <span className="mx-2">{currentFiles.length}</span>
-            <Eye size={24} />
+            <span className="mx-2">{currentFiles.length} file</span>
+            <List
+              size={16}
+              className="text-blue-900"
+              transform={showFiles ? "rotate(0)" : "rotate(90)"}
+            />
           </Button>
         )}
       </div>

@@ -25,6 +25,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import Select from "react-select";
 import ItineraryContainer from "./itinerary-container";
 import PesertaContainer from "./peserta-container";
 //import SelectSbmProvinsi from "./select-sbm-provinsi";
@@ -51,14 +52,19 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
       nama: "",
       lokasi: LOKASI.DALAM_KOTA, // Default value for lokasi atau nantinya bisa diisi dari data yang sudah ada klo mode edit
       provinsi: 31, // Default value for provinsi atau nantinya bisa diisi dari data yang sudah ada klo mode edit
+      dokumenSuratTugas: undefined,
+      dokumenJadwal: undefined,
+      dokumenNodinMemoSk: undefined,
     },
     //reValidateMode: "onChange",
   });
 
   const {
     setValue,
+    reset,
+    resetField,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     watch,
     trigger,
   } = form;
@@ -102,10 +108,11 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
     const kegiatanBaru = await setupKegiatan(formData);
     if (kegiatanBaru.success) {
       alert("Kegiatan berhasil disimpan");
-      form.reset();
-      setValue("dokumenSuratTugas", []);
-      setValue("dokumenNodinMemoSk", undefined);
-      setValue("dokumenJadwal", undefined);
+      reset(); // reset the form
+
+      // resetField("dokumenSuratTugas");
+      // resetField("dokumenNodinMemoSk");
+      // resetField("dokumenJadwal");
     } else {
       alert("Kegiatan gagal disimpan");
     }
@@ -141,6 +148,13 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
   }, [lokasi]);
 
   const displayAllErrors = false;
+
+  const LOKASI_OPTIONS = [
+    { value: LOKASI.DALAM_KOTA, label: "Dalam Kota" },
+    { value: LOKASI.LUAR_KOTA, label: "Luar Kota" },
+    { value: LOKASI.LUAR_NEGERI, label: "Luar Negeri" },
+  ];
+
   return (
     <Form {...form}>
       {/* Map errors to a div */}
@@ -156,7 +170,10 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
           </ul>
         </div>
       )}
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-2 w-full"
+      >
         <FormField
           control={form.control}
           name="nama"
@@ -267,8 +284,10 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
               >
                 <FormMultiFileUpload
                   name={field.name}
+                  text="Pilih dokumen Surat Tugas"
                   onFileChange={handleMultiFileChange}
-                  className="bg-white"
+                  className="bg-white w-full"
+                  classNameEyeButton=""
                 />
               </FormControl>
               <FormMessage />
@@ -282,21 +301,16 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             <FormItem>
               <FormLabel htmlFor={field.name}>Lokasi</FormLabel>
               <FormControl>
-                <select
-                  id="lokasi"
+                <Select
                   {...field}
-                  className="border-2 border-gray-300 p-2 rounded w-full"
-                >
-                  <option value={LOKASI.DALAM_KOTA} className="p-2">
-                    Dalam Kota
-                  </option>
-                  <option value={LOKASI.LUAR_KOTA} className="p-2">
-                    Luar Kota
-                  </option>
-                  <option value={LOKASI.LUAR_NEGERI} className="p-2">
-                    Luar Negeri
-                  </option>
-                </select>
+                  options={LOKASI_OPTIONS}
+                  onChange={(selectedOption) =>
+                    field.onChange(selectedOption?.value)
+                  }
+                  value={LOKASI_OPTIONS.find(
+                    (option) => option.value === field.value
+                  )}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -323,9 +337,24 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
           />
         )}
         <PesertaContainer />
-        <Button className="my-8" type="submit">
-          Submit
-        </Button>
+        <div className="flex flex-row gap-4 w-full">
+          <Button
+            className="w-5/6 h-12 bg-blue-600 hover:bg-blue-700"
+            type="submit"
+          >
+            Submit
+          </Button>
+          <Button
+            type="button"
+            variant={"outline"}
+            className="w-1/6 h-12"
+            onClick={() => {
+              reset();
+            }}
+          >
+            Cancel
+          </Button>
+        </div>
       </form>
     </Form>
   );
