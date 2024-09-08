@@ -1,25 +1,12 @@
 "use server";
 import { ActionResponse } from "@/actions/response";
+import { columns as allowedColumns } from "@/constants/excel/peserta";
 import { dbHonorarium } from "@/lib/db-honorarium";
-import parseExcel from "@/utils/parse-excel";
-import parseExcelOnServer from "@/utils/parse-excel-on-server";
+import parseExcel from "@/utils/excel/parse-excel";
+import parseExcelOnServer from "@/utils/excel/parse-excel-on-server";
 import kegiatanSchema, { Kegiatan as ZKegiatan } from "@/zod/schemas/kegiatan";
 import { Kegiatan } from "@prisma-honorarium/client";
 import { format } from "date-fns";
-
-export const allowedColumns = [
-  "ID",
-  "Nama",
-  "NIP",
-  "Golongan/Ruang",
-  "Jabatan",
-  "Eselon",
-  "NIK",
-  "NPWP",
-  "Nama Rekening",
-  "Bank",
-  "Nomor Rekening",
-];
 
 export const setupKegiatan = async (
   formData: FormData

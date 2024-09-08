@@ -6,12 +6,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { ParseExcelResult } from "@/utils/parse-excel";
+import { ParseExcelResult } from "@/utils/excel/parse-excel";
+import { splitEmptyValues } from "@/utils/excel/split-empty-values";
 import Link from "next/link";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import * as XLSX from "xlsx";
-import InputFileXlsx, { splitEmptyValues } from "./input-file-xlsx";
+import InputFileXlsx from "./input-file-xlsx";
 import TabelPeserta from "./tabel-peserta";
 
 interface PesertaContainerProps {
