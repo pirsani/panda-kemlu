@@ -37,22 +37,6 @@ export const setupKegiatan = async (
     "yyyy-MM-dd"
   );
 
-  // const dataparsedX = kegiatanSchema.parse(formDataObj);
-
-  // try {
-  //   console.log("dataparsedX", dataparsedX);
-  // } catch (error) {
-  //   return {
-  //     success: false,
-  //     error: "null",
-  //   };
-  // }
-
-  // return {
-  //   success: false,
-  //   error: "coba dulu",
-  // };
-
   let dataparsed: ZKegiatan;
   try {
     dataparsed = kegiatanSchema.parse(formDataObj);
@@ -69,55 +53,65 @@ export const setupKegiatan = async (
   let kegiatanBaru: Kegiatan;
 
   try {
-    kegiatanBaru = await dbHonorarium.kegiatan.create({
-      data: {
-        status: "setup-kegiatan",
-        nama: dataparsed.nama,
-        tanggalMulai: dataparsed.tanggalMulai,
-        tanggalSelesai: dataparsed.tanggalSelesai,
-        lokasi: dataparsed.lokasi,
-        dokumenNodinMemoSk: dataparsed.dokumenNodinMemoSk?.name!,
-        dokumenJadwal: dataparsed.dokumenJadwal?.name!,
-        createdBy: "admin",
-        provinsiId: dataparsed.provinsi,
-      },
-    });
+    const result = await dbHonorarium.$transaction(async (prisma) => {
+      // Create the main kegiatan entry
+      const kegiatanBaru = await prisma.kegiatan.create({
+        data: {
+          status: "setup-kegiatan",
+          nama: dataparsed.nama,
+          tanggalMulai: dataparsed.tanggalMulai,
+          tanggalSelesai: dataparsed.tanggalSelesai,
+          lokasi: dataparsed.lokasi,
+          dokumenNodinMemoSk: dataparsed.dokumenNodinMemoSk?.name!,
+          dokumenJadwal: dataparsed.dokumenJadwal?.name!,
+          createdBy: "admin",
+          provinsiId: dataparsed.provinsi,
+        },
+      });
 
-    const dokumenSuratTugas = dataparsed.dokumenSuratTugas;
-    if (dokumenSuratTugas) {
-      if (Array.isArray(dokumenSuratTugas)) {
-        await Promise.all(
-          dokumenSuratTugas.map((dokumen) => {
-            if (dokumen && dokumen.name) {
-              return dbHonorarium.dokumenSuratTugas.create({
-                data: {
-                  nama: dokumen.name,
-                  dokumen: dokumen.name,
-                  kegiatanId: kegiatanBaru.id,
-                  createdBy: "admin",
-                },
-              });
-            } else {
-              // Handle the case where dokumen.name is undefined
-              return Promise.resolve();
-            }
-          })
-        );
-      } else {
-        if (dokumenSuratTugas.name) {
-          await dbHonorarium.dokumenSuratTugas.create({
-            data: {
-              nama: dokumenSuratTugas.name,
-              dokumen: dokumenSuratTugas.name,
-              kegiatanId: kegiatanBaru.id,
-              createdBy: "admin",
-            },
-          });
+      // Handle the documents for surat tugas
+      if (dataparsed.dokumenSuratTugas) {
+        if (Array.isArray(dataparsed.dokumenSuratTugas)) {
+          await Promise.all(
+            dataparsed.dokumenSuratTugas.map((dokumen) => {
+              if (dokumen && dokumen.name) {
+                return prisma.dokumenSuratTugas.create({
+                  data: {
+                    nama: dokumen.name,
+                    dokumen: dokumen.name,
+                    kegiatanId: kegiatanBaru.id,
+                    createdBy: "admin",
+                  },
+                });
+              } else {
+                // Handle the case where dokumen.name is undefined
+                return Promise.resolve();
+              }
+            })
+          );
         } else {
-          // Handle the case where dokumenSuratTugas.name is undefined
+          if (dataparsed.dokumenSuratTugas.name) {
+            await prisma.dokumenSuratTugas.create({
+              data: {
+                nama: dataparsed.dokumenSuratTugas.name,
+                dokumen: dataparsed.dokumenSuratTugas.name,
+                kegiatanId: kegiatanBaru.id,
+                createdBy: "admin",
+              },
+            });
+          } else {
+            // Handle the case where dokumenSuratTugas.name is undefined
+          }
         }
       }
-    }
+
+      return kegiatanBaru;
+    });
+
+    return {
+      success: true,
+      data: result,
+    };
   } catch (error) {
     console.error("Error saving kegiatan:", error);
     return {
