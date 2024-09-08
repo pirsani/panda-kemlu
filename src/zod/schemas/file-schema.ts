@@ -11,10 +11,12 @@ function formatFileSize(bytes: number, si: boolean = true): string {
 interface fileSchemaOptions {
   maxsize?: number;
   required?: boolean;
+  allowedTypes?: string[];
 }
 export const fileSchema = ({
   maxsize = 100 * 1024 * 1024,
   required = true,
+  allowedTypes = ["application/pdf"],
 }: fileSchemaOptions = {}) => {
   const baseSchema = z
     .instanceof(File, { message: "Silakan pilih file" })
@@ -23,8 +25,8 @@ export const fileSchema = ({
       (file) => file.size < maxsize,
       `Ukuran file maksimal ${formatFileSize(maxsize)}`
     )
-    .refine((file) => file.type === "application/pdf", {
-      message: "Format .pdf",
+    .refine((file) => allowedTypes.includes(file.type), {
+      message: `Format file harus salah satu dari: ${allowedTypes.join(", ")}`,
     });
 
   return required ? baseSchema : z.union([baseSchema, z.undefined()]);

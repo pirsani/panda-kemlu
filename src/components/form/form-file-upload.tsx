@@ -16,6 +16,8 @@ interface FormFileUploadProps {
     field: ControllerRenderProps<FieldValues, string>
   ) => void;
   className?: string;
+  allowedTypes?: string[];
+
   //ref?: React.RefObject<HTMLInputElement>;
 }
 
@@ -23,6 +25,7 @@ export const FormFileUpload = ({
   name,
   onFileChange,
   className,
+  allowedTypes = ["application/pdf"],
 }: //ref,
 FormFileUploadProps) => {
   const { control, watch } = useFormContext();
@@ -61,7 +64,7 @@ FormFileUploadProps) => {
               ref={inputRef}
               id={name}
               type="file"
-              accept=".pdf"
+              accept={allowedTypes.join(", ")}
               className={cn(
                 "border-2 border-gray-300 p-2 rounded w-full hidden",
                 className

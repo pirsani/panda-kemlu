@@ -1,13 +1,20 @@
+import FormFileUpload from "@/components/form/form-file-upload";
 import { ChangeEvent, useState } from "react";
 import * as XLSX from "xlsx";
 
 interface InputFileXlsxProps {
+  name: string;
   onChange: (data: Record<string, any>[]) => void;
   maxColumns?: number; // Add maxColumns prop
 }
-const InputFileXlsx = ({ onChange, maxColumns = 8 }: InputFileXlsxProps) => {
-  const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+const InputFileXlsx = ({
+  name,
+  onChange,
+  maxColumns = 8,
+}: InputFileXlsxProps) => {
+  // const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleOnChange = (file: File | null) => {
+    //const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -49,12 +56,13 @@ const InputFileXlsx = ({ onChange, maxColumns = 8 }: InputFileXlsxProps) => {
   };
 
   return (
-    <input
-      id="peserta"
-      type="file"
-      accept=".xlsx"
-      onChange={handleOnChange}
-      className="border-2 border-gray-300 p-2 rounded w-full"
+    <FormFileUpload
+      name={name}
+      allowedTypes={[
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      ]}
+      onFileChange={handleOnChange}
+      className="bg-white"
     />
   );
 };

@@ -45,6 +45,12 @@ export const baseKegiatanSchema = z.object({
       .array(fileSchema({ required: true }))
       .nonempty({ message: "Surat Tugas harus diisi" }),
   ]),
+  pesertaXlsx: fileSchema({
+    required: true,
+    allowedTypes: [
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ],
+  }),
 });
 
 // Apply the refine method to add custom validation

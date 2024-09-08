@@ -25,17 +25,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import Select from "react-select";
 import ItineraryContainer from "./itinerary-container";
 import PesertaContainer from "./peserta-container";
 //import SelectSbmProvinsi from "./select-sbm-provinsi";
 import setupKegiatan from "@/actions/kegiatan/setup-kegiatan";
+import SelectLokasi from "@/components/form/select-lokasi";
 import { LOKASI } from "@prisma-honorarium/client";
+
+//import Select, { SingleValue } from "react-select";
 
 const SelectSbmProvinsi = dynamic(() => import("./select-sbm-provinsi"), {
   ssr: false,
   loading: () => <p>Loading provinsi...</p>,
 });
+// fix Warning: Extra attributes from the server: aria-activedescendant
+// Dynamically import Select to avoid SSR
 
 type FormValues<T> = T extends true ? KegiatanEditMode : Kegiatan;
 
@@ -76,6 +80,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
       dokumenNodinMemoSk,
       dokumenJadwal,
       dokumenSuratTugas,
+      pesertaXlsx,
       ...dataWithoutFile
     } = data;
     // create a new FormData object
@@ -95,6 +100,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
     // append the files to the form data
     formData.append("dokumenNodinMemoSk", dokumenNodinMemoSk as File);
     formData.append("dokumenJadwal", dokumenJadwal as File);
+    formData.append("pesertaXlsx", pesertaXlsx as File);
 
     // append the files to the form data
     if (Array.isArray(dokumenSuratTugas)) {
@@ -301,15 +307,10 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             <FormItem>
               <FormLabel htmlFor={field.name}>Lokasi</FormLabel>
               <FormControl>
-                <Select
-                  {...field}
-                  options={LOKASI_OPTIONS}
-                  onChange={(selectedOption) =>
-                    field.onChange(selectedOption?.value)
-                  }
-                  value={LOKASI_OPTIONS.find(
-                    (option) => option.value === field.value
-                  )}
+                <SelectLokasi
+                  value={field.value}
+                  fieldName={field.name}
+                  onChange={field.onChange}
                 />
               </FormControl>
               <FormMessage />
@@ -336,8 +337,25 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             )}
           />
         )}
-        <PesertaContainer />
-        <div className="flex flex-row gap-4 w-full">
+
+        <FormField
+          control={form.control}
+          name="pesertaXlsx"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <PesertaContainer
+                  fieldName={field.name}
+                  value={field.value}
+                  // onChange={field.onChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* <PesertaContainer fieldName="pesertaXls" /> */}
+        <div className="flex flex-row gap-4 w-full mt-12">
           <Button
             className="w-5/6 h-12 bg-blue-600 hover:bg-blue-700"
             type="submit"
