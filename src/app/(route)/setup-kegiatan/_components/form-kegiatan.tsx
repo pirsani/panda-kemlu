@@ -114,7 +114,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
     const kegiatanBaru = await setupKegiatan(formData);
     if (kegiatanBaru.success) {
       alert("Kegiatan berhasil disimpan");
-      reset(); // reset the form
+      //reset(); // reset the form
 
       // resetField("dokumenSuratTugas");
       // resetField("dokumenNodinMemoSk");

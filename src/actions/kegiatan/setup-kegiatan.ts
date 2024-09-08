@@ -1,6 +1,8 @@
 "use server";
 import { ActionResponse } from "@/actions/response";
 import { dbHonorarium } from "@/lib/db-honorarium";
+import parseExcel from "@/utils/parse-excel";
+import parseExcelOnServer from "@/utils/parse-excel-on-server";
 import kegiatanSchema, { Kegiatan as ZKegiatan } from "@/zod/schemas/kegiatan";
 import { Kegiatan } from "@prisma-honorarium/client";
 import { format } from "date-fns";
@@ -51,6 +53,20 @@ export const setupKegiatan = async (
   }
 
   let kegiatanBaru: Kegiatan;
+
+  try {
+    // parse xlsx file
+    const dataPeserta = await parseExcelOnServer(
+      dataparsed.pesertaXlsx as File,
+      {
+        allowedColumns: ["A", "B", "C", "D", "E", "F", "G", "H"],
+      }
+    );
+
+    console.log("dataPeserta", dataPeserta);
+  } catch (error) {
+    console.error("Error parsing xlsx file:", error);
+  }
 
   try {
     const result = await dbHonorarium.$transaction(async (prisma) => {
