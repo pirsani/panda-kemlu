@@ -6,11 +6,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { ParseExcelResult } from "@/utils/parse-excel";
 import Link from "next/link";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import * as XLSX from "xlsx";
-import InputFileXlsx from "./input-file-xlsx";
+import InputFileXlsx, { splitEmptyValues } from "./input-file-xlsx";
 import TabelPeserta from "./tabel-peserta";
 
 interface PesertaContainerProps {
@@ -20,12 +21,16 @@ interface PesertaContainerProps {
 }
 const PesertaContainer = ({ fieldName, value }: PesertaContainerProps) => {
   const [data, setData] = useState<Record<string, any>[]>([]);
-  const { control, watch, setValue, trigger } = useFormContext();
+  const emptyAllowed = ["Eselon", "ID", "Lainny"]; // kolom yang boleh kosong
+  const [emptyValues, setEmptyValues] = useState<Record<number, string[]>>([]);
+  const [missingColumns, setMissingColumns] = useState<string[]>([]);
 
-  const handleOnChange = (data: Record<string, any>[]) => {
-    if (data) {
-      setData(data);
-      console.log(data);
+  const handleOnChange = (parseExcelResult: ParseExcelResult) => {
+    if (parseExcelResult.rows.length > 0) {
+      setData(parseExcelResult.rows);
+      setEmptyValues(parseExcelResult.emptyValues);
+      setMissingColumns(parseExcelResult.missingColumns);
+      //console.log(data);
     } else {
       console.log("Data is empty");
       setData([]);
@@ -41,6 +46,20 @@ const PesertaContainer = ({ fieldName, value }: PesertaContainerProps) => {
     }
   }, [value]);
 
+  const allowedColumns = [
+    "ID",
+    "Nama",
+    "NIP",
+    "Golongan/Ruang",
+    "Jabatan",
+    "Eselon",
+    "NIK",
+    "NPWP",
+    "Nama Rekening",
+    "Bank",
+    "Nomor Rekening",
+  ];
+
   return (
     <div className="mt-4">
       <h1 className="text-lg font-semibold mb-2">Peserta</h1>
@@ -54,9 +73,65 @@ const PesertaContainer = ({ fieldName, value }: PesertaContainerProps) => {
         onChange={handleOnChange}
         maxColumns={9}
         name={fieldName}
+        allowedColumns={allowedColumns}
       />
 
+      {Object.keys(emptyValues).length > 0 && (
+        <WarningOnEmpty
+          emptyValues={emptyValues}
+          missingColumns={missingColumns}
+        />
+      )}
       {data.length > 0 && <TabelPeserta data={data} />}
+    </div>
+  );
+};
+
+const WarningOnEmpty = ({
+  missingColumns,
+  emptyValues,
+}: {
+  missingColumns: string[];
+  emptyValues: Record<number, string[]>;
+}) => {
+  const result = splitEmptyValues(emptyValues, ["Eselon", "ID", "Lainny"]);
+  const { shouldNotEmpty, allowEmpty } = result;
+  const rows = Object.entries(shouldNotEmpty);
+  const hasMissingColumns = missingColumns.length > 0;
+  return (
+    <div className="bg-red-500 text-white p-4">
+      <div className="font-bold">Peringatan!</div>
+
+      {hasMissingColumns && (
+        <div>
+          <div className="py-2">
+            <div>Terdapat kolom yang hilang</div>
+            <div className="font-bold">Kolom yang harus ditambahkan</div>
+
+            <ul>
+              {missingColumns.map((col) => (
+                <li key={col}>{col}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+
+      <div>
+        Terdapat kolom yang kosong, silahkan periksa kembali data peserta.
+      </div>
+      <div className="">
+        <div className="font-bold">Kolom yang harus diisi:</div>
+        {
+          <ul>
+            {rows.map(([rowIndex, columns]) => (
+              <li key={rowIndex}>
+                Baris {parseInt(rowIndex) + 1}: {columns.join(", ")}
+              </li>
+            ))}
+          </ul>
+        }
+      </div>
     </div>
   );
 };

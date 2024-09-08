@@ -7,6 +7,20 @@ import kegiatanSchema, { Kegiatan as ZKegiatan } from "@/zod/schemas/kegiatan";
 import { Kegiatan } from "@prisma-honorarium/client";
 import { format } from "date-fns";
 
+export const allowedColumns = [
+  "ID",
+  "Nama",
+  "NIP",
+  "Golongan/Ruang",
+  "Jabatan",
+  "Eselon",
+  "NIK",
+  "NPWP",
+  "Nama Rekening",
+  "Bank",
+  "Nomor Rekening",
+];
+
 export const setupKegiatan = async (
   formData: FormData
 ): Promise<ActionResponse<Kegiatan>> => {
@@ -59,20 +73,7 @@ export const setupKegiatan = async (
     const dataPeserta = await parseExcelOnServer(
       dataparsed.pesertaXlsx as File,
       {
-        allowedColumns: [
-          "ID",
-          "Nama",
-          "NIP",
-          "NIK",
-          "NPWP",
-          "Golongan/Ruang",
-          "NIP",
-          "Jabatan",
-          "Eselon",
-          "Nama Rekening",
-          "Bank",
-          "Nomor Rekening",
-        ],
+        allowedColumns: allowedColumns,
       }
     );
 
