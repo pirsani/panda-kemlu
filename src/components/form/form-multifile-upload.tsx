@@ -47,9 +47,8 @@ export const FormMultiFileUpload = ({
       ];
 
       setValue(name, updatedFiles);
-      if (onFileChange) {
-        onFileChange(updatedFiles);
-      }
+
+      onFileChange && onFileChange(updatedFiles);
     }
     resetInput();
     trigger(name);
@@ -60,9 +59,7 @@ export const FormMultiFileUpload = ({
     if (currentFiles) {
       const updatedFiles = currentFiles.filter((_, i) => i !== index);
       setValue(name, updatedFiles);
-      if (onFileChange) {
-        onFileChange(updatedFiles);
-      }
+      onFileChange && onFileChange(updatedFiles);
     }
     trigger(name);
   };

@@ -4,6 +4,7 @@ import { Kegiatan } from "@prisma-honorarium/client";
 import { useEffect, useState } from "react";
 import ButtonsVerifikasi from "./buttons-verifikasi";
 import FormGenerateRampungan from "./rampungan/form-generate-rampungan";
+import UangHarianDalamNegeriContainer from "./uang-harian/dalam-negeri-container";
 
 interface VerfikasiSelectionContainerProps {
   kegiatan: Kegiatan | null;
@@ -54,7 +55,7 @@ const VerfikasiSelectionContainer = ({
             <DaftarJadwal kegiatanId={kegiatan.id} proses="verfikasi" />
           )}
           {jenisPengajuan == "UH_DALAM_NEGERI" && (
-            <div>Verifikasi UH Dalam Negeri</div>
+            <UangHarianDalamNegeriContainer kegiatan={kegiatan} />
           )}
           {jenisPengajuan == "UH_LUAR_NEGERI" && (
             <div>Verifikasi UH Luar Negeri</div>

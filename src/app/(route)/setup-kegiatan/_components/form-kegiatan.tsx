@@ -28,6 +28,7 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import ItineraryContainer from "./itinerary-container";
 import PesertaContainer from "./peserta-container";
 //import SelectSbmProvinsi from "./select-sbm-provinsi";
+import setupKegiatan from "@/actions/kegiatan/setup-kegiatan";
 import { LOKASI } from "@prisma-honorarium/client";
 
 const SelectSbmProvinsi = dynamic(() => import("./select-sbm-provinsi"), {
@@ -49,13 +50,13 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
     defaultValues: {
       nama: "",
       lokasi: LOKASI.DALAM_KOTA, // Default value for lokasi atau nantinya bisa diisi dari data yang sudah ada klo mode edit
-      provinsi: 24, // Default value for provinsi atau nantinya bisa diisi dari data yang sudah ada klo mode edit
+      provinsi: 31, // Default value for provinsi atau nantinya bisa diisi dari data yang sudah ada klo mode edit
     },
     //reValidateMode: "onChange",
   });
 
   const {
-    register,
+    setValue,
     handleSubmit,
     formState: { errors },
     watch,
@@ -63,8 +64,51 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
   } = form;
 
   const onSubmit: SubmitHandler<FormValues<FormMode>> = async (data) => {
-    console.log(data.tanggalMulai); // Check the format here
-    console.log(data);
+    console.log("[onSubmit]", data);
+    // destructuring data to get the file object
+    const {
+      dokumenNodinMemoSk,
+      dokumenJadwal,
+      dokumenSuratTugas,
+      ...dataWithoutFile
+    } = data;
+    // create a new FormData object
+    const formData = new FormData();
+    // append the data to the form data
+    // formData.append("data", JSON.stringify(dataWithoutFile));
+    // dataWithoutFile
+    for (const [key, value] of Object.entries(dataWithoutFile)) {
+      if (value instanceof Date) {
+        formData.append(key, value.toISOString());
+      } else if (typeof value === "string") {
+        formData.append(key, value);
+      } else {
+        formData.append(key, JSON.stringify(value));
+      }
+    }
+    // append the files to the form data
+    formData.append("dokumenNodinMemoSk", dokumenNodinMemoSk as File);
+    formData.append("dokumenJadwal", dokumenJadwal as File);
+
+    // append the files to the form data
+    if (Array.isArray(dokumenSuratTugas)) {
+      dokumenSuratTugas.forEach((file) => {
+        formData.append("dokumenSuratTugas", file as File);
+      });
+    } else {
+      formData.append("dokumenSuratTugas", dokumenSuratTugas as File);
+    }
+
+    const kegiatanBaru = await setupKegiatan(formData);
+    if (kegiatanBaru.success) {
+      alert("Kegiatan berhasil disimpan");
+      form.reset();
+      setValue("dokumenSuratTugas", []);
+      setValue("dokumenNodinMemoSk", undefined);
+      setValue("dokumenJadwal", undefined);
+    } else {
+      alert("Kegiatan gagal disimpan");
+    }
   };
 
   const setFileUrl = useFileStore((state) => state.setFileUrl);
@@ -79,12 +123,13 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
     }
   };
 
-  const handleMultiFileChange = (file: File[] | null) => {
-    if (file !== null) {
-      //save to state
-    } else {
-      //setFileUrl(null);
-    }
+  const handleMultiFileChange = (files: File[] | null) => {
+    // Ensure files is an array and contains at least one file
+    const fileArray = files?.length ? (files as [File, ...File[]]) : undefined;
+
+    setValue("dokumenSuratTugas", fileArray);
+    trigger("dokumenSuratTugas");
+    console.log("dokumenSuratTugas", fileArray);
   };
 
   // Watch the lokasi field to update the state
@@ -171,10 +216,10 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
         </div>
         <FormField
           control={form.control}
-          name="dokumenSurat"
+          name="dokumenNodinMemoSk"
           render={({ field }) => (
             <FormItem>
-              <FormLabel htmlFor="dokumenSurat">
+              <FormLabel htmlFor="dokumenNodinMemoSk">
                 Upload Nota Dinas/Memorandum/SK Tim
               </FormLabel>
               <FormControl>
@@ -209,7 +254,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
         />
         <FormField
           control={form.control}
-          name="dokumentSuratTugas"
+          name="dokumenSuratTugas"
           render={({ field }) => (
             <FormItem>
               <FormLabel htmlFor={field.name}>

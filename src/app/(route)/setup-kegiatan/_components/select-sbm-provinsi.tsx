@@ -20,6 +20,7 @@ const SelectSbmProvinsi = ({
   value,
 }: SelectSbmProvinsiProps) => {
   const [options, setOptions] = useState<Option[]>([]);
+  const [selectedValue, setSelectedValue] = useState<number | null>(value);
 
   useEffect(() => {
     const fetchOptions = async () => {
@@ -30,28 +31,42 @@ const SelectSbmProvinsi = ({
           label: provinsi.label,
         }));
         setOptions(mappedOptions);
+
+        console.log("mappedOptions", mappedOptions);
+
+        // Set default value after options are loaded
+        if (value) {
+          console.log("value", value);
+          const defaultOption = mappedOptions.find(
+            (option) => option.value === value
+          );
+          console.log("defaultOption", defaultOption);
+          setSelectedValue(defaultOption ? defaultOption.value : null);
+        }
       }
     };
 
     fetchOptions();
-  }, []);
+  }, [value]);
 
   return (
     <Select
       instanceId={fullKey}
       options={options}
       isClearable
-      onChange={(option: SingleValue<Option>) =>
-        onChange(option ? option.value : null)
-      }
-      value={options.find((option) => option.value === value) || null}
+      onChange={(option: SingleValue<Option>) => {
+        const newValue = option ? option.value : null;
+        setSelectedValue(newValue); // Update local state
+        onChange(newValue); // Call onChange handler
+      }}
+      value={options.find((option) => option.value === selectedValue) || null}
       getOptionLabel={(option) => option.label}
       getOptionValue={(option) => option.value.toString()}
       filterOption={(option, inputValue) =>
         option.label.toLowerCase().includes(inputValue.toLowerCase())
       }
-      menuPortalTarget={document.body} // Ensure the menu is rendered in the document body so it doesn't get clipped by overflow:hidden containers
-      styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }} // Ensure the menu has a high z-index
+      menuPortalTarget={document.body} // Ensure the menu is rendered in the document body
+      styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }} // Ensure high z-index
     />
   );
 };

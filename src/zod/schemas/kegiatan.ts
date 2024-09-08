@@ -14,10 +14,10 @@ const isValidDateString = (value: string) => {
 const tanggalSchema = z
   .string()
   .min(10, {
-    message: "Invalid, use format as yyyy-mm-dd.",
+    message: "please complete the date",
   })
   .max(10, {
-    message: "Invalid, use format as yyyy-mm-dd.",
+    message: "please use valid date format",
   })
   .refine(isValidDateString, {
     message: "Invalid, use format as yyyy-mm-dd.",
@@ -37,11 +37,14 @@ export const baseKegiatanSchema = z.object({
   tanggalSelesai: tanggalSchema,
   lokasi: LokasiEnum, // Use the Zod enum schema for lokasi
   provinsi: z.number(),
-  dokumenSurat: fileSchema({ required: true }),
+  dokumenNodinMemoSk: fileSchema({ required: true }),
   dokumenJadwal: fileSchema({ required: true }),
-  dokumentSuratTugas: z
-    .array(fileSchema())
-    .nonempty("At least one file is required"), // array of files
+  dokumenSuratTugas: z.union([
+    fileSchema({ required: true }),
+    z
+      .array(fileSchema({ required: true }))
+      .nonempty({ message: "Surat Tugas harus diisi" }),
+  ]),
 });
 
 // Apply the refine method to add custom validation
@@ -56,7 +59,7 @@ export const kegiatanSchema = baseKegiatanSchema.refine(
 // Extend the refined schema for edit mode
 export const kegiatanSchemaEditMode = baseKegiatanSchema
   .extend({
-    dokumenSurat: fileSchema({ required: false }),
+    dokumenNodinMemoSk: fileSchema({ required: false }),
     dokumenJadwal: fileSchema({ required: false }),
   })
   .refine((data) => data.tanggalMulai <= data.tanggalSelesai, {
