@@ -19,17 +19,18 @@ const InputFileXlsx = ({
     if (file) {
       try {
         const allowedColumns = [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E",
-          "F",
-          "G",
-          "H",
-          "I",
-          "J",
-          "K",
+          "ID",
+          "Nama",
+          "NIP",
+          "Golongan/Ruang",
+          "NIP",
+          "Jabatan",
+          "Eselon",
+          "NIK",
+          "NPWP",
+          "Nama Rekening",
+          "Bank",
+          "Nomor Rekening",
         ];
         const parsedData = await parseExcel(file, { allowedColumns });
         onChange(parsedData);
