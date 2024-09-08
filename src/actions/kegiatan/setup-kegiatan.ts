@@ -59,7 +59,20 @@ export const setupKegiatan = async (
     const dataPeserta = await parseExcelOnServer(
       dataparsed.pesertaXlsx as File,
       {
-        allowedColumns: ["A", "B", "C", "D", "E", "F", "G", "H"],
+        allowedColumns: [
+          "ID",
+          "Nama",
+          "NIP",
+          "NIK",
+          "NPWP",
+          "Golongan/Ruang",
+          "NIP",
+          "Jabatan",
+          "Eselon",
+          "Nama Rekening",
+          "Bank",
+          "Nomor Rekening",
+        ],
       }
     );
 

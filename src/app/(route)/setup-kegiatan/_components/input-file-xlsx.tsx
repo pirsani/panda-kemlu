@@ -18,7 +18,19 @@ const InputFileXlsx = ({
     //const file = event.target.files?.[0];
     if (file) {
       try {
-        const allowedColumns = ["A", "B", "C", "D", "E", "F", "G", "H"];
+        const allowedColumns = [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "G",
+          "H",
+          "I",
+          "J",
+          "K",
+        ];
         const parsedData = await parseExcel(file, { allowedColumns });
         onChange(parsedData);
         //console.log("Parsed Data:", parsedData);
