@@ -13,12 +13,14 @@ interface ButtonsVerifikasiProps {
   handleSelection: (jenis: JenisPengajuan) => void;
   kegiatan: Kegiatan | null;
   jenisPengajuan: JenisPengajuan | null;
+  className?: string;
 }
 
 const ButtonsVerifikasi = ({
   handleSelection,
   kegiatan: initialKegiatan,
   jenisPengajuan,
+  className,
 }: ButtonsVerifikasiProps) => {
   const [kegiatan, setKegiatan] = useState<Kegiatan | null>(initialKegiatan);
 
@@ -32,7 +34,7 @@ const ButtonsVerifikasi = ({
 
   if (!kegiatan) return null;
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className={cn("flex flex-wrap gap-2", className)}>
       <ButtonRiwayatRampungan
         handleOnClick={() => handleOnClick("GENERATE_RAMPUNGAN")}
         jenisPengajuan={jenisPengajuan}

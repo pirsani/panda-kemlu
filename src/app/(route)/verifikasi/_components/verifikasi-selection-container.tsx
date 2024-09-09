@@ -43,6 +43,7 @@ const VerfikasiSelectionContainer = ({
           kegiatan={kegiatan}
           jenisPengajuan={jenisPengajuan}
           handleSelection={handleSelection}
+          className="w-1/2"
         />
         <div className="flex flex-col gap-2 mt-6 w-full border-gray-300 border rounded-md p-2 shadow-lg">
           {jenisPengajuan == "GENERATE_RAMPUNGAN" && (

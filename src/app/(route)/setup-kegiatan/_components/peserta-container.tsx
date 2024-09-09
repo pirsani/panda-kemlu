@@ -99,6 +99,12 @@ const WarningOnEmpty = ({
   const { shouldNotEmpty, allowEmpty } = result;
   const rows = Object.entries(shouldNotEmpty);
   const hasMissingColumns = missingColumns.length > 0;
+  const hasEmptyValues = rows.length > 0;
+
+  if (!hasMissingColumns && !hasEmptyValues) {
+    return null;
+  }
+
   return (
     <div className="bg-red-500 text-white p-4">
       <div className="font-bold">Peringatan!</div>
@@ -118,21 +124,25 @@ const WarningOnEmpty = ({
         </div>
       )}
 
-      <div>
-        Terdapat kolom yang kosong, silahkan periksa kembali data peserta.
-      </div>
-      <div className="">
-        <div className="font-bold">Kolom yang harus diisi:</div>
-        {
-          <ul>
-            {rows.map(([rowIndex, columns]) => (
-              <li key={rowIndex}>
-                Baris {parseInt(rowIndex) + 1}: {columns.join(", ")}
-              </li>
-            ))}
-          </ul>
-        }
-      </div>
+      {hasEmptyValues && (
+        <>
+          <div>
+            Terdapat kolom yang kosong, silahkan periksa kembali data peserta.
+          </div>
+          <div className="">
+            <div className="font-bold">Kolom yang harus diisi:</div>
+            {
+              <ul>
+                {rows.map(([rowIndex, columns]) => (
+                  <li key={rowIndex}>
+                    Baris {parseInt(rowIndex) + 1}: {columns.join(", ")}
+                  </li>
+                ))}
+              </ul>
+            }
+          </div>
+        </>
+      )}
     </div>
   );
 };

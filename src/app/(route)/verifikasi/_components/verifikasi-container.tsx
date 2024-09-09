@@ -36,10 +36,14 @@ const VerifikasiContainer = () => {
 
   return (
     <div className="relative flex flex-row w-full gap-6 pb-20">
-      <div className="w-1/2 flex flex-col gap-2 ">
-        <SelectKegiatan inputId="kegiatan" onChange={handleKegiatanChange} />
+      <div className="w-full flex flex-col gap-2 ">
+        <SelectKegiatan
+          inputId="kegiatan"
+          onChange={handleKegiatanChange}
+          className="w-1/2"
+        />
         <div className="flex flex-row gap-2 w-full border-gray-300 border rounded-md p-2 shadow-lg">
-          <PreviewKegiatan kegiatan={kegiatan} className="w-full" />
+          <PreviewKegiatan kegiatan={kegiatan} className="w-1/2" />
         </div>
         <VerfikasiSelectionContainer kegiatan={kegiatan} />
       </div>

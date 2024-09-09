@@ -63,7 +63,7 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
             )
           ),
           y: Math.max(
-            76,
+            11,
             Math.min(
               window.scrollY + window.innerHeight - size.height - 20,
               initialPosition.current.y + deltaY
@@ -148,7 +148,7 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
     setIsMinimized(true);
     setIsFixed(false);
     setSize({ width: 600, height: 750 }); // Set minimized size
-    setPosition({ x: window.innerWidth - window.innerWidth / 3, y: 80 });
+    setPosition({ x: 100 + window.innerWidth - window.innerWidth / 2, y: 80 });
   };
 
   // Handle Restore to Normal Size
@@ -172,7 +172,7 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
   const handleSmall = () => {
     setIsFixed(false);
     setIsMinimized(false);
-    setSize({ width: 300, height: 250 }); // Set minimized size
+    setSize({ width: 300, height: 50 }); // Set minimized size
 
     setPosition({ x: window.innerWidth - window.innerWidth / 3, y: 80 });
   };
@@ -228,7 +228,7 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
   return (
     <div
       ref={resizableRef}
-      className={`bg-white border border-gray-500 shadow-md ${
+      className={`z-51 bg-white border border-gray-500 shadow-md ${
         shouldUseAbsolutePosition ? "absolute" : "fixed"
       }`}
       style={{
@@ -236,7 +236,7 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
         height: `${size.height}px`,
         top: shouldUseAbsolutePosition
           ? `${Math.max(
-              76,
+              11,
               window.scrollY + window.innerHeight - size.height - 20
             )}px`
           : `${position.y}px`,

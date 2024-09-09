@@ -1,5 +1,6 @@
 "use client";
 import { getOptionsKegiatan } from "@/actions/kegiatan";
+import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import Select, { SingleValue } from "react-select";
 
@@ -7,6 +8,7 @@ interface SelectKegiatanProps {
   inputId: string;
   onChange?: (value: number | null) => void;
   value?: number;
+  className?: string;
 }
 
 interface Option {
@@ -18,6 +20,7 @@ const SelectKegiatan = ({
   inputId,
   onChange = () => {},
   value,
+  className,
 }: SelectKegiatanProps) => {
   const [options, setOptions] = useState<Option[]>([]);
   const [selectedOption, setSelectedOption] = useState<Option | null>(null);
@@ -60,6 +63,7 @@ const SelectKegiatan = ({
       styles={{
         menuPortal: (base) => ({ ...base, zIndex: 9999 }),
       }}
+      className={cn("w-full", className)}
     />
   );
 };

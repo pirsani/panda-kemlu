@@ -120,7 +120,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
       // resetField("dokumenNodinMemoSk");
       // resetField("dokumenJadwal");
     } else {
-      alert("Kegiatan gagal disimpan");
+      alert(kegiatanBaru.error);
     }
   };
 

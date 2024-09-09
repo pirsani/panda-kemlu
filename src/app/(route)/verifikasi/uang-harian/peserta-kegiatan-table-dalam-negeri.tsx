@@ -86,7 +86,7 @@ export const PesertaKegiatanTable = ({ data }: PesertaKegiatanTableProps) => {
                 <th
                   key={header.id}
                   className={`p-2 border border-gray-300 ${
-                    index < 2 ? "sticky left-0 bg-white z-10" : ""
+                    index < 1 ? "sticky left-0 bg-white z-10" : ""
                   } ${index === 1 ? "left-40" : "left-0"}`} // Adjust based on column width
                 >
                   {flexRender(
@@ -105,7 +105,7 @@ export const PesertaKegiatanTable = ({ data }: PesertaKegiatanTableProps) => {
                 <td
                   key={cell.id}
                   className={`p-2 border border-gray-300 ${
-                    index < 2 ? "sticky left-0 bg-white z-10" : ""
+                    index < 1 ? "sticky left-0 bg-white z-10" : ""
                   } ${index === 1 ? "left-40" : "left-0"}`} // Adjust based on column width
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}

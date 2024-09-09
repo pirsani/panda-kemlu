@@ -22,6 +22,7 @@ const UangHarianDalamNegeriContainer = ({
         console.error(peserta.message);
       }
     };
+    getPesertaKegiatan();
   }, [kegiatan]);
 
   return (

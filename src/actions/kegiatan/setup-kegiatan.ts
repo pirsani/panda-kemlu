@@ -2,8 +2,9 @@
 import { ActionResponse } from "@/actions/response";
 import { columns as allowedColumns } from "@/constants/excel/peserta";
 import { dbHonorarium } from "@/lib/db-honorarium";
-import parseExcel from "@/utils/excel/parse-excel";
+import parseExcel, { ParseExcelResult } from "@/utils/excel/parse-excel";
 import parseExcelOnServer from "@/utils/excel/parse-excel-on-server";
+import { splitEmptyValues } from "@/utils/excel/split-empty-values";
 import kegiatanSchema, { Kegiatan as ZKegiatan } from "@/zod/schemas/kegiatan";
 import { Kegiatan } from "@prisma-honorarium/client";
 import { format } from "date-fns";
@@ -54,19 +55,52 @@ export const setupKegiatan = async (
   }
 
   let kegiatanBaru: Kegiatan;
+  let dataPeserta: ParseExcelResult;
 
   try {
     // parse xlsx file
-    const dataPeserta = await parseExcelOnServer(
-      dataparsed.pesertaXlsx as File,
-      {
-        allowedColumns: allowedColumns,
-      }
-    );
+    dataPeserta = await parseExcelOnServer(dataparsed.pesertaXlsx as File, {
+      allowedColumns: allowedColumns,
+    });
 
-    console.log("dataPeserta", dataPeserta);
+    // seharusnya g pernah sampe sini jika pengecekan di client sudah benar dan tidak di bypass
+    // check it there is any empty column that is not allowed
+    const splitEmptyValuesResult = splitEmptyValues(dataPeserta.emptyValues, [
+      "Eselon",
+      "ID",
+      "Lainny",
+    ]);
+
+    const { allowEmpty, shouldNotEmpty } = splitEmptyValuesResult;
+    console.log("allowEmpty", allowEmpty);
+    console.log("shouldNotEmpty", shouldNotEmpty);
+
+    if (Object.keys(shouldNotEmpty).length > 0) {
+      let error = "";
+      // iterate over the rows with empty columns that are not allowed
+      for (const [rowIndex, columns] of Object.entries(shouldNotEmpty)) {
+        const rowNum = Number(rowIndex);
+        console.log("Row", rowNum, "has empty columns:", columns);
+        error += `Baris ${rowNum} memiliki kolom kosong: ${columns.join(
+          ", "
+        )}\n`;
+      }
+
+      return {
+        success: false,
+        error,
+        message: "Data peserta tidak valid",
+      };
+    }
+
+    // console.log("dataPeserta", dataPeserta);
   } catch (error) {
     console.error("Error parsing xlsx file:", error);
+    return {
+      success: false,
+      error: "Error parsing xlsx file",
+      message: "Data peserta tidak valid",
+    };
   }
 
   try {
@@ -85,6 +119,8 @@ export const setupKegiatan = async (
           provinsiId: dataparsed.provinsi,
         },
       });
+
+      console.log("[kegiatanBaru]", kegiatanBaru);
 
       // Handle the documents for surat tugas
       if (dataparsed.dokumenSuratTugas) {
@@ -122,6 +158,29 @@ export const setupKegiatan = async (
         }
       }
 
+      const pesertaKegiatan = dataPeserta.rows;
+
+      const pesertaBaru = await Promise.all(
+        pesertaKegiatan.map(async (peserta) => {
+          const pesertaBaru = await prisma.pesertaKegiatan.create({
+            data: {
+              nama: peserta["Nama"],
+              NIP: peserta["NIP"],
+              pangkatGolonganId: peserta["Golongan/Ruang"],
+              eselon: peserta["Eselon"],
+              jabatan: peserta["Jabatan"],
+              kegiatanId: kegiatanBaru.id,
+              bank: peserta["Bank"],
+              nomorRekening: peserta["Nomor Rekening"],
+              namaRekening: peserta["Nama Rekening"],
+              createdBy: "admin",
+              jumlahHari: 0, // Default to 0 HARDCODED
+            },
+          });
+          return pesertaBaru;
+        })
+      );
+
       return kegiatanBaru;
     });
 
@@ -143,5 +202,14 @@ export const setupKegiatan = async (
     data: kegiatanBaru,
   };
 };
+
+// const insertPesertaDariExcel = async (
+//   kegiatanBaruId: number,
+//   dataPeserta: Record<string, any>[]
+// ) => {
+//   // Insert peserta dari excel
+
+//   return pesertaBaru;
+// };
 
 export default setupKegiatan;
