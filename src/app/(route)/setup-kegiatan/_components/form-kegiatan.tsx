@@ -262,7 +262,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
           render={({ field }) => (
             <FormItem>
               <FormLabel htmlFor="dokumenJadwal">
-                Upload Nota Dinas/Memorandum/SK Tim
+                Dokumen Jadwal kegiatan
               </FormLabel>
               <FormControl>
                 <FormFileUpload

@@ -30,11 +30,14 @@ const FormGenerateRampungan = ({
     window.open(`/download/dokumen-rampungan/${kegiatanId}`, "_blank"); // Open new window
   };
   return (
-    <div className="flex flex-col w-full ">
-      <h1>Generate Rampungan</h1>
+    <div className="flex flex-col w-full sm:w-1/2 ">
       <div className="flex flex-row gap-4 w-full">
-        <Button type="button" className="grow" onClick={handleClickGenerate}>
-          Generate
+        <Button
+          type="button"
+          className="grow bg-blue-600 hover:bg-blue-700"
+          onClick={handleClickGenerate}
+        >
+          Generate Rampungan
         </Button>
         <Button
           type="button"

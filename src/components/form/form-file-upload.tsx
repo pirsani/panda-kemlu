@@ -43,6 +43,7 @@ FormFileUploadProps) => {
           <>
             <div className="flex flex-row gap-1">
               <Input
+                name={`fki-${name}`}
                 type="text"
                 readOnly
                 value={currentFile?.name ?? ""}

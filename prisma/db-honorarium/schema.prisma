@@ -74,7 +74,7 @@ model Session {
 model PejabatPenandatangan {
   id                Int        @id @default(autoincrement())
   nama              String
-  NIP               String
+  NIP               String     @map("nip")
   jabatan           String // enum bendahara, ppk
   tmtAwal           DateTime   @map("tmt_awal")
   tmtAkhir          DateTime   @map("tmt_akhir")
@@ -109,8 +109,8 @@ model PangkatGolongan {
 model Narasumber {
   id                String             @id // id narasumber adalah NIK
   nama              String
-  NIP               String?
-  NPWP              String?
+  NIP               String?            @map("nip")
+  NPWP              String?            @map("npwp")
   jabatan           String?
   eselon            String?
   pangkatGolonganId String?            @map("pangkat_golongan_id")
@@ -431,12 +431,15 @@ model DokumenSuratTugas {
 model PesertaKegiatan {
   id                              Int             @id @default(autoincrement())
   nama                            String
-  NIP                             String
+  NIP                             String?         @map("nip")
+  NIK                             String          @map("nik")
+  NPWP                            String?         @map("npwp")
   pangkatGolonganId               String          @map("pangkat_golongan_id")
   pangkatGolongan                 PangkatGolongan @relation(fields: [pangkatGolonganId], references: [id])
   jabatan                         String?
   eselon                          String?
   email                           String?
+  telp                            String?
   rekeningSendiri                 Boolean         @default(true) @map("rekening_sendiri")
   dokumenPeryataanRekeningBerbeda String?         @map("dokumen_peryataan_rekening_berbeda")
   bank                            String
@@ -444,7 +447,7 @@ model PesertaKegiatan {
   nomorRekening                   String          @map("nomor_rekening")
   kegiatanId                      Int             @map("kegiatan_id")
   kegiatan                        Kegiatan        @relation(fields: [kegiatanId], references: [id])
-  jumlahHari                      Int             @map("jumlah_hari")
+  jumlahHari                      Int?            @default(0) @map("jumlah_hari")
   createdBy                       String          @map("created_by")
   createdAt                       DateTime        @default(now()) @map("created_at")
   updatedBy                       String?         @map("updated_by")

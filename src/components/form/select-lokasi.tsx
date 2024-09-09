@@ -1,3 +1,4 @@
+import { randomStrimg } from "@/utils/random-string";
 import { LOKASI } from "@prisma-honorarium/client";
 import { useContext, useState } from "react";
 import { useController, useFormContext } from "react-hook-form";
@@ -23,10 +24,11 @@ const SelectLokasi = ({
   onChange = () => {},
 }: SelectLokasiProps) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(value);
-
+  const genId = randomStrimg(5);
   return (
     <Select
       instanceId={fieldName}
+      id={`${fieldName}-${genId}`}
       options={LOKASI_OPTIONS}
       onChange={(option: SingleValue<Option>) => {
         const newValue = option ? option.value : null;
@@ -36,7 +38,7 @@ const SelectLokasi = ({
       value={LOKASI_OPTIONS.find((option) => option.value === value)}
       classNamePrefix="react-select"
       // Ensure react-select manages its internal state correctly
-      aria-labelledby={fieldName}
+      aria-labelledby={`${fieldName}-${genId}`}
     />
   );
 };
