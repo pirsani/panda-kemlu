@@ -70,3 +70,46 @@ server {
 
 }
 ```
+
+create user
+
+```sh
+
+# Generate a secure password
+secure_password=$(openssl rand -base64 32 | tr -dc 'A-Za-z0-9' | head -c 32)
+echo $secure_password
+
+# Connect to PostgreSQL as the postgres user
+sudo -u postgres psql
+
+# Create a new database
+CREATE DATABASE new_database_name;
+
+# FOR PRISMA NEED ELEVATED USER
+# Create a new user with a password
+CREATE USER new_username WITH PASSWORD 'your_password';
+
+# Grant all privileges on a specific database to the new user
+GRANT ALL PRIVILEGES ON DATABASE your_database TO new_username;
+
+# FOR RUNTIME WE NEED LIMITED PRIVILEGES
+
+-- Create the elevated user
+CREATE USER prisma_admin WITH PASSWORD 'admin_password';
+
+-- Create the limited user
+CREATE USER prisma_user WITH PASSWORD 'user_password';
+
+-- Grant all privileges on the database to the elevated user
+GRANT ALL PRIVILEGES ON DATABASE your_database TO prisma_admin;
+
+-- Grant limited privileges on the database to the limited user
+GRANT CONNECT ON DATABASE your_database TO prisma_user;
+GRANT USAGE ON SCHEMA public TO prisma_user;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO prisma_user;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO prisma_user;
+
+
+# Exit psql
+\q
+```

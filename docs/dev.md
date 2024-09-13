@@ -76,6 +76,25 @@ pnpm prisma generate --schema=./prisma/db-honorarium/schema.prisma
 # pnpm prisma migrate reset --schema=./prisma/db-honorarium/schema.prisma
 ```
 
+updated:
+
+```json
+{
+  "scripts": {
+    "prisma:db-push": "DATABASE_URL=${DATABASE_URL_ADMIN} pnpm prisma db push --schema=./prisma/db-honorarium/schema.prisma",
+    "prisma:generate": "DATABASE_URL=${DATABASE_URL_ADMIN} pnpm prisma generate --schema=./prisma/db-honorarium/schema.prisma"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  }
+}
+```
+
+```sh
+pnpm run prisma:db-push
+pnpm run prisma:generate
+```
+
 ## UI
 
 ### install zustand for state management
@@ -83,3 +102,7 @@ pnpm prisma generate --schema=./prisma/db-honorarium/schema.prisma
 pnpm add zustand
 pnpm add lodash
 pnpm add -D @types/lodash
+
+```
+
+```

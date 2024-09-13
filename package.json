@@ -7,7 +7,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prisma:db-push": "cross-env DATABASE_URL=${DATABASE_URL_ADMIN} pnpm prisma db push --schema=./prisma/db-honorarium/schema.prisma",
+    "prisma:generate": "cross-env DATABASE_URL=${DATABASE_URL_ADMIN} pnpm prisma generate --schema=./prisma/db-honorarium/schema.prisma"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -67,6 +69,8 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "cross-env": "^7.0.3",
+    "dotenv-cli": "^7.4.2",
     "eslint": "^8",
     "eslint-config-next": "14.2.6",
     "postcss": "^8",
