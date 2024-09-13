@@ -26,13 +26,11 @@ import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 interface TambahKelasContainerProps {
-  onCancel?: () => void;
   onSubmit?: (data: Kelas) => void;
   className?: string;
 }
 
 const TambahKelasContainer = ({
-  onCancel = () => {},
   onSubmit: parentOnSubmit = () => {},
   className,
 }: TambahKelasContainerProps) => {
@@ -58,10 +56,10 @@ const TambahKelasContainer = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={"outline"}>
+        <Button variant={"outline"} className="gap-1">
           <Plus size={12} />
-          <span>Tambah Kelas</span>
-          <Grid2X2 size={16} />
+          <span className="hidden sm:block">Kelas</span>
+          <Grid2X2 size={24} />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -108,7 +106,11 @@ const TambahKelasContainer = ({
               )}
             >
               <Button type="submit">Submit</Button>
-              <Button type="button" onClick={onCancel}>
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => setOpen(false)}
+              >
                 Cancel
               </Button>
             </div>

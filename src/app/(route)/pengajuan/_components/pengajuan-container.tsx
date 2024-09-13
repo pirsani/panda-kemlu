@@ -69,13 +69,14 @@ const PengajuanContainer = () => {
         </div>
       </div>
       <div className="w-full sm:w-1/2 flex flex-col gap-2 ">
-        <span>{jenisPengajuan}</span>
         <ButtonsPengajuan
           jenisPengajuan={jenisPengajuan}
           handleSelection={handleSelection}
           kegiatan={kegiatan}
           riwayatProses={riwayatProses}
         />
+
+        <span>{jenisPengajuan}</span>
 
         <DisplayFormPengajuanGenerateRampungan
           jenisPengajuan={jenisPengajuan}

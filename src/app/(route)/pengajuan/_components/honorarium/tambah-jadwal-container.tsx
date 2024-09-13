@@ -53,8 +53,8 @@ const TambahJadwalContainer = () => {
       <DialogTrigger asChild>
         <Button variant={"outline"} className="gap-1">
           <Plus size={12} />
-          <span>Tambah Jadwal</span>
-          <Calendar size={16} />
+          <span className="hidden md:block">Jadwal</span>
+          <Calendar size={24} />
         </Button>
       </DialogTrigger>
       <DialogContent className="w-full sm:min-w-[750px] max-h-[90vh] overflow-auto">

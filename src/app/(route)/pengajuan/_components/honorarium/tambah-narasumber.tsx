@@ -31,8 +31,8 @@ const TambahNarasumber = () => {
       <DialogTrigger asChild>
         <Button variant={"outline"} className="gap-1">
           <Plus size={12} />
-          <span>Tambah Narasumber</span>
-          <GraduationCap size={16} />
+          <span className="hidden sm:block">Narasumber</span>
+          <GraduationCap size={24} />
         </Button>
       </DialogTrigger>
       <DialogContent className="w-full sm:min-w-[750px] max-h-[90vh] overflow-auto">

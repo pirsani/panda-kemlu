@@ -13,11 +13,19 @@ const HonorariumContainer = ({ kegiatan }: HonorariumContainerProps) => {
     <div className="mt-6">
       <h1 className="font-semibold">Pengajuan Honorarium</h1>
       <div className="flex flex-col gap-2 w-full">
-        <div className="flex flex-col sm:flex-row gap-2 w-full">
-          <TambahJadwalContainer />
-          <TambahKelasContainer />
-          <TambahMateriContainer />
-          <TambahNarasumber />
+        <div className="flex flex-wrap gap-1 max-w-full">
+          <div className="">
+            <TambahJadwalContainer />
+          </div>
+          <div className="">
+            <TambahKelasContainer />
+          </div>
+          <div className="">
+            <TambahMateriContainer />
+          </div>
+          <div className="w-1/4">
+            <TambahNarasumber />
+          </div>
         </div>
 
         <div>

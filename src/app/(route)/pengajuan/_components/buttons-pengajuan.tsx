@@ -7,6 +7,7 @@ import {
   LOKASI,
   RiwayatProses,
 } from "@prisma-honorarium/client";
+import { Coins, FileStack, HandCoins, Store } from "lucide-react";
 import { use, useEffect, useState } from "react";
 import FormPengajuanGenerateRampungan from "./form-pengajuan-generate-rampungan";
 import { DisplayFormPengajuanGenerateRampungan } from "./honorarium/display-form-pengajuan-generate-rampungan";
@@ -81,11 +82,12 @@ const ButtonsPengajuan = ({
           variant="outline"
           onClick={() => handleOnClick("HONORARIUM")}
           className={cn(
-            "hover:bg-blue-400 hover:text-white",
+            "hover:bg-blue-400 hover:text-white gap-1",
             jenisPengajuan == "HONORARIUM" && "bg-blue-500 text-white"
           )}
         >
-          Ajukan Honorarium
+          <span className="hidden sm:block">Ajukan Honorarium</span>
+          <HandCoins size={24} />
         </Button>
         {kegiatan.lokasi != LOKASI.LUAR_NEGERI && (
           <ButtonAjukanUhDalamNegeri
@@ -108,23 +110,27 @@ const ButtonsPengajuan = ({
           variant="outline"
           onClick={() => handleOnClick("PENGGANTIAN_REINBURSEMENT")}
           className={cn(
-            "hover:bg-blue-400 hover:text-white",
+            "hover:bg-blue-400 hover:text-white gap-1",
             jenisPengajuan == "PENGGANTIAN_REINBURSEMENT" &&
               "bg-blue-500 text-white"
           )}
         >
-          Ajukan Penggantian/Reinbursement
+          <span className="hidden sm:block">
+            Ajukan Penggantian/Reinbursement
+          </span>
+          <Coins size={24} />
         </Button>
         <Button
           variant="outline"
           onClick={() => handleOnClick("PEMBAYARAN_PIHAK_KETIGA")}
           className={cn(
-            "hover:bg-blue-400 hover:text-white",
+            "hover:bg-blue-400 hover:text-white gap-1",
             jenisPengajuan == "PEMBAYARAN_PIHAK_KETIGA" &&
               "bg-blue-500 text-white"
           )}
         >
-          Ajukan Pembayaran Pihak Ke-3
+          <span className="hidden sm:block">Ajukan Pembayaran Pihak Ke-3</span>
+          <Store size={24} />
         </Button>
       </div>
     </>
@@ -162,11 +168,12 @@ const ButtonRiwayatRampungan = ({
       variant="outline"
       onClick={() => handleOnClick("GENERATE_RAMPUNGAN")}
       className={cn(
-        "hover:bg-blue-400 hover:text-white",
+        "hover:bg-blue-400 hover:text-white gap-1",
         jenisPengajuan == "GENERATE_RAMPUNGAN" && "bg-blue-500 text-white"
       )}
     >
-      Ajukan Generate Rampungan
+      <span className="hidden sm:block">Ajukan Generate Rampungan</span>
+      <FileStack size={24} />
     </Button>
   );
 };

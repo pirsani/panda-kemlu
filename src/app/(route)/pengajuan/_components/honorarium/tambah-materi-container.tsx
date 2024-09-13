@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import { Materi, materiSchema } from "@/zod/schemas/materi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BookOpen, Calendar, Plus, Users } from "lucide-react";
@@ -47,8 +48,8 @@ const TambahMateriContainer = () => {
       <DialogTrigger asChild>
         <Button variant={"outline"} className="gap-1">
           <Plus size={12} />
-          <span>Tambah Materi</span>
-          <BookOpen size={16} />
+          <span className="hidden sm:block">Materi</span>
+          <BookOpen size={24} />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -92,9 +93,16 @@ const TambahMateriContainer = () => {
                 </FormItem>
               )}
             />
-            <DialogFooter>
+            <div
+              className={cn(
+                "flex flex-col sm:flex-row sm:flex-row sm:justify-end sm:space-x-2 gap-2 mt-6"
+              )}
+            >
               <Button type="submit">Simpan</Button>
-            </DialogFooter>
+              <Button variant="outline" onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+            </div>
           </form>
         </Form>
       </DialogContent>
