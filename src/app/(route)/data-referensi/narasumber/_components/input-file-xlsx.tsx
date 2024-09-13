@@ -25,14 +25,13 @@ const InputFileXlsx = ({
           allowedColumns: extractFromColumns,
         });
         onChange(parsedData); // pass the result to the parent component
-        console.log("Parsed Data: [rows]", parsedData.rows || []);
         // console.log(
         //   "Parsed Data: [missingColumns]",
         //   parsedData.missingColumns || []
         // );
       } catch (error) {
         console.error(error);
-        alert("Terjadi kesalahan saat membaca file excel");
+        //alert("excelDataReferensi");
       }
     } else {
       // set as empty when file is null

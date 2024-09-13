@@ -10,10 +10,16 @@ import {
 } from "@/components/ui/form";
 import { ParseExcelResult } from "@/utils/excel/parse-excel";
 import { splitEmptyValues } from "@/utils/excel/split-empty-values";
+import { extend } from "lodash";
 import Link from "next/link";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import * as XLSX from "xlsx";
+
+export interface ParseResult extends ParseExcelResult {
+  shouldNotEmpty: Record<number, string[]>;
+  allowEmpty: Record<number, string[]>;
+}
 
 interface ExcelContainerProps {
   // Define the props for ExcelContainer
@@ -22,27 +28,61 @@ interface ExcelContainerProps {
   value?: File | null;
   extractFromColumns: string[];
   columnsWithEmptyValueAllowed?: string[];
+  onChange?: (file: File | null) => void;
+  onParse?: (data: ParseResult | null) => void;
 }
+
 const ExcelContainer = ({
   name,
   value,
   templateXlsx,
   extractFromColumns = [],
   columnsWithEmptyValueAllowed = [],
+  onChange: parentOnChange = () => {},
+  onParse = () => {},
 }: ExcelContainerProps) => {
   const [data, setData] = useState<Record<string, any>[]>([]);
   const [emptyValues, setEmptyValues] = useState<Record<number, string[]>>([]);
   const [missingColumns, setMissingColumns] = useState<string[]>([]);
+  const [shouldNotEmpty, setshouldNotEmpty] = useState<
+    Record<number, string[]>
+  >([]);
+  const [allowEmpty, setAllowEmpty] = useState<Record<number, string[]>>([]);
 
   const handleOnChange = (parseExcelResult: ParseExcelResult) => {
+    console.log("parseExcelResult", parseExcelResult);
     if (parseExcelResult.rows.length > 0) {
       setData(parseExcelResult.rows);
+
+      // check if there is no missing columns and empty values
+      const result = splitEmptyValues(
+        parseExcelResult.emptyValues,
+        columnsWithEmptyValueAllowed
+      );
+      const { shouldNotEmpty, allowEmpty } = result;
+      setshouldNotEmpty(shouldNotEmpty);
+      setAllowEmpty(allowEmpty);
       setEmptyValues(parseExcelResult.emptyValues);
       setMissingColumns(parseExcelResult.missingColumns);
-      //console.log(data);
+
+      // if there is no shouldNotEmpty, pass the data to parent component
+      if (Object.keys(shouldNotEmpty).length === 0) {
+        // console.log("Data is not empty");
+      }
+      const finalResult: ParseResult = extend(parseExcelResult, {
+        shouldNotEmpty,
+        allowEmpty,
+      });
+      onParse(finalResult);
     } else {
       console.log("Data is empty");
+      // Clear data when value is empty
+      onParse(null);
+      parentOnChange && parentOnChange(null);
       setData([]);
+      setEmptyValues({});
+      setMissingColumns([]);
+      console.log(value);
     }
   };
 
@@ -52,6 +92,8 @@ const ExcelContainer = ({
   useEffect(() => {
     if (!value) {
       setData([]);
+      setEmptyValues({});
+      setMissingColumns([]);
     }
   }, [value]);
 
@@ -72,9 +114,9 @@ const ExcelContainer = ({
 
       {Object.keys(emptyValues).length > 0 && (
         <WarningOnEmpty
-          emptyValues={emptyValues}
+          shouldNotEmpty={shouldNotEmpty}
+          allowEmpty={allowEmpty}
           missingColumns={missingColumns}
-          columnsWithEmptyValueAllowed={columnsWithEmptyValueAllowed}
         />
       )}
       {data.length > 0 && <TabelDariExcel data={data} />}
@@ -83,16 +125,14 @@ const ExcelContainer = ({
 };
 
 const WarningOnEmpty = ({
-  columnsWithEmptyValueAllowed,
   missingColumns,
-  emptyValues,
+  shouldNotEmpty,
+  allowEmpty,
 }: {
-  columnsWithEmptyValueAllowed: string[];
   missingColumns: string[];
-  emptyValues: Record<number, string[]>;
+  shouldNotEmpty: Record<number, string[]>;
+  allowEmpty: Record<number, string[]>;
 }) => {
-  const result = splitEmptyValues(emptyValues, columnsWithEmptyValueAllowed);
-  const { shouldNotEmpty, allowEmpty } = result;
   const rows = Object.entries(shouldNotEmpty);
   const hasMissingColumns = missingColumns.length > 0;
   const hasEmptyValues = rows.length > 0;

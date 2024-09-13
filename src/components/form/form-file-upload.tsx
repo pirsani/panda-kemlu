@@ -59,6 +59,19 @@ FormFileUploadProps) => {
               >
                 {currentFile ? "Change" : "Choose File"}
               </Button>
+              <Button
+                variant={"outline"}
+                type="button"
+                onClick={() => {
+                  field.onChange(null);
+                  onFileChange && onFileChange(null, field); // update the parent component
+                  if (inputRef.current) {
+                    inputRef.current.value = ""; // Clear the file input
+                  }
+                }}
+              >
+                clear
+              </Button>
             </div>
 
             <input

@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -9,18 +10,21 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
-  ExcelReferensiTemplate,
-  excelReferensiTemplateSchema,
+  excelDataReferensi,
+  excelDataReferensiSchema,
 } from "@/zod/schemas/excel";
 import { Narasumber } from "@/zod/schemas/narasumber";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import ExcelContainer from "../../_components/excel-container";
+import ExcelContainer, { ParseResult } from "../../_components/excel-container";
 
 const FormUploadExcelNarasumber = () => {
-  const form = useForm<ExcelReferensiTemplate>({
-    resolver: zodResolver(excelReferensiTemplateSchema),
+  const form = useForm<excelDataReferensi>({
+    resolver: zodResolver(excelDataReferensiSchema),
   });
+  const [data, setData] = useState<ParseResult | null>(null);
+  const [isReadyToSubmit, setIsReadyToSubmit] = useState(false);
 
   const {
     setValue,
@@ -55,9 +59,27 @@ const FormUploadExcelNarasumber = () => {
     "Nomor Rekening",
   ];
 
+  const onSubmit = (data: excelDataReferensi) => {
+    // disubmit excel / data ke backend ?
+    // harus tidak ada error dulu
+    console.log(data);
+  };
+
+  const onParse = (data: ParseResult | null) => {
+    console.log("onParse", data);
+    setData(data);
+    if (data) {
+      console.log("data", data.shouldNotEmpty);
+      setIsReadyToSubmit(Object.keys(data.shouldNotEmpty).length === 0);
+    } else {
+      console.log("Not ready to submit");
+      setIsReadyToSubmit(false);
+    }
+  };
+
   return (
     <Form {...form}>
-      <form>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="file"
@@ -70,13 +92,16 @@ const FormUploadExcelNarasumber = () => {
                   value={field.value}
                   extractFromColumns={extractFromColumns}
                   columnsWithEmptyValueAllowed={columnsWithEmptyValueAllowed}
-                  // onChange={field.onChange}
+                  onParse={onParse}
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+        <div className="flex mt-8">
+          {isReadyToSubmit && <Button type="submit">Submit</Button>}
+        </div>
       </form>
     </Form>
   );

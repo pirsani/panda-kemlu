@@ -1,10 +1,13 @@
 import { fileSchema } from "@/zod/schemas/file-schema";
 import { z } from "zod";
 
-export const excelReferensiTemplateSchema = z.object({
-  file: fileSchema({ required: true }),
+export const excelDataReferensiSchema = z.object({
+  file: fileSchema({
+    required: true,
+    allowedTypes: [
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ],
+  }),
 });
 
-export type ExcelReferensiTemplate = z.infer<
-  typeof excelReferensiTemplateSchema
->;
+export type excelDataReferensi = z.infer<typeof excelDataReferensiSchema>;
