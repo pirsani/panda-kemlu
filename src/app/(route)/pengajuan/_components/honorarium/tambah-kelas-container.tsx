@@ -18,13 +18,24 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import { Kelas, kelasSchema } from "@/zod/schemas/kelas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Calendar, Plus, Users } from "lucide-react";
+import { Calendar, Grid2X2, Plus, Users } from "lucide-react";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-const TambahKelasContainer = () => {
+interface TambahKelasContainerProps {
+  onCancel?: () => void;
+  onSubmit?: (data: Kelas) => void;
+  className?: string;
+}
+
+const TambahKelasContainer = ({
+  onCancel = () => {},
+  onSubmit: parentOnSubmit = () => {},
+  className,
+}: TambahKelasContainerProps) => {
   const [open, setOpen] = useState(false);
 
   const form = useForm<Kelas>({
@@ -50,7 +61,7 @@ const TambahKelasContainer = () => {
         <Button variant={"outline"}>
           <Plus size={12} />
           <span>Tambah Kelas</span>
-          <Users size={16} />
+          <Grid2X2 size={16} />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -91,9 +102,16 @@ const TambahKelasContainer = () => {
                 </FormItem>
               )}
             />
-            <DialogFooter>
-              <Button type="submit">Simpan</Button>
-            </DialogFooter>
+            <div
+              className={cn(
+                "flex flex-col sm:flex-row sm:flex-row sm:justify-end sm:space-x-2 gap-2 mt-6"
+              )}
+            >
+              <Button type="submit">Submit</Button>
+              <Button type="button" onClick={onCancel}>
+                Cancel
+              </Button>
+            </div>
           </form>
         </Form>
       </DialogContent>

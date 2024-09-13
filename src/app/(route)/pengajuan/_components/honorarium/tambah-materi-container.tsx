@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Materi, materiSchema } from "@/zod/schemas/materi";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Calendar, Plus, Users } from "lucide-react";
+import { BookOpen, Calendar, Plus, Users } from "lucide-react";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
@@ -45,10 +45,10 @@ const TambahMateriContainer = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={"outline"}>
+        <Button variant={"outline"} className="gap-1">
           <Plus size={12} />
           <span>Tambah Materi</span>
-          <Users size={16} />
+          <BookOpen size={16} />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">

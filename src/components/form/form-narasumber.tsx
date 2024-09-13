@@ -220,7 +220,7 @@ const FormNarasumber = ({
 
         <div
           className={cn(
-            "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2"
+            "flex flex-col sm:flex-row sm:flex-row sm:justify-end sm:space-x-2 gap-2 mt-6"
           )}
         >
           <Button type="submit">Submit</Button>

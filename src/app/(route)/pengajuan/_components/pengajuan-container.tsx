@@ -62,13 +62,13 @@ const PengajuanContainer = () => {
 
   return (
     <div className="relative flex flex-col w-full gap-6 pb-20">
-      <div className="w-1/2 flex flex-col gap-2 ">
+      <div className="w-full sm:w-1/2 flex flex-col gap-2 ">
         <SelectKegiatan inputId="kegiatan" onChange={handleKegiatanChange} />
         <div className="flex flex-row gap-2 w-full border-gray-300 border rounded-md p-2 shadow-lg">
           <PreviewKegiatan kegiatan={kegiatan} className="w-full" />
         </div>
       </div>
-      <div className="w-1/2 flex flex-col gap-2 ">
+      <div className="w-full sm:w-1/2 flex flex-col gap-2 ">
         <span>{jenisPengajuan}</span>
         <ButtonsPengajuan
           jenisPengajuan={jenisPengajuan}

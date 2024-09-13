@@ -113,3 +113,7 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO prisma_user;
 # Exit psql
 \q
 ```
+
+```sh
+pm2 start pnpm --name d01 -- start -p 3030
+```

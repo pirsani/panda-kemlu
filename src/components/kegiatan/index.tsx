@@ -35,14 +35,14 @@ const PreviewKegiatan = ({ kegiatan, className }: PreviewKegiatanProps) => {
               {kegiatan.nama}
             </span>
           </div>
-          <div className="flex flex-row gap-2 w-full border-2 ">
-            <div className="flex flex-col w-1/3">
+          <div className="flex flex-col sm:flex-row gap-2 w-full  ">
+            <div className="flex flex-col w-full sm:w-1/3">
               <label className="text-gray-700">Tanggal Mulai</label>
               <span className=" bg-gray-100 border border-gray-300 rounded px-2 py-1 w-full">
                 {format(new Date(kegiatan.tanggalMulai), "yyyy-MM-dd")}
               </span>
             </div>
-            <div className="flex flex-col w-1/3">
+            <div className="flex flex-col w-full sm:w-1/3 ">
               <label className="text-gray-700">Tanggal Selesai</label>
               <span className=" bg-gray-100 border border-gray-300 rounded px-2 py-1  w-full">
                 {format(new Date(kegiatan.tanggalSelesai), "yyyy-MM-dd")}

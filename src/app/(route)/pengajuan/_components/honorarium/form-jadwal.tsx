@@ -10,6 +10,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import { Jadwal, jadwalSchema } from "@/zod/schemas/jadwal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -146,7 +147,11 @@ const FormJadwal = ({ onCancel, onSubmit = () => {} }: FormJadwalProps) => {
             </FormItem>
           )}
         />
-        <div>
+        <div
+          className={cn(
+            "flex flex-col sm:flex-row sm:flex-row sm:justify-end sm:space-x-2 gap-2 mt-6"
+          )}
+        >
           <Button type="submit">Simpan</Button>
           <Button variant="outline" onClick={onCancel}>
             Cancel
