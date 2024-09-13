@@ -9,7 +9,7 @@ import {
   Minimize,
   Minus,
 } from "lucide-react"; // Import icons from lucide-react
-import React, { MouseEvent, use, useEffect, useRef, useState } from "react";
+import React, { MouseEvent, useEffect, useRef, useState } from "react";
 
 interface ResizableDraggableProps {
   children?: React.ReactNode;
@@ -18,17 +18,14 @@ interface ResizableDraggableProps {
 const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
   children,
 }) => {
-  const [position, setPosition] = useState({
-    x: 100,
-    y: 100,
-  });
+  const [position, setPosition] = useState({ x: 100, y: 100 });
   const [size, setSize] = useState({ width: 750, height: 600 });
   const [isFixed, setIsFixed] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const resizableRef = useRef<HTMLDivElement | null>(null);
   const isDragging = useRef(false);
   const isResizing = useRef(false);
-  const resizeSide = useRef<string | null>(null);
+  const resizeDirection = useRef<string | null>(null);
   const initialMousePosition = useRef({ x: 0, y: 0 });
   const initialSize = useRef({ width: 750, height: 600 });
   const initialPosition = useRef({ x: 500, y: 100 });
@@ -38,123 +35,109 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
     setIsClient(true);
   }, []);
 
-  // Handle Drag Start
+  const updatePosition = (deltaX: number, deltaY: number) => {
+    if (!isFixed) {
+      setPosition((prevPosition) => ({
+        x: Math.max(
+          0,
+          Math.min(
+            window.innerWidth - size.width - 20,
+            initialPosition.current.x + deltaX
+          )
+        ),
+        y: Math.max(
+          11,
+          Math.min(
+            window.scrollY + window.innerHeight - size.height - 20,
+            initialPosition.current.y + deltaY
+          )
+        ),
+      }));
+    }
+  };
+
+  const updateSize = (side: string, deltaX: number, deltaY: number) => {
+    switch (side) {
+      case "right":
+        setSize((prevSize) => ({
+          ...prevSize,
+          width: Math.max(prevSize.width + deltaX, 50),
+        }));
+        break;
+      case "bottom":
+        setSize((prevSize) => ({
+          ...prevSize,
+          height: Math.max(prevSize.height + deltaY, 50),
+        }));
+        break;
+      case "left":
+        setSize((prevSize) => ({
+          ...prevSize,
+          width: Math.max(prevSize.width - deltaX, 50),
+        }));
+        setPosition((prevPosition) => ({
+          ...prevPosition,
+          x: prevPosition.x + deltaX,
+        }));
+        break;
+      case "top":
+        setSize((prevSize) => ({
+          ...prevSize,
+          height: Math.max(prevSize.height - deltaY, 50),
+        }));
+        setPosition((prevPosition) => ({
+          ...prevPosition,
+          y: prevPosition.y + deltaY,
+        }));
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    const deltaX = e.clientX - initialMousePosition.current.x;
+    const deltaY = e.clientY - initialMousePosition.current.y;
+
+    if (isDragging.current) {
+      updatePosition(deltaX, deltaY);
+    } else if (isResizing.current && resizeDirection.current) {
+      updateSize(resizeDirection.current, deltaX, deltaY);
+    }
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+    isResizing.current = false;
+    resizeDirection.current = null;
+  };
+
   const handleDragStart = (e: MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
-    e.stopPropagation();
     isDragging.current = true;
     initialMousePosition.current = { x: e.clientX, y: e.clientY };
     initialPosition.current = { ...position };
   };
 
-  // Handle Mouse Move
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isDragging.current) {
-      const deltaX = e.clientX - initialMousePosition.current.x;
-      const deltaY = e.clientY - initialMousePosition.current.y;
-
-      if (!isFixed) {
-        setPosition((prevPosition) => ({
-          x: Math.max(
-            0,
-            Math.min(
-              window.innerWidth - size.width - 20,
-              initialPosition.current.x + deltaX
-            )
-          ),
-          y: Math.max(
-            11,
-            Math.min(
-              window.scrollY + window.innerHeight - size.height - 20,
-              initialPosition.current.y + deltaY
-            )
-          ),
-        }));
-      }
-    } else if (isResizing.current && resizeSide.current) {
-      const deltaX = e.clientX - initialMousePosition.current.x;
-      const deltaY = e.clientY - initialMousePosition.current.y;
-
-      switch (resizeSide.current) {
-        case "right":
-          setSize((prevSize) => ({
-            width: Math.max(prevSize.width + deltaX, 50),
-            height: prevSize.height,
-          }));
-          initialMousePosition.current = { x: e.clientX, y: e.clientY };
-          break;
-        case "bottom":
-          setSize((prevSize) => ({
-            width: prevSize.width,
-            height: Math.max(prevSize.height + deltaY, 50),
-          }));
-          initialMousePosition.current = { x: e.clientX, y: e.clientY };
-          break;
-        case "left":
-          setSize((prevSize) => ({
-            width: Math.max(prevSize.width - deltaX, 50),
-            height: prevSize.height,
-          }));
-          setPosition((prevPosition) => ({
-            x: Math.min(
-              prevPosition.x + deltaX,
-              window.innerWidth - size.width - 20
-            ),
-            y: prevPosition.y,
-          }));
-          initialMousePosition.current = { x: e.clientX, y: e.clientY };
-          break;
-        case "top":
-          setSize((prevSize) => ({
-            width: prevSize.width,
-            height: Math.max(prevSize.height - deltaY, 50),
-          }));
-          setPosition((prevPosition) => ({
-            x: prevPosition.x,
-            y: Math.min(
-              prevPosition.y + deltaY,
-              window.scrollY + window.innerHeight - size.height - 20
-            ),
-          }));
-          initialMousePosition.current = { x: e.clientX, y: e.clientY };
-          break;
-        default:
-          break;
-      }
-    }
-  };
-
-  // Handle Mouse Up
-  const handleMouseUp = () => {
-    isDragging.current = false;
-    isResizing.current = false;
-    resizeSide.current = null;
-  };
-
-  // Handle Resize Start
   const handleResizeStart =
     (side: string) => (e: MouseEvent<HTMLDivElement>) => {
       e.preventDefault();
-      e.stopPropagation();
       isResizing.current = true;
-      resizeSide.current = side;
+      resizeDirection.current = side;
       initialMousePosition.current = { x: e.clientX, y: e.clientY };
       initialSize.current = { ...size };
       initialPosition.current = { ...position };
     };
 
-  // Handle Minimize
   const handleMinimize = () => {
     setIsMinimized(true);
-    setIsFixed(false);
-    setSize({ width: 600, height: 750 }); // Set minimized size
-    setPosition({ x: 100 + window.innerWidth - window.innerWidth / 2, y: 80 });
+    setSize({ width: 600, height: 50 });
+    setPosition({ x: 100, y: 80 });
   };
 
-  // Handle Restore to Normal Size
   const handleRestore = () => {
-    setIsFixed(false);
     setIsMinimized(false);
+    setIsFixed(false);
     setSize({
       width: window.innerWidth - 200,
       height: window.innerHeight - 100,
@@ -162,92 +145,52 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
     setPosition({ x: 100, y: 80 });
   };
 
-  const handleFix = () => {
-    setIsFixed(true);
+  const handleToggleFixed = () => {
+    setIsFixed((prev) => !prev);
     setIsMinimized(false);
-    setSize({ width: window.innerWidth - 200, height: 350 }); // Set minimized size
-    setPosition({ x: 100, y: 80 });
+    if (!isFixed) {
+      setSize({ width: window.innerWidth - 200, height: 350 });
+      setPosition({ x: 100, y: 80 });
+    } else {
+      handleRestore();
+    }
   };
 
-  const handleSmall = () => {
-    setIsFixed(false);
-    setIsMinimized(false);
-    setSize({ width: 300, height: 50 }); // Set minimized size
-
-    setPosition({ x: window.innerWidth - window.innerWidth / 3, y: 80 });
-  };
-
-  // Attach React event handlers
   useEffect(() => {
-    const handleDocumentMouseMove = (e: MouseEvent) => {
-      if (isDragging.current || isResizing.current) {
-        handleMouseMove(e);
-      }
-    };
+    const handleDocumentMouseMove = (e: MouseEvent) => handleMouseMove(e);
+    const handleDocumentMouseUp = handleMouseUp;
 
-    const handleDocumentMouseUp = () => {
-      handleMouseUp();
-    };
-
-    document.addEventListener(
-      "mousemove",
-      handleDocumentMouseMove as unknown as EventListener
-    );
-    document.addEventListener(
-      "mouseup",
-      handleDocumentMouseUp as unknown as EventListener
-    );
+    document.addEventListener("mousemove", handleDocumentMouseMove);
+    document.addEventListener("mouseup", handleDocumentMouseUp);
 
     return () => {
-      document.removeEventListener(
-        "mousemove",
-        handleDocumentMouseMove as unknown as EventListener
-      );
-      document.removeEventListener(
-        "mouseup",
-        handleDocumentMouseUp as unknown as EventListener
-      );
+      document.removeEventListener("mousemove", handleDocumentMouseMove);
+      document.removeEventListener("mouseup", handleDocumentMouseUp);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [size, position]);
 
-  useEffect(() => {
-    handleMinimize();
-  }, []);
+  if (!isClient) return null;
 
-  // If not on client, don't render anything
-  if (!isClient) {
-    return null;
-  }
-
-  // Determine if the component should use fixed positioning
-  const shouldUseAbsolutePosition =
-    (!isFixed && size.width >= window.innerWidth - 40) ||
+  const useAbsolutePosition =
+    size.width >= window.innerWidth - 40 ||
     size.height >= window.innerHeight - 40;
 
   return (
     <div
       ref={resizableRef}
-      className={`z-51 bg-white border border-gray-500 shadow-md ${
-        shouldUseAbsolutePosition ? "absolute" : "fixed"
-      }`}
+      className={cn(
+        "z-51 bg-white border border-gray-500 shadow-md",
+        "hidden sm:block",
+        useAbsolutePosition ? "absolute" : "fixed"
+      )}
       style={{
         width: `${size.width}px`,
         height: `${size.height}px`,
-        top: shouldUseAbsolutePosition
-          ? `${Math.max(
-              11,
-              window.scrollY + window.innerHeight - size.height - 20
-            )}px`
-          : `${position.y}px`,
-        left: shouldUseAbsolutePosition
-          ? `${Math.min(10, window.innerWidth - size.width - 20)}px`
-          : `${position.x}px`,
-        margin: "10px",
+        top: `${position.y}px`,
+        left: `${position.x}px`,
         cursor: isDragging.current ? "grabbing" : "default",
       }}
     >
-      {/* Draggable Header with Buttons */}
       <div
         className="flex items-center justify-between bg-gray-300 p-2 cursor-move border-b-2 border-gray-400"
         onMouseDown={handleDragStart}
@@ -267,7 +210,7 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
           </button>
           <button
             className="hover:bg-yellow-200 p-1 rounded-full"
-            onClick={() => (isFixed ? handleRestore() : handleFix())}
+            onClick={handleToggleFixed}
             aria-label="Maximize"
           >
             <ChevronLeft
@@ -278,33 +221,13 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
               }}
             />
           </button>
-          <button
-            className="hover:bg-yellow-200 p-1 rounded-full"
-            onClick={() => (isMinimized ? handleSmall() : handleMinimize())}
-            aria-label="Maximize"
-          >
-            <Minus
-              size={16}
-              className="transform transition-transform text-green-600"
-            />
-          </button>
         </div>
       </div>
 
-      {/* Resizable Content Area */}
       <div
         className={cn("overflow-auto flex flex-col h-full w-full bg-gray-100")}
       >
         {children}
-        {/* <div
-          className={cn(
-            "overflow-auto bg-gray-400 h-8 text-green-400 -mt-10",
-            { " ": isMinimized },
-            { "flex flex-auto ": isFixed }
-          )}
-        >
-          {isFixed ? "fixed" : " "} {isMinimized ? "minimized" : " "}
-        </div> */}
       </div>
 
       {/* Resizers */}
