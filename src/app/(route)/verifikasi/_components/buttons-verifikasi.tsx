@@ -7,7 +7,15 @@ import {
   LOKASI,
   RiwayatProses,
 } from "@prisma-honorarium/client";
-import { FileStack, HandCoins, Store } from "lucide-react";
+import {
+  Coins,
+  FileStack,
+  Globe,
+  HandCoins,
+  MapPinned,
+  PlaneTakeoff,
+  Store,
+} from "lucide-react";
 import { use, useEffect, useState } from "react";
 
 interface ButtonsVerifikasiProps {
@@ -45,12 +53,12 @@ const ButtonsVerifikasi = ({
         variant="outline"
         onClick={() => handleOnClick("HONORARIUM")}
         className={cn(
-          "hover:bg-blue-400 hover:text-white gap-1",
+          "hover:bg-blue-400 hover:text-white gap-2",
           jenisPengajuan == "HONORARIUM" && "bg-blue-500 text-white"
         )}
       >
-        <span className="hidden sm:block">Verifikasi Honorarium</span>
         <HandCoins size={24} />
+        <span className="hidden sm:block">Verifikasi Honorarium</span>
       </Button>
       {kegiatan.lokasi != LOKASI.LUAR_NEGERI && (
         <ButtonVerifikasiUhDalamNegeri
@@ -73,26 +81,29 @@ const ButtonsVerifikasi = ({
         variant="outline"
         onClick={() => handleOnClick("PENGGANTIAN_REINBURSEMENT")}
         className={cn(
-          "hover:bg-blue-400 hover:text-white",
+          "hover:bg-blue-400 hover:text-white gap-2",
           jenisPengajuan == "PENGGANTIAN_REINBURSEMENT" &&
             "bg-blue-500 text-white"
         )}
       >
-        Verifikasi Penggantian/Reinbursement
+        <Coins size={24} />
+        <span className="hidden sm:block">
+          Verifikasi Penggantian/Reinbursement
+        </span>
       </Button>
       <Button
         variant="outline"
         onClick={() => handleOnClick("PEMBAYARAN_PIHAK_KETIGA")}
         className={cn(
-          "hover:bg-blue-400 hover:text-white",
+          "hover:bg-blue-400 hover:text-white gap-2",
           jenisPengajuan == "PEMBAYARAN_PIHAK_KETIGA" &&
             "bg-blue-500 text-white"
         )}
       >
+        <Store size={24} />
         <span className="hidden sm:block">
           Verifikasi Pembayaran Pihak Ke-3
         </span>
-        <Store size={24} />
       </Button>
     </div>
   );
@@ -115,12 +126,12 @@ const ButtonRiwayatRampungan = ({
       variant="outline"
       onClick={() => handleOnClick("GENERATE_RAMPUNGAN")}
       className={cn(
-        "hover:bg-blue-400 hover:text-white",
+        "hover:bg-blue-400 hover:text-white gap-2",
         jenisPengajuan == "GENERATE_RAMPUNGAN" && "bg-blue-500 text-white"
       )}
     >
-      <span className="hidden sm:block">Verifikasi Generate Rampungan</span>
       <FileStack size={24} />
+      <span className="hidden sm:block">Verifikasi Generate Rampungan</span>
     </Button>
   );
 };
@@ -152,11 +163,15 @@ const ButtonVerifikasiUhDalamNegeri = ({
       variant="outline"
       onClick={() => handleOnClick("UH_DALAM_NEGERI")}
       className={cn(
-        "hover:bg-blue-400 hover:text-white",
+        "hover:bg-blue-400 hover:text-white gap-2",
         jenisPengajuan == "UH_DALAM_NEGERI" && "bg-blue-500 text-white"
       )}
     >
-      Verifikasi UH Dalam Negeri
+      <div className="flex items-center space-x-1">
+        <MapPinned size={24} />
+        <PlaneTakeoff size={24} />
+      </div>
+      <span className="hidden sm:block">Verifikasi UH Dalam Negeri</span>
     </Button>
   );
 };
@@ -188,11 +203,15 @@ const ButtonVerifikasiUhLuarNegeri = ({
       variant="outline"
       onClick={() => handleOnClick("UH_LUAR_NEGERI")}
       className={cn(
-        "hover:bg-blue-400 hover:text-white",
+        "hover:bg-blue-400 hover:text-white gap-2",
         jenisPengajuan == "UH_LUAR_NEGERI" && "bg-blue-500 text-white"
       )}
     >
-      Verifikasi UH Luar Negeri
+      <div className="flex items-center space-x-1">
+        <Globe size={24} />
+        <PlaneTakeoff size={24} />
+      </div>
+      <span className="hidden sm:block">Verifikasi UH Luar Negeri</span>
     </Button>
   );
 };

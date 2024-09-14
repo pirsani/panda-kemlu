@@ -7,7 +7,20 @@ import {
   LOKASI,
   RiwayatProses,
 } from "@prisma-honorarium/client";
-import { Coins, FileStack, HandCoins, Store } from "lucide-react";
+import {
+  Car,
+  Coins,
+  FileStack,
+  Globe,
+  HandCoins,
+  MapPin,
+  MapPinned,
+  Plane,
+  PlaneTakeoff,
+  Ship,
+  Store,
+  Train,
+} from "lucide-react";
 import { use, useEffect, useState } from "react";
 import FormPengajuanGenerateRampungan from "./form-pengajuan-generate-rampungan";
 import { DisplayFormPengajuanGenerateRampungan } from "./honorarium/display-form-pengajuan-generate-rampungan";
@@ -82,12 +95,12 @@ const ButtonsPengajuan = ({
           variant="outline"
           onClick={() => handleOnClick("HONORARIUM")}
           className={cn(
-            "hover:bg-blue-400 hover:text-white gap-1",
+            "hover:bg-blue-400 hover:text-white gap-2",
             jenisPengajuan == "HONORARIUM" && "bg-blue-500 text-white"
           )}
         >
-          <span className="hidden sm:block">Ajukan Honorarium</span>
           <HandCoins size={24} />
+          <span className="hidden sm:block">Ajukan Honorarium</span>
         </Button>
         {kegiatan.lokasi != LOKASI.LUAR_NEGERI && (
           <ButtonAjukanUhDalamNegeri
@@ -110,27 +123,27 @@ const ButtonsPengajuan = ({
           variant="outline"
           onClick={() => handleOnClick("PENGGANTIAN_REINBURSEMENT")}
           className={cn(
-            "hover:bg-blue-400 hover:text-white gap-1",
+            "hover:bg-blue-400 hover:text-white gap-2",
             jenisPengajuan == "PENGGANTIAN_REINBURSEMENT" &&
               "bg-blue-500 text-white"
           )}
         >
+          <Coins size={24} />
           <span className="hidden sm:block">
             Ajukan Penggantian/Reinbursement
           </span>
-          <Coins size={24} />
         </Button>
         <Button
           variant="outline"
           onClick={() => handleOnClick("PEMBAYARAN_PIHAK_KETIGA")}
           className={cn(
-            "hover:bg-blue-400 hover:text-white gap-1",
+            "hover:bg-blue-400 hover:text-white gap-2",
             jenisPengajuan == "PEMBAYARAN_PIHAK_KETIGA" &&
               "bg-blue-500 text-white"
           )}
         >
-          <span className="hidden sm:block">Ajukan Pembayaran Pihak Ke-3</span>
           <Store size={24} />
+          <span className="hidden sm:block">Ajukan Pembayaran Pihak Ke-3</span>
         </Button>
       </div>
     </>
@@ -168,12 +181,12 @@ const ButtonRiwayatRampungan = ({
       variant="outline"
       onClick={() => handleOnClick("GENERATE_RAMPUNGAN")}
       className={cn(
-        "hover:bg-blue-400 hover:text-white gap-1",
+        "hover:bg-blue-400 hover:text-white gap-2",
         jenisPengajuan == "GENERATE_RAMPUNGAN" && "bg-blue-500 text-white"
       )}
     >
-      <span className="hidden sm:block">Ajukan Generate Rampungan</span>
       <FileStack size={24} />
+      <span className="hidden sm:block">Ajukan Generate Rampungan</span>
     </Button>
   );
 };
@@ -206,11 +219,15 @@ const ButtonAjukanUhDalamNegeri = ({
       variant="outline"
       onClick={() => handleOnClick("UH_DALAM_NEGERI")}
       className={cn(
-        "hover:bg-blue-400 hover:text-white",
+        "hover:bg-blue-400 hover:text-white gap-2",
         jenisPengajuan == "UH_DALAM_NEGERI" && "bg-blue-500 text-white"
       )}
     >
-      Ajukan UH Dalam Negeri
+      <div className="flex items-center space-x-1">
+        <MapPinned size={24} />
+        <PlaneTakeoff size={24} />
+      </div>
+      <span className="hidden sm:block">Ajukan UH Dalam Negeri</span>
     </Button>
   );
 };
@@ -238,11 +255,15 @@ const ButtonAjukanUhLuarNegeri = ({
       variant="outline"
       onClick={() => handleOnClick("UH_LUAR_NEGERI")}
       className={cn(
-        "hover:bg-blue-400 hover:text-white",
+        "hover:bg-blue-400 hover:text-white gap-2",
         jenisPengajuan == "UH_LUAR_NEGERI" && "bg-blue-500 text-white"
       )}
     >
-      Ajukan UH Luar Negeri
+      <div className="flex items-center space-x-1">
+        <Globe size={24} />
+        <PlaneTakeoff size={24} />
+      </div>
+      <span className="hidden sm:block">Ajukan UH Luar Negeri</span>
     </Button>
   );
 };
