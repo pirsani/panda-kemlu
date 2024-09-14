@@ -70,5 +70,5 @@ interface TabelNarasumberProps {
   data: NarasumberWithStringDate[];
 }
 export const TabelNarasumber = ({ data }: TabelNarasumberProps) => {
-  return <TabelGeneric data={data} columns={columns} />;
+  return <TabelGeneric data={data} columns={columns} frozenColumnCount={1} />;
 };

@@ -16,16 +16,23 @@ import { useEffect, useRef, useState } from "react";
 interface TabelGenericProps<T> {
   data: T[];
   columns: ColumnDef<T>[];
+  frozenColumnCount?: number;
 }
 
-export const TabelGeneric = <T,>({ data, columns }: TabelGenericProps<T>) => {
+export const TabelGeneric = <T,>({
+  data,
+  columns,
+  frozenColumnCount = 1,
+}: TabelGenericProps<T>) => {
   const [pageSize, setPageSize] = useState(10); // Set the initial page size
   const [pageIndex, setPageIndex] = useState(0); // Set the initial page index
   const [sorting, setSorting] = useState<SortingState>([]); // Explicitly define SortingState
 
   const [stickyLeft, setStickyLeft] = useState<number>(0);
+  const [cumulativeWidths, setCumulativeWidths] = useState<number[]>([]);
   const col1Ref = useRef<HTMLTableCellElement>(null);
   const col2Ref = useRef<HTMLTableCellElement>(null);
+  const colRefs = useRef<HTMLTableCellElement[]>([]);
 
   const table = useReactTable({
     data,
@@ -53,6 +60,22 @@ export const TabelGeneric = <T,>({ data, columns }: TabelGenericProps<T>) => {
   });
 
   useEffect(() => {
+    if (
+      frozenColumnCount > 0 &&
+      colRefs.current &&
+      colRefs.current.length >= frozenColumnCount
+    ) {
+      const colWidths = colRefs.current.map(
+        (col) => col.getBoundingClientRect().width
+      );
+      const cumulativeWidths = colWidths.reduce(
+        (acc, width) => [...acc, acc[acc.length - 1] + width],
+        [0]
+      );
+      setCumulativeWidths(cumulativeWidths);
+      console.log("cumulativeWidths", cumulativeWidths);
+    }
+
     if (col1Ref.current && col2Ref.current) {
       const col1Width = col1Ref.current.getBoundingClientRect().width;
       const col2Width = col2Ref.current.getBoundingClientRect().width;
@@ -72,12 +95,24 @@ export const TabelGeneric = <T,>({ data, columns }: TabelGenericProps<T>) => {
                 {headerGroup.headers.map((header, index) => (
                   <th
                     key={header.id}
-                    ref={index === 0 ? col1Ref : index === 1 ? col2Ref : null}
+                    ref={(el) => {
+                      if (
+                        index < frozenColumnCount &&
+                        el instanceof HTMLTableCellElement
+                      ) {
+                        colRefs.current[index] = el;
+                      }
+                    }}
                     className={cn("p-2 border border-gray-300", {
-                      [`sticky left-0 bg-white z-${10 - index}`]: index < 2, // Sticky columns
-                      "left-0": index >= 2, // Default position for other columns
+                      [`sticky left-0 bg-white z-${10 - index}`]:
+                        index < frozenColumnCount, // Sticky columns
+                      "left-0": index >= frozenColumnCount, // Default position for other columns
                     })}
-                    style={index === 1 ? { left: `${stickyLeft}px` } : {}} // Apply dynamic left for the second sticky column
+                    style={
+                      index < frozenColumnCount
+                        ? { left: `${cumulativeWidths[index] || 0}px` }
+                        : undefined
+                    }
                     onClick={header.column.getToggleSortingHandler()} // Enable sorting on click
                   >
                     <div className="flex flex-row items-center w-full">
@@ -111,12 +146,27 @@ export const TabelGeneric = <T,>({ data, columns }: TabelGenericProps<T>) => {
                 {row.getVisibleCells().map((cell, index) => (
                   <td
                     key={cell.id}
-                    ref={index === 0 ? col1Ref : index === 1 ? col2Ref : null}
-                    className={cn("p-2 border border-gray-300", {
-                      [`sticky left-0 bg-white z-${10 - index}`]: index < 2, // Sticky columns
-                      "left-0": index >= 2, // Default position for other columns
-                    })}
-                    style={index === 1 ? { left: `${stickyLeft}px` } : {}} // Apply dynamic left for the second sticky column
+                    ref={(el) => {
+                      if (
+                        index < frozenColumnCount &&
+                        el instanceof HTMLTableCellElement
+                      ) {
+                        colRefs.current[index] = el;
+                      }
+                    }}
+                    className={cn(
+                      "p-2 border border-gray-300 odd:bg-white even:bg-gray-100",
+                      {
+                        [`sticky left-0 bg-gray-100 z-${10 - index}`]:
+                          index < frozenColumnCount, // Sticky columns
+                        "left-0": index >= frozenColumnCount, // Default position for other columns
+                      }
+                    )}
+                    style={
+                      index < frozenColumnCount
+                        ? { left: `${cumulativeWidths[index] || 0}px` }
+                        : undefined
+                    }
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
@@ -131,7 +181,7 @@ export const TabelGeneric = <T,>({ data, columns }: TabelGenericProps<T>) => {
                 <td
                   key={header.id}
                   className={`p-2 border border-gray-300 ${
-                    index < 2 ? "sticky left-0 bg-white z-10" : ""
+                    index < frozenColumnCount ? "sticky left-0 bg-white z-10" : ""
                   } ${index === 2 ? "left-40" : "left-0"}`} // Adjust based on column width
                 >
                   {header.isPlaceholder
