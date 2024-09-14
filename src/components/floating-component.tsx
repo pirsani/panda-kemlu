@@ -73,14 +73,26 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
       if (isDragging.current) handleMouseMove(e);
     };
 
-    const handleDocumentMouseUp = () => handleMouseUp();
+    const handleDocumentMouseUp = (e: MouseEvent) => handleMouseUp();
 
-    document.addEventListener("mousemove", handleDocumentMouseMove);
-    document.addEventListener("mouseup", handleDocumentMouseUp);
+    document.addEventListener(
+      "mousemove",
+      handleDocumentMouseMove as unknown as EventListener
+    );
+    document.addEventListener(
+      "mouseup",
+      handleDocumentMouseUp as unknown as EventListener
+    );
 
     return () => {
-      document.removeEventListener("mousemove", handleDocumentMouseMove);
-      document.removeEventListener("mouseup", handleDocumentMouseUp);
+      document.removeEventListener(
+        "mousemove",
+        handleDocumentMouseMove as unknown as EventListener
+      );
+      document.removeEventListener(
+        "mouseup",
+        handleDocumentMouseUp as unknown as EventListener
+      );
     };
   }, [sizeMode, position]);
 
