@@ -7,9 +7,16 @@ interface ButtonEyeProps {
   url: string | null;
 }
 const ButtonEye = ({ url }: ButtonEyeProps) => {
+  // Access state and actions from the store
+  const { isPreviewHidden, showPreview } = useFileStore((state) => ({
+    isPreviewHidden: state.isPreviewHidden,
+    showPreview: state.showPreview,
+  }));
+
   const setUrl = () => {
     if (url === "") return;
     useFileStore.setState({ fileUrl: url });
+    showPreview();
   };
 
   const { fileUrl } = useFileStore();

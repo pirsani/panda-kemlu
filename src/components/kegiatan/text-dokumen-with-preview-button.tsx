@@ -1,4 +1,5 @@
 "use client";
+import ButtonEye from "@/components/button-eye-open-document";
 import useFileStore from "@/hooks/use-file-store";
 import { Eye } from "lucide-react";
 import { Button } from "../ui/button";
@@ -26,13 +27,14 @@ const TextDokumenWithPreviewButton = ({
         <span className=" bg-gray-100 border border-gray-300 rounded p-2 w-full">
           {dokumen}
         </span>
-        <Button
+        <ButtonEye url={url} />
+        {/* <Button
           variant={"outline"}
           className="border-blue-500"
           onClick={setUrl}
         >
           <Eye size={16} className="text-blue-900" />
-        </Button>
+        </Button> */}
       </div>
     </div>
   );

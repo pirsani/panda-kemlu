@@ -71,7 +71,7 @@ const ButtonsPengajuan = ({
 
   return (
     <>
-      <div className="flex flex-wrap gap-2">
+      <div className={cn("flex flex-wrap gap-2")}>
         {/* jika sudah ada generate rampungan, tidak bisa generate rampungan lagi */}
         <ButtonRiwayatRampungan
           statusRampungan={kegiatan.statusRampungan}

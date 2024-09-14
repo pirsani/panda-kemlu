@@ -38,12 +38,12 @@ const VerfikasiSelectionContainer = ({
 
   return (
     kegiatan && (
-      <>
+      <div className="w-full flex flex-col gap-2 ">
         <ButtonsVerifikasi
           kegiatan={kegiatan}
           jenisPengajuan={jenisPengajuan}
           handleSelection={handleSelection}
-          className="w-1/2"
+          className="w-full"
         />
         <div className="flex flex-col gap-2 mt-6 w-full border-gray-300 border rounded-md p-2 shadow-lg">
           {jenisPengajuan == "GENERATE_RAMPUNGAN" && (
@@ -68,7 +68,7 @@ const VerfikasiSelectionContainer = ({
             <div>Verifikasi Pembayaran Pihak Ke-3</div>
           )}
         </div>
-      </>
+      </div>
     )
   );
 };

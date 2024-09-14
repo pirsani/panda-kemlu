@@ -1,8 +1,9 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { Maximize, Minimize, Minus } from "lucide-react";
+import { Maximize, Minimize, Minus, X } from "lucide-react";
 import React, {
   MouseEvent,
+  use,
   useCallback,
   useEffect,
   useRef,
@@ -11,10 +12,14 @@ import React, {
 
 interface ResizableDraggableProps {
   children?: React.ReactNode;
+  hide?: boolean;
+  onHide?: (isHidden: boolean) => void;
 }
 
 const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
   children,
+  hide = false,
+  onHide = () => {},
 }) => {
   const [position, setPosition] = useState({ x: 100, y: 100 });
   const [sizeMode, setSizeMode] = useState<
@@ -27,6 +32,11 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
   const isDragging = useRef(false);
   const initialMousePosition = useRef({ x: 0, y: 0 });
   const initialPosition = useRef({ x: 100, y: 100 });
+
+  const [isHidden, setIsHidden] = useState(hide);
+  useEffect(() => {
+    setIsHidden(hide);
+  }, [hide]);
 
   // Check if running on client-side
   useEffect(() => {
@@ -143,6 +153,11 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
     }
   };
 
+  const handleOnHide = () => {
+    setIsHidden(true);
+    onHide(true);
+  };
+
   // If not on client, don't render anything
   if (!isClient) return null;
 
@@ -152,6 +167,7 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
       className={cn(
         "z-51 bg-white border border-gray-500 shadow-md flex flex-col h-full w-full",
         "fixed",
+        isHidden ? "hidden" : "",
         isDragging.current ? "cursor-grabbing" : "cursor-default"
       )}
       style={{
@@ -186,8 +202,15 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
               <Maximize size={16} className="text-green-600" />
             )}
           </button>
+          <button
+            className="hover:bg-red-200 p-1 rounded-full"
+            onClick={handleOnHide}
+            aria-label="Close"
+          >
+            <X size={16} className="text-red-600" />
+          </button>
           {sizeMode !== "minimized" && (
-            <span className="text-gray-700">
+            <span className="text-gray-700 hidden sm:block">
               view {sizeMode} - {position.x.toFixed()} - {position.y}
             </span>
           )}

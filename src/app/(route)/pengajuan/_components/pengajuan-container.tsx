@@ -9,6 +9,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
 import { getRiwayatProses } from "@/actions/kegiatan/proses";
+import useFileStore from "@/hooks/use-file-store";
 import ButtonsPengajuan from "./buttons-pengajuan";
 import FormPengajuanGenerateRampungan from "./form-pengajuan-generate-rampungan";
 import { DisplayFormPengajuanGenerateRampungan } from "./honorarium/display-form-pengajuan-generate-rampungan";
@@ -30,6 +31,9 @@ const PengajuanContainer = () => {
   const [jenisPengajuan, setJenisPengajuan] = useState<JenisPengajuan | null>(
     null
   );
+
+  const { fileUrl, isPreviewHidden } = useFileStore();
+
   const handleSelection = (jenis: JenisPengajuan) => {
     setJenisPengajuan(jenis);
   };
@@ -60,10 +64,18 @@ const PengajuanContainer = () => {
     getKegiatan();
   }, [kegiatanId]);
 
+  const handleOnHide = () => {
+    useFileStore.setState({ isPreviewHidden: true });
+  };
+
   return (
     <div className="relative flex flex-col w-full gap-6 pb-20">
       <div className="w-full sm:w-1/2 flex flex-col gap-2 ">
-        <SelectKegiatan inputId="kegiatan" onChange={handleKegiatanChange} />
+        <SelectKegiatan
+          inputId="kegiatan"
+          onChange={handleKegiatanChange}
+          className="w-full"
+        />
         <div className="flex flex-row gap-2 w-full border-gray-300 border rounded-md p-2 shadow-lg">
           <PreviewKegiatan kegiatan={kegiatan} className="w-full" />
         </div>
@@ -102,7 +114,7 @@ const PengajuanContainer = () => {
         {jenisPengajuan == "PEMBAYARAN_PIHAK_KETIGA" && <PihakKe3Container />}
       </div>
 
-      <FloatingComponent>
+      <FloatingComponent hide={isPreviewHidden} onHide={handleOnHide}>
         <PdfPreviewContainer className="border-2 h-full border-gray-500" />
       </FloatingComponent>
     </div>

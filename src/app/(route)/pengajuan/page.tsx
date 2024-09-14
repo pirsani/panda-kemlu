@@ -6,7 +6,7 @@ const PengajuanPage = () => {
   const dataKegiatan = [];
   return (
     <div className="p-4 pb-24 h-auto min-h-full flex flex-col">
-      <h1>Pengajuan</h1>
+      <h1 className="m-2">Alur Proses &gt; Pengajuan </h1>
       <PengajuanContainer />
     </div>
   );

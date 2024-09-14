@@ -9,7 +9,7 @@ export default function Home() {
         <div className="flex flex-col w-full">
           <h1 className="text-4xl font-bold">Panda</h1>
           <p className="text-lg font-light">
-            Pengelolan Administrasi Perbendaharaan
+            Pengelolaan Administrasi Perbendaharaan
           </p>
           <div className="py-10 flex flex-col sm:flex-row gap-6 h-auto">
             <div className="w-full sm:w-1/2 h-52 sm:h-96 relative">
