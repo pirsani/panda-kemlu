@@ -1,4 +1,5 @@
 "use client";
+import { importExcelNarasumber } from "@/actions/excel/narasumber";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -9,6 +10,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  columnsWithEmptyValueAllowed,
+  extractFromColumns,
+} from "@/constants/excel/narasumber";
 import {
   excelDataReferensi,
   excelDataReferensiSchema,
@@ -36,32 +41,45 @@ const FormUploadExcelNarasumber = () => {
     trigger,
   } = form;
 
-  const extractFromColumns = [
-    "ID",
-    "Nama",
-    "NIP",
-    "NIK",
-    "NPWP",
-    "Golongan/Ruang",
-    "Jabatan",
-    "Eselon",
-    "Nama Rekening",
-    "Bank",
-    "Nomor Rekening",
-  ];
-  const columnsWithEmptyValueAllowed = [
-    "NIP",
-    "Eselon",
-    "Golongan/Ruang",
-    "NPWP",
-    "Nama Rekening",
-    "Bank",
-    "Nomor Rekening",
-  ];
+  // const extractFromColumns = [
+  //   "ID",
+  //   "Nama",
+  //   "NIP",
+  //   "NIK",
+  //   "NPWP",
+  //   "Golongan/Ruang",
+  //   "Jabatan",
+  //   "Eselon",
+  //   "Nama Rekening",
+  //   "Bank",
+  //   "Nomor Rekening",
+  // ];
+  // const columnsWithEmptyValueAllowed = [
+  //   "NIP",
+  //   "Eselon",
+  //   "Golongan/Ruang",
+  //   "NPWP",
+  //   "Nama Rekening",
+  //   "Bank",
+  //   "Nomor Rekening",
+  // ];
 
-  const onSubmit = (data: excelDataReferensi) => {
+  const onSubmit = async (data: excelDataReferensi) => {
     // disubmit excel / data ke backend ?
     // harus tidak ada error dulu
+
+    if (!data.file) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", data.file);
+    const importedData = await importExcelNarasumber(formData);
+    if (importedData.success) {
+      console.log("Data berhasil diimport", importedData.data);
+    } else {
+      console.log("Data gagal diimport ", importedData.error);
+    }
     console.log(data);
   };
 

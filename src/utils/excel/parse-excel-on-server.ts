@@ -1,7 +1,7 @@
 import { fileTypeFromBuffer } from "file-type";
 import * as XLSX from "xlsx";
 
-interface ParseExcelOptions {
+export interface ParseExcelOptions {
   allowedColumns: string[];
   sheetName?: string;
   range?: string; // Optional range of cells
@@ -13,6 +13,17 @@ export interface ParseExcelResult {
   emptyValues: Record<number, string[]>; // Row index and columns with empty values
 }
 
+/**
+ * Parses an Excel file on the server.
+ *
+ * @param {File} file - The Excel file to be parsed.
+ * @param {ParseExcelOptions} options - Options for parsing the Excel file.
+ * @param {string[]} options.allowedColumns - The columns that are allowed to be parsed.
+ * @param {string} [options.sheetName] - The name of the sheet to be parsed.
+ * @param {string} [options.range] - The optional range of cells to be parsed.
+ * @returns {Promise<ParseExcelResult>} A promise that resolves to the result of parsing the Excel file.
+ * @throws {Error} If the provided input is not a file or if allowed columns are not provided or empty.
+ */
 const parseExcelOnServer = async (
   file: File,
   options: ParseExcelOptions

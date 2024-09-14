@@ -1,12 +1,35 @@
 import { getExcelColumnNames } from ".";
 
-const columnsMap = {
+// const extractFromColumns = [
+//   "ID",
+//   "Nama",
+//   "NIP",
+//   "NIK",
+//   "NPWP",
+//   "Golongan/Ruang",
+//   "Jabatan",
+//   "Eselon",
+//   "Nama Rekening",
+//   "Bank",
+//   "Nomor Rekening",
+// ];
+// const columnsWithEmptyValueAllowed = [
+//   "NIP",
+//   "Eselon",
+//   "Golongan/Ruang",
+//   "NPWP",
+//   "Nama Rekening",
+//   "Bank",
+//   "Nomor Rekening",
+// ];
+
+export const columnsMap = {
   ID: "id",
   Nama: "nama",
-  NIP: "nip",
-  NIK: "nik",
-  NPWP: "npwp",
-  "Golongan/Ruang": "golonganRuangId",
+  NIP: "NIP",
+  NIK: "NIK",
+  NPWP: "NPWP",
+  "Golongan/Ruang": "pangkatGolonganId",
   Jabatan: "jabatan",
   Eselon: "eselon",
   "Nama Rekening": "namaRekening",
@@ -16,7 +39,7 @@ const columnsMap = {
 
 export const extractFromColumns = getExcelColumnNames(columnsMap);
 
-const columnsWithEmptyValueAllowed = [
+export const columnsWithEmptyValueAllowed = [
   "NIP",
   "Eselon",
   "Golongan/Ruang",
@@ -26,7 +49,7 @@ const columnsWithEmptyValueAllowed = [
   "Nomor Rekening",
 ];
 
-function mapColumnExcelToField(
+export function mapColumnExcelToField(
   data: Record<string, any>,
   columnMapping: Record<string, string>
 ) {
@@ -57,20 +80,21 @@ const exampleData = [
   },
 ];
 
-const expectedData = [
-  {
-    id: "1",
-    nama: "John Doe",
-    nip: "123456789",
-    nik: "1234567890123456",
-    npwp: "123456789012345",
-    golonganRuangId: "IV/a",
-    jabatan: "Kepala Sekolah",
-    eselon: "III",
-    namaRekening: "John Doe",
-    bank: "Bank Mandiri",
-    nomorRekening: "123",
-  },
-];
-
 const mappedData = mapColumnExcelToField(exampleData, columnsMap);
+
+// console.log(mappedData);
+// mappedData = [
+//   {
+//     id: "1",
+//     nama: "John Doe",
+//     nip: "123456789",
+//     nik: "1234567890123456",
+//     npwp: "123456789012345",
+//     pangkatGolonganId: "IV/a",
+//     jabatan: "Kepala Sekolah",
+//     eselon: "III",
+//     namaRekening: "John Doe",
+//     bank: "Bank Mandiri",
+//     nomorRekening: "123",
+//   },
+// ];
