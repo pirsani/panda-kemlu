@@ -1,7 +1,13 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { Maximize, Minimize, Minus } from "lucide-react";
-import React, { MouseEvent, useEffect, useRef, useState } from "react";
+import React, {
+  MouseEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 interface ResizableDraggableProps {
   children?: React.ReactNode;
@@ -38,34 +44,38 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
   };
 
   // Handle Mouse Move (Dragging)
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isDragging.current && sizeMode !== "minimized") {
-      const deltaX = e.clientX - initialMousePosition.current.x;
-      const deltaY = e.clientY - initialMousePosition.current.y;
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (isDragging.current && sizeMode !== "minimized") {
+        const deltaX = e.clientX - initialMousePosition.current.x;
+        const deltaY = e.clientY - initialMousePosition.current.y;
 
-      setPosition((prevPosition) => ({
-        x: Math.max(
-          0,
-          Math.min(
-            window.innerWidth - resizableRef.current!.offsetWidth - 20,
-            initialPosition.current.x + deltaX
-          )
-        ),
-        y: Math.max(
-          0,
-          Math.min(
-            window.innerHeight - resizableRef.current!.offsetHeight - 20,
-            initialPosition.current.y + deltaY
-          )
-        ),
-      }));
-    }
-  };
+        setPosition((prevPosition) => ({
+          x: Math.max(
+            0,
+            Math.min(
+              window.innerWidth - resizableRef.current!.offsetWidth - 20,
+              initialPosition.current.x + deltaX
+            )
+          ),
+          y: Math.max(
+            0,
+            Math.min(
+              window.innerHeight - resizableRef.current!.offsetHeight - 20,
+              initialPosition.current.y + deltaY
+            )
+          ),
+        }));
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sizeMode, position]
+  );
 
   // Handle Mouse Up (Stop Dragging)
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     isDragging.current = false;
-  };
+  }, []);
 
   // Attach MouseMove and MouseUp handlers to the document
   useEffect(() => {
@@ -94,6 +104,7 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
         handleDocumentMouseUp as unknown as EventListener
       );
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sizeMode, position]);
 
   // Size Handlers
