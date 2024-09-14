@@ -47,7 +47,7 @@ const PesertaContainer = ({ fieldName, value }: PesertaContainerProps) => {
     }
   }, [value]);
 
-  const allowedColumns = [
+  const extractFromColumns = [
     "ID",
     "Nama",
     "NIP",
@@ -74,7 +74,7 @@ const PesertaContainer = ({ fieldName, value }: PesertaContainerProps) => {
         onChange={handleOnChange}
         maxColumns={9}
         name={fieldName}
-        allowedColumns={allowedColumns}
+        extractFromColumns={extractFromColumns}
       />
 
       {Object.keys(emptyValues).length > 0 && (

@@ -7,23 +7,23 @@ interface InputFileXlsxProps {
   name: string;
   onChange: (parseExcelResult: ParseExcelResult) => void;
   maxColumns?: number; // Add maxColumns prop
-  allowedColumns: string[];
+  extractFromColumns: string[];
 }
 const InputFileXlsx = ({
   name,
   onChange,
   maxColumns = 8,
-  allowedColumns,
+  extractFromColumns,
 }: InputFileXlsxProps) => {
   // const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {
   const handleOnChange = async (file: File | null) => {
     //const file = event.target.files?.[0];
     if (file) {
       try {
-        console.log("[allowedColumns]", allowedColumns);
-        //const allowedColumns = allowedColumns;
+        console.log("[extractFromColumns]", extractFromColumns);
+        //const extractFromColumns = extractFromColumns;
         const parsedData = await parseExcel(file, {
-          allowedColumns: allowedColumns,
+          extractFromColumns: extractFromColumns,
         });
         onChange(parsedData);
         console.log(

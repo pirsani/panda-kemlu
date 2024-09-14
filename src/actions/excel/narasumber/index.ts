@@ -82,7 +82,7 @@ const formDataToObject = (formData: FormData) => {
 async function parseDataNarasumberDariExcel(file: File) {
   // parse the form data
   const options: ParseExcelOptions = {
-    allowedColumns: extractFromColumns,
+    extractFromColumns: extractFromColumns,
   };
   try {
     const dataNarasumberDariExcel = await parseExcelOnServer(file, options);

@@ -1,7 +1,7 @@
 import * as XLSX from "xlsx";
 
 interface ParseExcelOptions {
-  allowedColumns: string[];
+  extractFromColumns: string[];
   sheetName?: string;
   range?: string; // Optional range of cells
 }
@@ -16,7 +16,7 @@ const parseExcel = async (
   file: File,
   options: ParseExcelOptions
 ): Promise<ParseExcelResult> => {
-  if (!options.allowedColumns || options.allowedColumns.length === 0) {
+  if (!options.extractFromColumns || options.extractFromColumns.length === 0) {
     throw new Error("Allowed columns must be provided and cannot be empty.");
   }
 
@@ -28,7 +28,7 @@ const parseExcel = async (
     const data = new Uint8Array(arrayBuffer);
     const workbook = XLSX.read(data, { type: "array" });
     const sheetName = options.sheetName || workbook.SheetNames[0];
-    const { allowedColumns } = options;
+    const { extractFromColumns } = options;
 
     // Read and parse the worksheet
     const rawData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
@@ -44,13 +44,13 @@ const parseExcel = async (
     // Identify missing columns
     const actualColumns = headers;
     missingColumns.push(
-      ...allowedColumns.filter((col) => !actualColumns.includes(col))
+      ...extractFromColumns.filter((col) => !actualColumns.includes(col))
     );
 
     // Filter columns based on allowed columns
     const filteredRows = dataRows.map((row: any[]) => {
       const rowObject: Record<string, any> = {};
-      allowedColumns.forEach((col, index) => {
+      extractFromColumns.forEach((col, index) => {
         const colIndex = headers.indexOf(col);
         if (colIndex >= 0 && colIndex < row.length) {
           rowObject[col] = row[colIndex];
@@ -62,12 +62,14 @@ const parseExcel = async (
 
     // Filter out rows where all values are empty in the allowed columns
     const validRows = filteredRows.filter((row) =>
-      allowedColumns.some((col) => row[col] !== "" && row[col] !== undefined)
+      extractFromColumns.some(
+        (col) => row[col] !== "" && row[col] !== undefined
+      )
     );
 
     // Identify rows with empty values
     validRows.forEach((row, rowIndex) => {
-      const emptyColumns = allowedColumns.filter(
+      const emptyColumns = extractFromColumns.filter(
         (col) => row[col] === "" || row[col] === undefined
       );
       if (emptyColumns.length > 0) {

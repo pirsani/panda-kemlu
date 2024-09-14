@@ -22,7 +22,7 @@ const InputFileXlsx = ({
         console.log("[extractFromColumns]", extractFromColumns);
         //const extractFromColumns = extractFromColumns;
         const parsedData = await parseExcel(file, {
-          allowedColumns: extractFromColumns,
+          extractFromColumns: extractFromColumns,
         });
         onChange(parsedData); // pass the result to the parent component
         // console.log(

@@ -1,6 +1,6 @@
 "use server";
 import { ActionResponse } from "@/actions/response";
-import { columns as allowedColumns } from "@/constants/excel/peserta";
+import { columns as extractFromColumns } from "@/constants/excel/peserta";
 import { dbHonorarium, Prisma } from "@/lib/db-honorarium";
 import parseExcel, { ParseExcelResult } from "@/utils/excel/parse-excel";
 import parseExcelOnServer from "@/utils/excel/parse-excel-on-server";
@@ -118,7 +118,7 @@ async function parseDataPesertaDariExcel(dataparsed: ZKegiatan) {
     const dataPesertaDariExcel = await parseExcelOnServer(
       dataparsed.pesertaXlsx as File,
       {
-        allowedColumns: allowedColumns,
+        extractFromColumns: extractFromColumns,
       }
     );
 

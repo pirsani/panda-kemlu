@@ -2,7 +2,7 @@ import { fileTypeFromBuffer } from "file-type";
 import * as XLSX from "xlsx";
 
 export interface ParseExcelOptions {
-  allowedColumns: string[];
+  extractFromColumns: string[];
   sheetName?: string;
   range?: string; // Optional range of cells
 }
@@ -18,7 +18,7 @@ export interface ParseExcelResult {
  *
  * @param {File} file - The Excel file to be parsed.
  * @param {ParseExcelOptions} options - Options for parsing the Excel file.
- * @param {string[]} options.allowedColumns - The columns that are allowed to be parsed.
+ * @param {string[]} options.extractFromColumns - The columns that are allowed to be parsed.
  * @param {string} [options.sheetName] - The name of the sheet to be parsed.
  * @param {string} [options.range] - The optional range of cells to be parsed.
  * @returns {Promise<ParseExcelResult>} A promise that resolves to the result of parsing the Excel file.
@@ -32,7 +32,7 @@ const parseExcelOnServer = async (
     throw new Error("The provided input is not a file.");
   }
 
-  if (!options.allowedColumns || options.allowedColumns.length === 0) {
+  if (!options.extractFromColumns || options.extractFromColumns.length === 0) {
     throw new Error("Allowed columns must be provided and cannot be empty.");
   }
 
@@ -56,7 +56,7 @@ const parseExcelOnServer = async (
     // Parse the file using XLSX
     const workbook = XLSX.read(buffer, { type: "buffer" });
     const sheetName = options.sheetName || workbook.SheetNames[0];
-    const { allowedColumns } = options;
+    const { extractFromColumns } = options;
 
     console.log(`Parsing sheet: ${sheetName}`);
 
@@ -73,13 +73,13 @@ const parseExcelOnServer = async (
     // Identify missing columns
     const actualColumns = headers;
     missingColumns.push(
-      ...allowedColumns.filter((col) => !actualColumns.includes(col))
+      ...extractFromColumns.filter((col) => !actualColumns.includes(col))
     );
 
     // Filter columns based on allowed columns
     const filteredRows = dataRows.map((row: Record<string, any>[]) => {
       const rowObject: Record<string, any> = {};
-      allowedColumns.forEach((col, index) => {
+      extractFromColumns.forEach((col, index) => {
         const colIndex = headers.indexOf(col);
         if (colIndex >= 0 && colIndex < row.length) {
           rowObject[col] = row[colIndex];
@@ -90,12 +90,14 @@ const parseExcelOnServer = async (
 
     // Remove rows where all values are empty
     const validRows = filteredRows.filter((row) =>
-      allowedColumns.some((col) => row[col] !== "" && row[col] !== undefined)
+      extractFromColumns.some(
+        (col) => row[col] !== "" && row[col] !== undefined
+      )
     );
 
     // Identify rows with empty values
     validRows.forEach((row, rowIndex) => {
-      const emptyColumns = allowedColumns.filter(
+      const emptyColumns = extractFromColumns.filter(
         (col) => row[col] === "" || row[col] === undefined
       );
       if (emptyColumns.length > 0) {
