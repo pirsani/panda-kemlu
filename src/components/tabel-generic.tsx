@@ -11,6 +11,7 @@ import {
   Table,
   useReactTable,
 } from "@tanstack/react-table";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 interface TabelGenericProps<T> {
@@ -83,7 +84,8 @@ export const TabelGeneric = <T,>({
       console.log(col1Width, col2Width);
       console.log("stickyLeft", col1Width + col2Width);
     }
-  }, [table.getRowModel().rows]); // Recalculate when rows change
+  }, [frozenColumnCount, colRefs]); // Only run when frozen column count or refs change
+  //[table.getRowModel().rows]); // Recalculate when rows change
 
   return (
     <div>
@@ -142,7 +144,7 @@ export const TabelGeneric = <T,>({
           </thead>
           <tbody>
             {table.getRowModel().rows.map((row) => (
-              <tr key={row.id}>
+              <tr key={row.id} className="odd:bg-white even:bg-gray-50">
                 {row.getVisibleCells().map((cell, index) => (
                   <td
                     key={cell.id}
@@ -154,14 +156,11 @@ export const TabelGeneric = <T,>({
                         colRefs.current[index] = el;
                       }
                     }}
-                    className={cn(
-                      "p-2 border border-gray-300 odd:bg-white even:bg-gray-100",
-                      {
-                        [`sticky left-0 bg-gray-100 z-${10 - index}`]:
-                          index < frozenColumnCount, // Sticky columns
-                        "left-0": index >= frozenColumnCount, // Default position for other columns
-                      }
-                    )}
+                    className={cn("p-2 border border-gray-300 ", {
+                      [`sticky left-0 bg-gray-100 z-${10 - index}`]:
+                        index < frozenColumnCount, // Sticky columns
+                      "left-0": index >= frozenColumnCount, // Default position for other columns
+                    })}
                     style={
                       index < frozenColumnCount
                         ? { left: `${cumulativeWidths[index] || 0}px` }
@@ -221,14 +220,16 @@ export const PaginationControls = <T,>({
   };
 
   return (
-    <div className="my-2 flex flex-row gap-2 items-center">
+    <div className="my-2 flex flex-row gap-0 sm:gap-2 items-center">
       {/* Pagination controls */}
       <Button
         variant={"outline"}
         onClick={() => table.previousPage()}
         disabled={!table.getCanPreviousPage()}
+        className="p-2"
       >
-        Previous
+        <ChevronLeft size={24} />
+        <span className="hidden sm:block">Previous</span>
       </Button>
 
       <select
@@ -247,8 +248,10 @@ export const PaginationControls = <T,>({
         variant={"outline"}
         onClick={() => table.nextPage()}
         disabled={!table.getCanNextPage()}
+        className="p-2"
       >
-        Next
+        <ChevronRight size={24} />
+        <span className="hidden sm:block">Next</span>
       </Button>
 
       {/* Select page size */}
