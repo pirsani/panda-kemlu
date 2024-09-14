@@ -1,4 +1,5 @@
 import { dbHonorarium } from "@/lib/db-honorarium";
+import { faker } from "@faker-js/faker";
 import { LOKASI, Provinsi } from "@prisma-honorarium/client";
 import bcrypt from "bcryptjs"; // Import bcrypt for password hashing and comparison
 import csv from "csv-parser";
@@ -70,6 +71,7 @@ const deleteExisting = async (): Promise<void> => {
     await dbHonorarium.kelas.deleteMany({});
     await dbHonorarium.riwayatProses.deleteMany({});
     await dbHonorarium.dokumenSuratTugas.deleteMany({});
+    await dbHonorarium.pesertaKegiatan.deleteMany({});
     await dbHonorarium.kegiatan.deleteMany({});
     await dbHonorarium.sbmHonorarium.deleteMany({});
     await dbHonorarium.unitKerja.deleteMany({});
@@ -542,6 +544,26 @@ async function main() {
         email: "",
       },
     ],
+  });
+
+  const narasumberData = Array.from({ length: 100 }).map(() => ({
+    id: faker.string.numeric(16), // Generate a unique ID
+    nama: faker.person.fullName(), // Generate a random full name
+    NIP: faker.string.numeric(18), // Generate a random 18-digit string
+    pangkatGolonganId: faker.helpers.arrayElement([
+      "IV/A",
+      "IV/B",
+      "IV/C",
+      "IV/D",
+      "IV/E",
+    ]),
+    createdBy: "init",
+    email: faker.internet.email(),
+  }));
+
+  // Insert the generated data into the database
+  const narasumberFaker = await dbHonorarium.narasumber.createMany({
+    data: narasumberData,
   });
 
   const materiku = await dbHonorarium.materi.findMany({
