@@ -694,7 +694,7 @@ async function main() {
   const sbmHonorarium = await dbHonorarium.sbmHonorarium.createMany({
     data: [
       {
-        pmkAcuanId: "2024",
+        tahun: 2024,
         jenis: " Narasumber",
         satuan: "OJ",
         besaran: 1700000,
@@ -703,7 +703,7 @@ async function main() {
         createdBy: "init",
       },
       {
-        pmkAcuanId: "2024",
+        tahun: 2024,
         jenis: " Narasumber",
         satuan: "OJ",
         besaran: 1400000,
@@ -711,7 +711,7 @@ async function main() {
         createdBy: "init",
       },
       {
-        pmkAcuanId: "2024",
+        tahun: 2024,
         jenis: " Narasumber",
         satuan: "OJ",
         besaran: 1000000,
@@ -719,7 +719,7 @@ async function main() {
         createdBy: "init",
       },
       {
-        pmkAcuanId: "2024",
+        tahun: 2024,
         jenis: " Narasumber",
         satuan: "OJ",
         besaran: 1000000,
@@ -727,7 +727,7 @@ async function main() {
         createdBy: "init",
       },
       {
-        pmkAcuanId: "2024",
+        tahun: 2024,
         jenis: " Moderator",
         satuan: "Orang/kali",
         besaran: 700000,
@@ -735,7 +735,7 @@ async function main() {
         createdBy: "init",
       },
       {
-        pmkAcuanId: "2024",
+        tahun: 2024,
         jenis: " Pembawa Acara",
         satuan: "OK",
         besaran: 400000,
@@ -743,7 +743,7 @@ async function main() {
         createdBy: "init",
       },
       {
-        pmkAcuanId: "2024",
+        tahun: 2024,
         jenis: "Panitia",
         satuan: "OK",
         besaran: 450000,
@@ -751,7 +751,7 @@ async function main() {
         createdBy: "init",
       },
       {
-        pmkAcuanId: "2024",
+        tahun: 2024,
         jenis: "Panitia",
         satuan: "OK",
         besaran: 400000,
@@ -759,7 +759,7 @@ async function main() {
         createdBy: "init",
       },
       {
-        pmkAcuanId: "2024",
+        tahun: 2024,
         jenis: "Panitia",
         satuan: "OK",
         besaran: 300000,
@@ -767,7 +767,7 @@ async function main() {
         createdBy: "init",
       },
       {
-        pmkAcuanId: "2024",
+        tahun: 2024,
         jenis: "Panitia",
         satuan: "OK",
         besaran: 300000,

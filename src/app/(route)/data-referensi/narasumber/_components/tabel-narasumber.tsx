@@ -23,6 +23,12 @@ const columnHelper = createColumnHelper<NarasumberWithStringDate>();
 
 const columns: ColumnDef<NarasumberWithStringDate>[] = [
   {
+    id: "rowNumber",
+    header: "#",
+    // cell: (info) => info.row.index + 1, // Display row number (1-based index)
+    footer: "#",
+  },
+  {
     accessorKey: "nama",
     header: "Nama",
     cell: (info) => info.getValue(),

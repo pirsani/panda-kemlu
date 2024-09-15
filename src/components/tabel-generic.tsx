@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
+  CellContext,
   ColumnDef,
   flexRender,
   getCoreRowModel,
@@ -11,6 +12,7 @@ import {
   Table,
   useReactTable,
 } from "@tanstack/react-table";
+import Decimal from "decimal.js";
 import { ArrowDownUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -100,7 +102,7 @@ export const TabelGeneric = <T,>({
       <div className="overflow-x-auto w-full">
         <table className="min-w-full table-auto border-collapse border border-gray-300">
           <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map((headerGroup, index) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header, index) => {
                   const columnRelativeDepth =
@@ -188,7 +190,7 @@ export const TabelGeneric = <T,>({
             ))}
           </thead>
           <tbody>
-            {table.getRowModel().rows.map((row) => (
+            {table.getRowModel().rows.map((row, rowIndex) => (
               <tr key={row.id} className="odd:bg-white even:bg-gray-50">
                 {row.getVisibleCells().map((cell, index) => (
                   <td
@@ -212,7 +214,12 @@ export const TabelGeneric = <T,>({
                         : undefined
                     }
                   >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    {cell.column.id === "rowNumber"
+                      ? rowIndex + 1 + pageSize * pageIndex
+                      : flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
                   </td>
                 ))}
               </tr>
@@ -311,6 +318,34 @@ export const PaginationControls = <T,>({
           </option>
         ))}
       </select>
+    </div>
+  );
+};
+
+export const formatCurrency = <T,>(info: CellContext<T, unknown>) => {
+  const value = info.getValue() as number;
+
+  // Format the value as currency
+  const formattedValue = new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
+
+  // Format the value as a plain number
+  const formattedNumber = new Intl.NumberFormat("id-ID", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
+
+  // Extract the currency symbol by removing the formatted number from the formatted value
+  const currencySymbol = formattedValue.replace(formattedNumber, "").trim();
+
+  return (
+    <div className="flex flex-row w-full justify-between items-center">
+      <span className="mr-2">{currencySymbol}</span> {/* Currency symbol */}
+      <span className="ml-2">{formattedNumber}</span> {/* Number */}
     </div>
   );
 };
