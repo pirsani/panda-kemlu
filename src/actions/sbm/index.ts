@@ -42,12 +42,12 @@ export const getOptionsProvinsi = async () => {
   return optionsProvinsi;
 };
 
-const currentYear = new Date().getFullYear().toString();
+const currentYear = new Date().getFullYear();
 
-export const getSbmHonorarium = async (pmkAcuan: string = currentYear) => {
+export const getSbmHonorarium = async (tahun: number = currentYear) => {
   const dataSbm = await dbHonorarium.sbmHonorarium.findMany({
     where: {
-      pmkAcuanId: pmkAcuan,
+      tahun,
     },
   });
   return dataSbm;

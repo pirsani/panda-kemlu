@@ -56,6 +56,7 @@ const formDataToObject = (formData: FormData) => {
 const saveDataToDatabase = async (data: ZNarasumber, createdBy: string) => {
   const dataCreatedBy = {
     ...data,
+    dokumenPeryataanRekeningBerbeda: data.dokumenPeryataanRekeningBerbeda?.name,
     createdBy,
   };
   // Save data to database

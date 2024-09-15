@@ -63,6 +63,9 @@ const deleteExisting = async (): Promise<void> => {
   try {
     console.log("Deleting existing data");
 
+    await dbHonorarium.sbmHonorarium.deleteMany({});
+    await dbHonorarium.sbmUhDalamNegeri.deleteMany({});
+    await dbHonorarium.sbmUhLuarNegeri.deleteMany({});
     await dbHonorarium.kota.deleteMany({});
     await dbHonorarium.provinsi.deleteMany({});
     await dbHonorarium.jadwalNarasumber.deleteMany({});
@@ -654,26 +657,6 @@ async function main() {
       {
         jadwalId: jadwalku[2].id,
         narasumberId: narasumberku[3].id,
-        createdBy: "init",
-      },
-    ],
-  });
-
-  const kota = await dbHonorarium.kota.createMany({
-    data: [
-      {
-        nama: "Jakarta",
-        provinsiId: 31,
-        createdBy: "init",
-      },
-      {
-        nama: "Bandung",
-        provinsiId: 32,
-        createdBy: "init",
-      },
-      {
-        nama: "Surabaya",
-        provinsiId: 35,
         createdBy: "init",
       },
     ],
