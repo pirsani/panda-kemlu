@@ -54,7 +54,7 @@ const DaftarJadwal = ({ kegiatanId, proses }: DaftarJadwalProps) => {
   // karena pengajuan dilakukan per-jadwal, maka log status di tulis di jadwal, bukan di jadwalNarasumber
 
   return (
-    <>
+    <div className="flex flex-col gap-6">
       {dataJadwal &&
         dataJadwal.map((jadwal, index) => {
           return (
@@ -110,7 +110,7 @@ const DaftarJadwal = ({ kegiatanId, proses }: DaftarJadwalProps) => {
             </div>
           );
         })}
-    </>
+    </div>
   );
 };
 

@@ -1,5 +1,5 @@
 import { dbHonorarium } from "@/lib/db-honorarium";
-import { faker } from "@faker-js/faker";
+import { es, faker } from "@faker-js/faker";
 import { LOKASI, Provinsi } from "@prisma-honorarium/client";
 import bcrypt from "bcryptjs"; // Import bcrypt for password hashing and comparison
 import csv from "csv-parser";
@@ -550,6 +550,8 @@ async function main() {
     id: faker.string.numeric(16), // Generate a unique ID
     nama: faker.person.fullName(), // Generate a random full name
     NIP: faker.string.numeric(18), // Generate a random 18-digit string
+    jabatan: faker.person.jobTitle(), // Generate a random job title
+    eselon: faker.helpers.arrayElement(["", "I", "II", "III"]), // Generate a random eselon
     pangkatGolonganId: faker.helpers.arrayElement([
       "IV/A",
       "IV/B",
@@ -557,8 +559,12 @@ async function main() {
       "IV/D",
       "IV/E",
     ]),
-    createdBy: "init",
     email: faker.internet.email(),
+    nomorTelepon: faker.phone.number(),
+    bank: faker.helpers.arrayElement(["BNI", "BCA", "Mandiri", "BRI"]),
+    namaRekening: faker.person.fullName(),
+    nomorRekening: faker.string.numeric(10),
+    createdBy: "init",
   }));
 
   // Insert the generated data into the database

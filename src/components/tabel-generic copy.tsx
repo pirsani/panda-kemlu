@@ -11,16 +11,8 @@ import {
   Table,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowDownUp, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-
-// <https://github.com/TanStack/table/discussions/5051
-declare module "@tanstack/react-table" {
-  // @ts-expect-error
-  interface ColumnMeta<TData extends RowData, TValue> {
-    rowSpan?: number;
-  }
-}
 
 interface TabelGenericProps<T> {
   data: T[];
@@ -99,91 +91,54 @@ export const TabelGeneric = <T,>({
     <div>
       <div className="overflow-x-auto w-full">
         <table className="min-w-full table-auto border-collapse border border-gray-300">
-          <thead>
+          <thead className="bg-gray-100">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header, index) => {
-                  const columnRelativeDepth =
-                    header.depth - header.column.depth;
-                  if (columnRelativeDepth > 1) {
-                    return null;
-                  }
-
-                  let rowSpan = 1;
-                  if (header.isPlaceholder) {
-                    const leafs = header.getLeafHeaders();
-                    rowSpan = leafs[leafs.length - 1].depth - header.depth;
-                  }
-
-                  const isGroupHeader =
-                    header.subHeaders && header.subHeaders.length > 1;
-
-                  return (
-                    <th
-                      key={header.id}
-                      ref={(el) => {
-                        if (
-                          index < frozenColumnCount &&
-                          el instanceof HTMLTableCellElement
-                        ) {
-                          colRefs.current[index] = el;
-                        }
-                      }}
-                      colSpan={header.colSpan}
-                      rowSpan={rowSpan}
-                      className={cn(
-                        "p-2 border border-gray-300",
-                        !isGroupHeader
-                          ? "hover:cursor-pointer bg-gray-50"
-                          : "bg-gray-100",
-
-                        {
-                          [`sticky left-0 z-${10 - index}`]:
-                            index < frozenColumnCount, // Sticky columns
-                          "left-0": index >= frozenColumnCount, // Default position for other columns
-                        }
-                      )}
-                      style={
-                        index < frozenColumnCount
-                          ? { left: `${cumulativeWidths[index] || 0}px` }
-                          : undefined
+                {headerGroup.headers.map((header, index) => (
+                  <th
+                    key={header.id}
+                    ref={(el) => {
+                      if (
+                        index < frozenColumnCount &&
+                        el instanceof HTMLTableCellElement
+                      ) {
+                        colRefs.current[index] = el;
                       }
-                      onClick={header.column.getToggleSortingHandler()} // Enable sorting on click
-                    >
-                      <div
-                        className={cn(
-                          "flex flex-row items-center w-full h-full"
-                        )}
-                      >
-                        {/* {header.isPlaceholder ? "y" : "n"}
-                        {header.column.columnDef.header ? "y" : "n"} */}
-                        <span className="flex-grow">
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                        </span>
-                        {/* Sorting icon only for non-grouped columns */}
-                        {!isGroupHeader && (
-                          <span className="hover:cursor-pointer">
-                            {(() => {
-                              const sortOrder = header.column.getIsSorted();
-                              if (sortOrder === false) {
-                                return <ArrowDownUp size={16} />; // Not sorted icon
-                              }
-                              return sortOrder === "asc" ? "🔼" : "🔽"; // Sort ascending/descending icon
-                            })()}
-                          </span>
-                        )}
-                        {/* {isGroupHeader && (
-                          <span className="hover:cursor-pointer">
-                            {header.subHeaders.length}
-                          </span>
-                        )} */}
-                      </div>
-                    </th>
-                  );
-                })}
+                    }}
+                    className={cn("p-2 border border-gray-300", {
+                      [`sticky left-0 bg-white z-${10 - index}`]:
+                        index < frozenColumnCount, // Sticky columns
+                      "left-0": index >= frozenColumnCount, // Default position for other columns
+                    })}
+                    style={
+                      index < frozenColumnCount
+                        ? { left: `${cumulativeWidths[index] || 0}px` }
+                        : undefined
+                    }
+                    onClick={header.column.getToggleSortingHandler()} // Enable sorting on click
+                  >
+                    <div className="flex flex-row items-center w-full">
+                      <span className="flex-grow">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </span>
+                      <span className="hover:cursor-pointer">
+                        {/* Default: show nothing */}
+                        {(() => {
+                          const sortOrder = header.column.getIsSorted();
+                          if (sortOrder === false) {
+                            return "↕️"; // Not sorted icon
+                          }
+                          return sortOrder === "asc" ? "🔼" : "🔽"; // Sort ascending or descending icon
+                        })()}
+                      </span>
+                    </div>
+                  </th>
+                ))}
               </tr>
             ))}
           </thead>
