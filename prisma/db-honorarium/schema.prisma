@@ -167,18 +167,16 @@ model SbmHonorarium {
 }
 
 model SbmUhDalamNegeri {
-  id         Int      @id @default(autoincrement())
-  provinsiId Int      @map("provinsi_id")
-  provinsi   Provinsi @relation(fields: [provinsiId], references: [id])
-  satuan     String
-  halfday    Decimal  @db.Decimal(10, 0)
-  fullday    Decimal  @db.Decimal(10, 0)
-  fullboard  Decimal  @db.Decimal(10, 0)
-  // fulldayHalfday String   @map("full_day_half_day")
-  luarKota   Decimal  @map("luar_kota") @db.Decimal(10, 0)
-  dalamKota  Decimal  @map("dalam_kota") @db.Decimal(10, 0)
-  diklat     Decimal  @db.Decimal(10, 0)
-  tahun      Int
+  id             String   @id @default(cuid()) // format id: tahun nomor urut pada sbm contoh untuk aceh tahun 2024 nomor urut 1 maka id: 01-2024
+  provinsiId     Int      @map("provinsi_id")
+  provinsi       Provinsi @relation(fields: [provinsiId], references: [id])
+  satuan         String
+  fullboard      Decimal  @db.Decimal(10, 0)
+  fulldayHalfday Decimal  @map("fullday_halfday") @db.Decimal(10, 0) // fullday/halfday dijadikan satu
+  luarKota       Decimal  @map("luar_kota") @db.Decimal(10, 0)
+  dalamKota      Decimal  @map("dalam_kota") @db.Decimal(10, 0)
+  diklat         Decimal  @db.Decimal(10, 0)
+  tahun          Int
 
   createdBy String    @map("created_by")
   createdAt DateTime  @default(now()) @map("created_at")
@@ -599,13 +597,13 @@ model JadwalNarasumber {
   narasumber                         Narasumber     @relation(fields: [narasumberId], references: [id])
   jenisHonorariumId                  Int?           @map("jenis_honorarium_id") // ini bisa saja berbeda dengan jenis narasumber yang ada di tabel narasumber
   jenisHonorarium                    SbmHonorarium? @relation(fields: [jenisHonorariumId], references: [id])
-  besaranHonorarium                  Decimal        @map("besaran_honorarium") @db.Decimal(10, 0) // bersifat historis, karena bisa saja berubah sesuai dengan jenis honorarium yang ada di sbm_honorarium
+  besaranHonorarium                  Decimal?       @map("besaran_honorarium") @db.Decimal(10, 0) // bersifat historis, karena bisa saja berubah sesuai dengan jenis honorarium yang ada di sbm_honorarium
   jumlahJamPelajaran                 Decimal?       @map("jumlah_jam_pelajaran") @db.Decimal(5, 2) // bisa saja berbeda dengan jumlah jam pelajaran yang ada di tabel jadwal
   dokumenKonfirmasiKesediaanMengajar String?        @map("dokumen_konfirmasi_kesediaan_mengajar")
-  pajakDPP                           Decimal        @map("pajak_dpp") @db.Decimal(10, 0)
-  pajakTarif                         Decimal        @map("pajak_tarif") @db.Decimal(5, 2)
-  pph21                              Decimal        @map("pph_21") @db.Decimal(5, 2)
-  jumlahPembayaran                   Decimal        @map("jumlah_diterima") @db.Decimal(10, 2)
+  pajakDPP                           Decimal?       @map("pajak_dpp") @db.Decimal(10, 0)
+  pajakTarif                         Decimal?       @map("pajak_tarif") @db.Decimal(5, 2)
+  pph21                              Decimal?       @map("pph_21") @db.Decimal(5, 2)
+  jumlahPembayaran                   Decimal?       @map("jumlah_diterima") @db.Decimal(10, 2)
   createdBy                          String         @map("created_by")
   createdAt                          DateTime       @default(now()) @map("created_at")
   updatedBy                          String?        @map("updated_by")
