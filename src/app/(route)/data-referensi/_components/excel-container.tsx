@@ -51,7 +51,10 @@ const ExcelContainer = ({
 
   const handleOnChange = (parseExcelResult: ParseExcelResult) => {
     console.log("parseExcelResult", parseExcelResult);
-    if (parseExcelResult.rows.length > 0) {
+    if (
+      parseExcelResult.rows.length > 0 ||
+      parseExcelResult.missingColumns.length > 0
+    ) {
       setData(parseExcelResult.rows);
 
       // check if there is no missing columns and empty values
@@ -64,6 +67,10 @@ const ExcelContainer = ({
       setAllowEmpty(allowEmpty);
       setEmptyValues(parseExcelResult.emptyValues);
       setMissingColumns(parseExcelResult.missingColumns);
+      console.log(
+        "parseExcelResult.missingColumns",
+        parseExcelResult.missingColumns
+      );
 
       // if there is no shouldNotEmpty, pass the data to parent component
       if (Object.keys(shouldNotEmpty).length === 0) {
@@ -75,7 +82,7 @@ const ExcelContainer = ({
       });
       onParse(finalResult);
     } else {
-      console.log("Data is empty");
+      console.log("[parseExcelResult] is empty");
       // Clear data when value is empty
       onParse(null);
       parentOnChange && parentOnChange(null);
@@ -112,7 +119,7 @@ const ExcelContainer = ({
         extractFromColumns={extractFromColumns}
       />
 
-      {Object.keys(emptyValues).length > 0 && (
+      {(Object.keys(emptyValues).length > 0 || missingColumns.length > 0) && (
         <WarningOnEmpty
           shouldNotEmpty={shouldNotEmpty}
           allowEmpty={allowEmpty}
@@ -151,7 +158,7 @@ const WarningOnEmpty = ({
             <div>Terdapat kolom yang hilang</div>
             <div className="font-bold">Kolom yang harus ditambahkan</div>
 
-            <ul>
+            <ul className="flex flex-wrap gap-2">
               {missingColumns.map((col) => (
                 <li key={col}>{col}</li>
               ))}
