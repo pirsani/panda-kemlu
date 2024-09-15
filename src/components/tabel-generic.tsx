@@ -8,6 +8,7 @@ import {
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  Row,
   SortingState,
   Table,
   useReactTable,
@@ -19,8 +20,10 @@ import {
   ChevronRight,
   Delete,
   Pencil,
+  Save,
   Trash,
   Trash2,
+  Undo2,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -29,6 +32,7 @@ declare module "@tanstack/react-table" {
   // @ts-expect-error
   interface ColumnMeta<TData extends RowData, TValue> {
     rowSpan?: number;
+    isKolomAksi?: boolean;
   }
 }
 
@@ -36,21 +40,81 @@ interface TabelGenericProps<T> {
   data: T[];
   columns: ColumnDef<T>[];
   frozenColumnCount?: number;
+  isEditing?: boolean;
+  editableRowId?: string | null;
 }
 
 export const TabelGeneric = <T,>({
-  data,
+  data: initialData,
   columns,
   frozenColumnCount = 1,
+  isEditing = false,
+  editableRowId = null,
 }: TabelGenericProps<T>) => {
+  const [data, setData] = useState(initialData); // Assuming `initialData` is your table data
+  //const [isEditing, setIsEditing] = useState(initialIsEditing);
+  // const [editableRowId, setEditableRowId] = useState<string | null>(
+  //   initialEditableRowId
+  // );
+
   const [pageSize, setPageSize] = useState(10); // Set the initial page size
   const [pageIndex, setPageIndex] = useState(0); // Set the initial page index
   const [sorting, setSorting] = useState<SortingState>([]); // Explicitly define SortingState
+  const [editingCell, setEditingCell] = useState<{
+    rowIndex: number;
+    columnId: string;
+  } | null>(null);
+  const [updatedValues, setUpdatedValues] = useState<{ [key: string]: any }>(
+    {}
+  );
 
-  const [stickyLeft, setStickyLeft] = useState<number>(0);
+  const handleCellEdit = (rowIndex: number, columnId: string, value: any) => {
+    setEditingCell({ rowIndex, columnId });
+    setUpdatedValues((prev) => ({
+      ...prev,
+      [`${rowIndex}-${columnId}`]: value,
+    }));
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    rowIndex: number,
+    columnId: string
+  ) => {
+    const { value } = e.target;
+    setUpdatedValues((prev) => ({
+      ...prev,
+      [`${rowIndex}-${columnId}`]: value,
+    }));
+  };
+
+  // Handle saving the updated value
+  const handleSave = (rowIndex: number, columnId: string) => {
+    // Update the data with the new value
+    const key = `${rowIndex}-${columnId}`;
+    if (updatedValues[key] === undefined) {
+      return;
+    }
+    const updatedRow = {
+      ...data[rowIndex],
+      [columnId]: updatedValues[`${rowIndex}-${columnId}`],
+    };
+
+    // Update the data array with the modified row
+    const updatedData = [...data];
+    updatedData[rowIndex] = updatedRow;
+
+    setData(updatedData); // Update the table data
+    //setEditableRowId(null); // Exit edit mode for the row
+    setUpdatedValues({}); // Clear the updated values
+    console.log("updatedData", updatedData);
+  };
+
+  const handleCancel = () => {
+    setEditingCell(null);
+  };
+
   const [cumulativeWidths, setCumulativeWidths] = useState<number[]>([]);
-  const col1Ref = useRef<HTMLTableCellElement>(null);
-  const col2Ref = useRef<HTMLTableCellElement>(null);
   const colRefs = useRef<HTMLTableCellElement[]>([]);
 
   const table = useReactTable({
@@ -94,16 +158,19 @@ export const TabelGeneric = <T,>({
       setCumulativeWidths(cumulativeWidths);
       console.log("cumulativeWidths", cumulativeWidths);
     }
-
-    if (col1Ref.current && col2Ref.current) {
-      const col1Width = col1Ref.current.getBoundingClientRect().width;
-      const col2Width = col2Ref.current.getBoundingClientRect().width;
-      setStickyLeft(col1Width);
-      console.log(col1Width, col2Width);
-      console.log("stickyLeft", col1Width + col2Width);
-    }
   }, [frozenColumnCount, colRefs]); // Only run when frozen column count or refs change
   //[table.getRowModel().rows]); // Recalculate when rows change
+
+  useEffect(() => {
+    console.log("is Editing", isEditing);
+    console.log("editableRowId", editableRowId);
+    // setEditableRowId(initialEditableRowId);
+    // setIsEditing(initialIsEditing);
+  }, [isEditing, editableRowId]);
+
+  useEffect(() => {
+    setData(initialData);
+  }, [initialData]);
 
   return (
     <div>
@@ -222,38 +289,60 @@ export const TabelGeneric = <T,>({
                         : undefined
                     }
                   >
-                    {cell.column.id === "rowNumber"
-                      ? rowIndex + 1 + pageSize * pageIndex
-                      : flexRender(
+                    {(() => {
+                      if (cell.column.id === "rowNumber") {
+                        // Display the row number, considering pagination
+                        return rowIndex + 1 + pageSize * pageIndex;
+                      }
+
+                      if (cell.column.id === "_additionalKolomAksi") {
+                        // Always render the "aksi" column with flexRender
+                        if (isEditing && editableRowId !== row.id) {
+                          return null;
+                        }
+                        return flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
-                        )}
+                        );
+                      }
+
+                      if (isEditing && editableRowId === row.id) {
+                        // If in edit mode, render an editable input
+                        return (
+                          <input
+                            type="text"
+                            value={
+                              updatedValues[`${rowIndex}-${cell.column.id}`] !==
+                              undefined
+                                ? updatedValues[`${rowIndex}-${cell.column.id}`]
+                                : String(cell.getValue() || "")
+                            }
+                            onChange={(e) =>
+                              handleChange(e, rowIndex, cell.column.id)
+                            }
+                            onBlur={() => handleSave(rowIndex, cell.column.id)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter")
+                                handleSave(rowIndex, cell.column.id);
+                              if (e.key === "Escape") handleCancel();
+                            }}
+                            // autoFocus
+                            className="p-2"
+                          />
+                        );
+                      }
+
+                      // Display the cell value if not in edit mode
+                      return flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      );
+                    })()}
                   </td>
                 ))}
               </tr>
             ))}
           </tbody>
-          {/* <tfoot>
-          {table.getFooterGroups().map((footerGroup) => (
-            <tr key={footerGroup.id} className="even:bg-gray-50">
-              {footerGroup.headers.map((header, index) => (
-                <td
-                  key={header.id}
-                  className={`p-2 border border-gray-300 ${
-                    index < frozenColumnCount ? "sticky left-0 bg-white z-10" : ""
-                  } ${index === 2 ? "left-40" : "left-0"}`} // Adjust based on column width
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.footer,
-                        header.getContext()
-                      )}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tfoot> */}
         </table>
       </div>
       <PaginationControls table={table} />
@@ -332,26 +421,67 @@ export const PaginationControls = <T,>({
 
 export const KolomAksi = <T,>(
   info: CellContext<T, unknown>,
-  onEdit?: (row: T) => void,
-  onDelete?: (row: T) => void
+  onEdit?: (row: Row<T>) => void,
+  onDelete?: (row: T) => void,
+  onSave?: (row: T) => void,
+  onUndo?: (row: T) => void,
+  isEditing?: boolean
 ) => {
+  const [oldRow, setOldRow] = useState<T>(info.row.original);
+
+  const handleOnClickEdit = () => {
+    console.log("Edit clicked");
+    onEdit && onEdit(info.row);
+  };
+
+  const handleOnClickSave = () => {
+    console.log("Save clicked");
+    onSave && onSave(info.row.original);
+  };
+
+  const handleOnClickDelete = () => {
+    console.log("Delete clicked");
+    onDelete && onDelete(info.row.original);
+  };
+
+  const handleOnClickUndo = () => {
+    onUndo && onUndo(oldRow);
+    console.log("Undo clicked");
+  };
+
   return (
-    <div className="flex gap-2">
-      <Button
-        variant="secondary"
-        size="sm"
-        onClick={() => onEdit && onEdit(info.row.original)}
-      >
-        <Pencil size={20} />
-      </Button>
-      <Button
-        variant="secondary"
-        size="sm"
-        onClick={() => onDelete && onDelete(info.row.original)}
-      >
-        <Trash2 size={20} />
-      </Button>
-    </div>
+    <>
+      {isEditing && (
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="bg-blue-600 hover:bg-blue-700 text-white hover:text-white"
+            onClick={handleOnClickSave}
+          >
+            <Save size={20} />
+          </Button>
+          <Button
+            variant="outline"
+            size={"sm"}
+            className="bg-green-600 hover:bg-green-700 text-white hover:text-white"
+            onClick={handleOnClickUndo}
+          >
+            <Undo2 size={20} />
+          </Button>
+        </div>
+      )}
+      {!isEditing && (
+        <div className="flex gap-2">
+          <Button variant="secondary" size="sm" onClick={handleOnClickEdit}>
+            <Pencil size={20} />
+          </Button>
+          <Button variant="secondary" size="sm" onClick={handleOnClickDelete}>
+            <Trash2 size={20} />
+          </Button>
+        </div>
+      )}
+    </>
   );
 };
 

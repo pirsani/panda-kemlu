@@ -154,7 +154,7 @@ async function saveDataSbmHonorariumToDatabase(
 
 export const deleteDataSbmHonorarium = async (
   id: number
-): Promise<ActionResponse<SbmHonorarium>> => {
+): Promise<ActionResponse<SbmHonorariumWithNumber>> => {
   // check user permission
   // if (!userCanDeleteData) {}
 
@@ -164,11 +164,17 @@ export const deleteDataSbmHonorarium = async (
         id,
       },
     });
-    console.log("[deleted]", deleted);
-    revalidatePath("/data-referensi/sbm/honorarium");
+
+    const convertedData = {
+      ...deleted,
+      besaran: deleted.besaran.toNumber(), // Convert Decimal to number
+    };
+    revalidatePath("/data-referensi/sbm/honorarium", "page");
+    console.log("[deleted]", convertedData);
+
     return {
       success: true,
-      data: deleted,
+      data: convertedData,
       message: "Data sbmHonorarium berhasil dihapus",
     };
   } catch (error) {
