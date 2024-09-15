@@ -1,3 +1,4 @@
+import simpanNarasumber from "@/actions/narasumber";
 import FormNarasumber from "@/components/form/form-narasumber";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,8 +22,35 @@ const TambahNarasumber = () => {
 
   const onSubmit = async (data: Narasumber) => {
     // Call API to save data
-    // Close dialog
+    // convert data dari zod schema ke FormData, g bisa langsung karena ada file, klo tidak ada file bisa langsung simpan data
+    const formData = new FormData();
+    // append the data to the form data
+    // formData.append("data", JSON.stringify(dataWithoutFile));
+    // dataWithoutFile
+    const { dokumenPeryataanRekeningBerbeda, ...dataWithoutFile } = data;
+    for (const [key, value] of Object.entries(dataWithoutFile)) {
+      if (typeof value === "string") {
+        formData.append(key, value);
+      } else {
+        formData.append(key, JSON.stringify(value));
+      }
+    }
+
+    formData.append(
+      "dokumenPeryataanRekeningBerbeda",
+      dokumenPeryataanRekeningBerbeda as File
+    );
+    const simpan = await simpanNarasumber(formData);
+    if (!simpan.success) {
+      console.error("Error saving narasumber:", simpan.error);
+      alert(`Gagal menyimpan narasumber ${simpan.message}`);
+      return;
+    } else {
+      alert("Berhasil menyimpan narasumber");
+      console.log("Berhasil menyimpan narasumber");
+    }
     console.log(data);
+    // Close dialog
     setOpen(false);
   };
 

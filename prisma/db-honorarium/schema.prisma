@@ -107,26 +107,27 @@ model PangkatGolongan {
 }
 
 model Narasumber {
-  id                String             @id // id narasumber adalah NIK
-  nama              String
-  NIP               String?            @map("nip")
-  NPWP              String?            @map("npwp")
-  jabatan           String?
-  eselon            String?
-  pangkatGolonganId String?            @map("pangkat_golongan_id")
-  pangkatGolongan   PangkatGolongan?   @relation(fields: [pangkatGolonganId], references: [id])
-  jenisHonorariumId Int?               @map("jenis_honorarium_id") // ini hanya jadi catatan jenis yang sekarang saat pengajuan,bisa saja berubah krn kenaikan pangkat dll,  sehingga ketika pencatatan transaksi honorarium harus diacu ke jenis honorarium yg ada di sbm_honorarium dan dicatat di tabel jadwal_narasumber
-  jenisHonorarium   SbmHonorarium?     @relation(fields: [jenisHonorariumId], references: [id])
-  email             String?
-  nomorTelepon      String?            @map("nomor_telepon")
-  bank              String?
-  namaRekening      String?            @map("nama_rekening")
-  nomorRekening     String?            @map("nomor_rekening")
-  createdBy         String             @map("created_by")
-  createdAt         DateTime           @default(now()) @map("created_at")
-  updatedBy         String?            @map("updated_by")
-  updatedAt         DateTime?          @updatedAt @map("updated_at")
-  JadwalNarasumber  JadwalNarasumber[]
+  id                              String             @id // id narasumber adalah NIK
+  nama                            String
+  NIP                             String?            @map("nip")
+  NPWP                            String?            @map("npwp")
+  jabatan                         String?
+  eselon                          String?
+  pangkatGolonganId               String?            @map("pangkat_golongan_id")
+  pangkatGolongan                 PangkatGolongan?   @relation(fields: [pangkatGolonganId], references: [id])
+  jenisHonorariumId               Int?               @map("jenis_honorarium_id") // ini hanya jadi catatan jenis yang sekarang saat pengajuan,bisa saja berubah krn kenaikan pangkat dll,  sehingga ketika pencatatan transaksi honorarium harus diacu ke jenis honorarium yg ada di sbm_honorarium dan dicatat di tabel jadwal_narasumber
+  jenisHonorarium                 SbmHonorarium?     @relation(fields: [jenisHonorariumId], references: [id])
+  email                           String?
+  nomorTelepon                    String?            @map("nomor_telepon")
+  bank                            String?
+  namaRekening                    String?            @map("nama_rekening")
+  nomorRekening                   String?            @map("nomor_rekening")
+  dokumenPeryataanRekeningBerbeda String?            @map("dokumen_peryataan_rekening_berbeda")
+  createdBy                       String             @map("created_by")
+  createdAt                       DateTime           @default(now()) @map("created_at")
+  updatedBy                       String?            @map("updated_by")
+  updatedAt                       DateTime?          @updatedAt @map("updated_at")
+  JadwalNarasumber                JadwalNarasumber[]
 
   @@map("narasumber")
 }

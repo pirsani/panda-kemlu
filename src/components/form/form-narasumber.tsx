@@ -200,7 +200,7 @@ const FormNarasumber = ({
           />
         </div>
         <FormField
-          name="pernyataanBedaRekening"
+          name="dokumenPeryataanRekeningBerbeda"
           control={control}
           render={({ field }) => (
             <FormItem>
@@ -224,7 +224,7 @@ const FormNarasumber = ({
           )}
         >
           <Button type="submit">Submit</Button>
-          <Button type="button" onClick={onCancel}>
+          <Button type="button" variant={"outline"} onClick={onCancel}>
             Cancel
           </Button>
         </div>

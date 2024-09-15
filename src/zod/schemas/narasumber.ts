@@ -48,7 +48,7 @@ export const narasumberSchema = z.object({
   bank: z.string(),
   namaRekening: z.string(),
   nomorRekening: z.string(),
-  pernyataanBedaRekening: fileSchema({ required: false }),
+  dokumenPeryataanRekeningBerbeda: fileSchema({ required: false }),
 });
 
 export type Narasumber = z.infer<typeof narasumberSchema>;

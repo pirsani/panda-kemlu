@@ -1,9 +1,9 @@
+import TambahNarasumber from "@/approute/data-referensi/narasumber/_components/tambah-narasumber";
 import DaftarJadwal from "@/components/kegiatan/honorarium/daftar-jadwal";
 import { Kegiatan } from "@prisma-honorarium/client";
 import TambahJadwalContainer from "./tambah-jadwal-container";
 import TambahKelasContainer from "./tambah-kelas-container";
 import TambahMateriContainer from "./tambah-materi-container";
-import TambahNarasumber from "./tambah-narasumber";
 
 interface HonorariumContainerProps {
   kegiatan: Kegiatan;
