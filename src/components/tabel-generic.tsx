@@ -13,7 +13,15 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import Decimal from "decimal.js";
-import { ArrowDownUp, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ArrowDownUp,
+  ChevronLeft,
+  ChevronRight,
+  Delete,
+  Pencil,
+  Trash,
+  Trash2,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 // <https://github.com/TanStack/table/discussions/5051
@@ -166,7 +174,7 @@ export const TabelGeneric = <T,>({
                           )}
                         </span>
                         {/* Sorting icon only for non-grouped columns */}
-                        {!isGroupHeader && (
+                        {!isGroupHeader && header.column.getCanSort() && (
                           <span className="hover:cursor-pointer">
                             {(() => {
                               const sortOrder = header.column.getIsSorted();
@@ -318,6 +326,31 @@ export const PaginationControls = <T,>({
           </option>
         ))}
       </select>
+    </div>
+  );
+};
+
+export const KolomAksi = <T,>(
+  info: CellContext<T, unknown>,
+  onEdit?: (row: T) => void,
+  onDelete?: (row: T) => void
+) => {
+  return (
+    <div className="flex gap-2">
+      <Button
+        variant="secondary"
+        size="sm"
+        onClick={() => onEdit && onEdit(info.row.original)}
+      >
+        <Pencil size={20} />
+      </Button>
+      <Button
+        variant="secondary"
+        size="sm"
+        onClick={() => onDelete && onDelete(info.row.original)}
+      >
+        <Trash2 size={20} />
+      </Button>
     </div>
   );
 };

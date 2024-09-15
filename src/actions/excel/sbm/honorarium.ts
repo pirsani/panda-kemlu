@@ -151,3 +151,31 @@ async function saveDataSbmHonorariumToDatabase(
     throw new Error("Error saving data to database");
   }
 }
+
+export const deleteDataSbmHonorarium = async (
+  id: number
+): Promise<ActionResponse<SbmHonorarium>> => {
+  // check user permission
+  // if (!userCanDeleteData) {}
+
+  try {
+    const deleted = await dbHonorarium.sbmHonorarium.delete({
+      where: {
+        id,
+      },
+    });
+    console.log("[deleted]", deleted);
+    revalidatePath("/data-referensi/sbm/honorarium");
+    return {
+      success: true,
+      data: deleted,
+      message: "Data sbmHonorarium berhasil dihapus",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: "Error deleting data from database",
+      message: "Error deleting data from database",
+    };
+  }
+};

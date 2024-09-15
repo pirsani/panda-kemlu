@@ -1,6 +1,8 @@
 "use client";
+import { deleteDataSbmHonorarium } from "@/actions/excel/sbm/honorarium";
 import {
   formatCurrency,
+  KolomAksi,
   PaginationControls,
   TabelGeneric,
 } from "@/components/tabel-generic";
@@ -59,7 +61,33 @@ const columns: ColumnDef<SbmHonorariumWithNumber>[] = [
     header: "Tahun",
     cell: (info) => info.getValue(),
   },
+  {
+    accessorKey: "aksi",
+    header: "Aksi",
+    cell: (info) =>
+      KolomAksi<SbmHonorariumWithNumber>(info, handleEdit, handleDelete),
+    enableSorting: false, // Disable sorting for this column
+  },
 ];
+
+const handleEdit = (row: SbmHonorariumWithNumber) => {
+  console.log("Edit row:", row);
+  // Implement your edit logic here
+};
+
+const handleDelete = async (row: SbmHonorariumWithNumber) => {
+  console.log("Delete row:", row);
+  const cfm = confirm(
+    `Apakah Anda yakin ingin menghapus data ${row.jenis} ${row.uraian}?`
+  );
+  if (cfm) {
+    const deleted = await deleteDataSbmHonorarium(row.id);
+    //alert(deleted.message);
+  } else {
+    console.log("Data tidak dihapus");
+  }
+  // Implement your delete logic here
+};
 
 interface TabelSbmHonorariumProps {
   data: SbmHonorariumWithNumber[];
