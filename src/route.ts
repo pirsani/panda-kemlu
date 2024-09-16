@@ -130,9 +130,9 @@ export const dataReferensiRoutes: RouteItem[] = [
     displayAsMenu: true,
   },
   {
-    name: "referensi-pejabat-penandatangan",
-    title: "Pejabat Penandatangan",
-    href: "/data-referensi/pejabat-penandatangan",
+    name: "referensi-pejabat-perbendaharan",
+    title: "Pejabat Perbendaharaan",
+    href: "/data-referensi/pejabat-perbendaharan",
     icon: "signature",
     order: 6,
     displayAsMenu: true,
