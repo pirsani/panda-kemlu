@@ -40,7 +40,7 @@ const seedProvinsi = async (): Promise<void> => {
                 tahun: parseInt(row.tahun),
                 kode: parseInt(row.kode),
                 nama: row.nama,
-                namaSingkatan: row.nama_singkatan || null,
+                singkatan: row.nama_singkatan || null,
                 aktif: row.aktif === "true",
                 createdBy: row.created_by,
                 createdAt: new Date(row.created_at),
@@ -76,8 +76,10 @@ const deleteExisting = async (): Promise<void> => {
     await dbHonorarium.dokumenSuratTugas.deleteMany({});
     await dbHonorarium.pesertaKegiatan.deleteMany({});
     await dbHonorarium.kegiatan.deleteMany({});
+    await dbHonorarium.pejabatPerbendaharaan.deleteMany({});
+    await dbHonorarium.jenisJabatanPerbendaharaan.deleteMany({});
     await dbHonorarium.sbmHonorarium.deleteMany({});
-    await dbHonorarium.unitKerja.deleteMany({});
+    await dbHonorarium.organisasi.deleteMany({});
     await dbHonorarium.jenisDokumenKegiatan.deleteMany({});
     await dbHonorarium.materi.deleteMany({});
     await dbHonorarium.narasumber.deleteMany({});
@@ -176,36 +178,104 @@ async function main() {
     ],
   });
 
-  // Truncate the table
-  const unitKerja = await dbHonorarium.unitKerja.createMany({
+  // INITIATE ORGANISASI
+  // UPT sekdilu dasar hukumnya apa ?
+  const organisasi = await dbHonorarium.organisasi.createMany({
     data: [
       {
-        nama: "Tata Usaha",
-        namaSingkatan: "TU",
+        nama: "Kementerian Luar Negeri",
+        singkatan: "Kemlu",
         createdBy: "init",
       },
       {
-        nama: "PPE",
-        namaSingkatan: "PPE",
+        nama: "Sekretariat Jenderal",
+        singkatan: "Setjen",
+        eselon: 1,
         createdBy: "init",
+      },
+      {
+        nama: "Pusat Pendidikan dan Pelatihan",
+        singkatan: "Pusdiklat",
+        createdBy: "init",
+        eselon: 2,
+      },
+      {
+        nama: "Bidang Perencanaan, Pengembangan, dan Evaluasi",
+        singkatan: "PPE",
+        createdBy: "init",
+      },
+      {
+        nama: "Bidang Pendidikan dan Pelatihan Nondiplomatik",
+        singkatan: "PPN",
+        createdBy: "init",
+      },
+      {
+        nama: "Bidang Pendidikan dan Pelatihan Teknis",
+        singkatan: "PPT",
+        createdBy: "init",
+      },
+      {
+        nama: "Bidang Kerja Sama Pendidikan dan Pelatihan",
+        singkatan: "KSPP",
+        createdBy: "init",
+      },
+      {
+        nama: "Tata Usaha",
+        singkatan: "TU",
+        createdBy: "init",
+        eselon: 3,
       },
       {
         nama: "UPT Sekdilu",
-        namaSingkatan: "UPT Sekdilu",
+        singkatan: "UPT Sekdilu",
         createdBy: "init",
       },
       {
         nama: "UPT Sesdilu",
-        namaSingkatan: "UPT Sesdilu ",
+        singkatan: "UPT Sesdilu ",
         createdBy: "init",
       },
       {
         nama: "UPT Sesparlu",
-        namaSingkatan: "UPT Sesparlu",
+        singkatan: "UPT Sesparlu",
         createdBy: "init",
       },
     ],
   });
+
+  const jenisPejabatPerbendaharaan =
+    await dbHonorarium.jenisJabatanPerbendaharaan.createMany({
+      data: [
+        {
+          id: "KPA",
+          nama: "Kuasa Pengguna Anggaran",
+          singkatan: "KPA",
+          createdBy: "init",
+        },
+        {
+          id: "PPK",
+          nama: "Pejabat Pembuat Komitmen",
+          singkatan: "PPK",
+          createdBy: "init",
+        },
+        {
+          id: "PPSPM",
+          nama: "Pejabat Penandatangan Surat Perintah Membayar ",
+          singkatan: "PPSPM",
+          createdBy: "init",
+        },
+        {
+          id: "bendahara-pengeluaran",
+          nama: "Bendahara Pengeluaran",
+          createdBy: "init",
+        },
+        {
+          id: "bendahara-penerimaan",
+          nama: "Bendahara Penerimaan",
+          createdBy: "init",
+        },
+      ],
+    });
 
   // Truncate the table
   const role = await dbHonorarium.role.createMany({
@@ -269,7 +339,7 @@ async function main() {
       lokasi: LOKASI.LUAR_KOTA,
       dokumenNodinMemoSk: "123456789.pdf",
       dokumenJadwal: "123456789.pdf",
-      //unitKerjaId: "1",
+      //organisasiId: "1",
       provinsiId: 18,
       status: "setup-kegiatan",
     },
@@ -285,7 +355,7 @@ async function main() {
       lokasi: LOKASI.LUAR_NEGERI,
       dokumenNodinMemoSk: "123456789.pdf",
       dokumenJadwal: "123456789.pdf",
-      //unitKerjaId: "1",
+      //organisasiId: "1",
       status: "setup-kegiatan",
     },
   });
@@ -300,7 +370,7 @@ async function main() {
       lokasi: LOKASI.DALAM_KOTA,
       dokumenNodinMemoSk: "123456789.pdf",
       dokumenJadwal: "123456789.pdf",
-      //unitKerjaId: "1",
+      //organisasiId: "1",
       status: "setup-kegiatan",
     },
   });
