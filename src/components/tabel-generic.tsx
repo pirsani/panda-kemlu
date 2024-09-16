@@ -26,14 +26,12 @@ import {
   Undo2,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { Input } from "./ui/input";
 
 // <https://github.com/TanStack/table/discussions/5051
-declare module "@tanstack/react-table" {
-  // @ts-expect-error
-  interface ColumnMeta<TData extends RowData, TValue> {
-    rowSpan?: number;
-    isKolomAksi?: boolean;
-  }
+
+interface RowData {
+  [key: string]: any; // Replace with actual field names and types if known
 }
 
 interface TabelGenericProps<T> {
@@ -77,7 +75,7 @@ export const TabelGeneric = <T,>({
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     rowIndex: number,
     columnId: string
   ) => {
@@ -209,7 +207,7 @@ export const TabelGeneric = <T,>({
                       colSpan={header.colSpan}
                       rowSpan={rowSpan}
                       className={cn(
-                        "p-2 border border-gray-300",
+                        "px-2 border border-gray-300",
                         !isGroupHeader
                           ? "hover:cursor-pointer bg-gray-50"
                           : "bg-gray-100",
@@ -267,79 +265,138 @@ export const TabelGeneric = <T,>({
           <tbody>
             {table.getRowModel().rows.map((row, rowIndex) => (
               <tr key={row.id} className="odd:bg-white even:bg-gray-50">
-                {row.getVisibleCells().map((cell, index) => (
-                  <td
-                    key={cell.id}
-                    ref={(el) => {
-                      if (
-                        index < frozenColumnCount &&
-                        el instanceof HTMLTableCellElement
-                      ) {
-                        colRefs.current[index] = el;
-                      }
-                    }}
-                    className={cn("p-2 border border-gray-300 ", {
-                      [`sticky left-0 bg-gray-100 z-${10 - index}`]:
-                        index < frozenColumnCount, // Sticky columns
-                      "left-0": index >= frozenColumnCount, // Default position for other columns
-                    })}
-                    style={
-                      index < frozenColumnCount
-                        ? { left: `${cumulativeWidths[index] || 0}px` }
-                        : undefined
-                    }
-                  >
-                    {(() => {
-                      if (cell.column.id === "rowNumber") {
-                        // Display the row number, considering pagination
-                        return rowIndex + 1 + pageSize * pageIndex;
-                      }
-
-                      if (cell.column.id === "_additionalKolomAksi") {
-                        // Always render the "aksi" column with flexRender
-                        if (isEditing && editableRowId !== row.id) {
-                          return null;
+                {row.getVisibleCells().map((cell, index) => {
+                  const field = cell.column.columnDef.meta?.field;
+                  //This will ensure TypeScript understands that row.original can be indexed by a string.
+                  const fieldValue = field
+                    ? (row.original as RowData)[field]
+                    : undefined;
+                  return (
+                    <td
+                      key={cell.id}
+                      ref={(el) => {
+                        if (
+                          index < frozenColumnCount &&
+                          el instanceof HTMLTableCellElement
+                        ) {
+                          colRefs.current[index] = el;
                         }
+                      }}
+                      className={cn("px-2 border border-gray-300 ", {
+                        [`sticky left-0 bg-gray-100 z-${10 - index}`]:
+                          index < frozenColumnCount, // Sticky columns
+                        "left-0": index >= frozenColumnCount, // Default position for other columns
+                      })}
+                      style={
+                        index < frozenColumnCount
+                          ? { left: `${cumulativeWidths[index] || 0}px` }
+                          : undefined
+                      }
+                    >
+                      {(() => {
+                        if (cell.column.id === "rowNumber") {
+                          // Display the row number, considering pagination
+                          return rowIndex + 1 + pageSize * pageIndex;
+                        }
+
+                        if (cell.column.id === "_additionalKolomAksi") {
+                          // Always render the "aksi" column with flexRender
+                          if (isEditing && editableRowId !== row.id) {
+                            return null;
+                          }
+                          return flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          );
+                        }
+
+                        if (isEditing && editableRowId === row.id) {
+                          // If in edit mode, render an editable input
+                          console.log(
+                            "cell.column.columnDef.meta",
+                            cell.column.columnDef.meta
+                          );
+                          if (
+                            cell.column.columnDef.meta?.inputType === "select"
+                          ) {
+                            return (
+                              <select
+                                value={
+                                  updatedValues[
+                                    `${rowIndex}-${cell.column.id}`
+                                  ] !== undefined
+                                    ? updatedValues[
+                                        `${rowIndex}-${cell.column.id}`
+                                      ]
+                                    : String(fieldValue || "")
+                                }
+                                onChange={(e) => {
+                                  handleChange(e, rowIndex, cell.column.id);
+                                  //console.log("e", e);
+                                }}
+                                onBlur={() =>
+                                  handleSave(rowIndex, cell.column.id)
+                                }
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter")
+                                    handleSave(rowIndex, cell.column.id);
+                                  if (e.key === "Escape") handleCancel();
+                                }}
+                                // autoFocus
+                                className="p-2"
+                              >
+                                {cell.column.columnDef.meta?.options?.map(
+                                  (option) => (
+                                    <option
+                                      key={option.value}
+                                      value={option.value}
+                                    >
+                                      {option.label}
+                                    </option>
+                                  )
+                                )}
+                              </select>
+                            );
+                          }
+
+                          return (
+                            <input
+                              type="text"
+                              value={
+                                updatedValues[
+                                  `${rowIndex}-${cell.column.id}`
+                                ] !== undefined
+                                  ? updatedValues[
+                                      `${rowIndex}-${cell.column.id}`
+                                    ]
+                                  : String(cell.getValue() || "")
+                              }
+                              onChange={(e) =>
+                                handleChange(e, rowIndex, cell.column.id)
+                              }
+                              onBlur={() =>
+                                handleSave(rowIndex, cell.column.id)
+                              }
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter")
+                                  handleSave(rowIndex, cell.column.id);
+                                if (e.key === "Escape") handleCancel();
+                              }}
+                              // autoFocus
+                              className="px-2 m-0 h-10 border border-blue-700 w-auto min-w-10"
+                            />
+                          );
+                        }
+
+                        // Display the cell value if not in edit mode
                         return flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
                         );
-                      }
-
-                      if (isEditing && editableRowId === row.id) {
-                        // If in edit mode, render an editable input
-                        return (
-                          <input
-                            type="text"
-                            value={
-                              updatedValues[`${rowIndex}-${cell.column.id}`] !==
-                              undefined
-                                ? updatedValues[`${rowIndex}-${cell.column.id}`]
-                                : String(cell.getValue() || "")
-                            }
-                            onChange={(e) =>
-                              handleChange(e, rowIndex, cell.column.id)
-                            }
-                            onBlur={() => handleSave(rowIndex, cell.column.id)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter")
-                                handleSave(rowIndex, cell.column.id);
-                              if (e.key === "Escape") handleCancel();
-                            }}
-                            // autoFocus
-                            className="p-2"
-                          />
-                        );
-                      }
-
-                      // Display the cell value if not in edit mode
-                      return flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      );
-                    })()}
-                  </td>
-                ))}
+                      })()}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>
@@ -369,7 +426,7 @@ export const PaginationControls = <T,>({
   };
 
   return (
-    <div className="my-2 flex flex-row gap-0 sm:gap-2 items-center">
+    <div className="my-2 flex flex-row gapx-2 sm:gap-2 items-center">
       {/* Pagination controls */}
       <Button
         variant={"outline"}

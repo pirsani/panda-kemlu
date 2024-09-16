@@ -29,9 +29,13 @@ const data: SbmUhDalamNegeriWithNumber[] = [];
 
 interface TabelSbmUhDalamNegeriProps {
   data: SbmUhDalamNegeriWithNumber[];
+  optionsProvinsi: { value: number; label: string }[];
+  frozenColumnCount?: number;
 }
 export const TabelSbmUhDalamNegeri = ({
   data: initialData,
+  optionsProvinsi,
+  frozenColumnCount = 2,
 }: TabelSbmUhDalamNegeriProps) => {
   const [data, setData] = useState<SbmUhDalamNegeriWithNumber[]>(initialData);
   const [isEditing, setIsEditing] = useState(false);
@@ -53,6 +57,11 @@ export const TabelSbmUhDalamNegeri = ({
       header: "Provinsi",
       cell: (info) => info.getValue(),
       footer: "Provinsi",
+      meta: {
+        inputType: "select",
+        options: optionsProvinsi,
+        field: "provinsiId",
+      },
     },
     {
       accessorKey: "satuan",
@@ -162,7 +171,7 @@ export const TabelSbmUhDalamNegeri = ({
     <TabelGeneric
       data={data}
       columns={columns}
-      frozenColumnCount={1}
+      frozenColumnCount={frozenColumnCount}
       isEditing={isEditing}
       editableRowId={editableRowId}
     />
