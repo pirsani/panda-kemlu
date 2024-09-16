@@ -172,7 +172,7 @@ export const TabelGeneric = <T,>({
 
   return (
     <div>
-      <div className="overflow-x-auto w-full">
+      <div className="overflow-x-auto w-full pb-6">
         <table className="min-w-full table-auto border-collapse border border-gray-300">
           <thead>
             {table.getHeaderGroups().map((headerGroup, index) => (
