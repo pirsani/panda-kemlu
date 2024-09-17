@@ -22,6 +22,9 @@ const golonganRuangEnum = z.enum([
   "IV/E",
 ]);
 
+// Generate the validation message with all available options
+const availableOptions = golonganRuangEnum.options.join(", ");
+const validationMessage = `Invalid Golongan/Ruang. Available options are: ${availableOptions}`;
 // Create a custom validation function to handle case insensitivity
 const golonganRuangSchema = z
   .string()
@@ -31,7 +34,7 @@ const golonganRuangSchema = z
       return golonganRuangEnum.options.includes(value as any);
     },
     {
-      message: "Invalid Golongan/Ruang",
+      message: validationMessage,
     }
   );
 

@@ -1,5 +1,9 @@
 "use client";
-import { deleteDataPejabatPerbendaharaan } from "@/actions/pejabat-perbendaharaan";
+import {
+  deleteDataPejabatPerbendaharaan,
+  simpanPejabatPerbendaharaan,
+} from "@/actions/pejabat-perbendaharaan";
+import ZodErrorList from "@/approute/data-referensi/_components/zod-error-list";
 import {
   formatCurrency,
   KolomAksi,
@@ -8,6 +12,10 @@ import {
 } from "@/components/tabel-generic";
 import { Button } from "@/components/ui/button";
 import { PejabatPerbendaharaanWithStringDate } from "@/data/pejabat-perbendaharaan";
+import {
+  pejabatPerbendaharaanSchema,
+  PejabatPerbendaharaan as ZPejabatPerbendaharaan,
+} from "@/zod/schemas/pejabat-perbendaharaan";
 import { PejabatPerbendaharaan } from "@prisma-honorarium/client";
 import {
   ColumnDef,
@@ -23,6 +31,7 @@ import {
 } from "@tanstack/react-table";
 import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
+import { ZodError } from "zod";
 
 const data: PejabatPerbendaharaanWithStringDate[] = [];
 
@@ -36,7 +45,7 @@ export const TabelPejabatPerbendaharaan = ({
   data: initialData,
   optionsJenisJabatan = [],
   optionsSatker = [],
-  frozenColumnCount = 2,
+  frozenColumnCount = 3,
 }: TabelPejabatPerbendaharaanProps) => {
   const [data, setData] =
     useState<PejabatPerbendaharaanWithStringDate[]>(initialData);
@@ -44,7 +53,7 @@ export const TabelPejabatPerbendaharaan = ({
   const [editableRowId, setEditableRowIndex] = useState<string | null>(null);
   const [originalData, setOriginalData] =
     useState<PejabatPerbendaharaanWithStringDate | null>(null);
-
+  const [errors, setErrors] = useState<ZodError | null>(null);
   const columnHelper =
     createColumnHelper<PejabatPerbendaharaanWithStringDate>();
 
@@ -67,11 +76,6 @@ export const TabelPejabatPerbendaharaan = ({
       },
     },
     {
-      accessorKey: "nama",
-      header: "Nama",
-      cell: (info) => info.getValue(),
-    },
-    {
       accessorKey: "jabatan.nama",
       header: "Jabatan",
       cell: (info) => info.getValue(),
@@ -83,19 +87,45 @@ export const TabelPejabatPerbendaharaan = ({
       },
     },
     {
+      accessorKey: "nama",
+      header: "Nama",
+      cell: (info) => info.getValue(),
+    },
+    {
+      accessorKey: "NIP",
+      header: "NIP",
+      cell: (info) => info.getValue(),
+    },
+    {
+      accessorKey: "pangkatGolonganId",
+      header: "Golongan/Ruang",
+      cell: (info) => info.getValue(),
+    },
+
+    {
+      accessorKey: "NIK",
+      header: "NIK",
+      cell: (info) => info.getValue(),
+    },
+
+    {
       accessorKey: "tmtMulai",
       header: "Tmt Mulai",
       cell: (info) => {
         const date = new Date(info.getValue() as string);
-        return format(date, "dd/MM/yyyy");
+        return format(date, "yyyy-MM-dd");
       },
     },
     {
       accessorKey: "tmtSelesai",
       header: "Tmt Selesai",
       cell: (info) => {
-        const date = new Date(info.getValue() as string);
-        return format(date, "dd/MM/yyyy");
+        if (info.getValue()) {
+          const date = new Date(info.getValue() as string);
+          return format(date, "yyyy-MM-dd");
+        } else {
+          return "Hingga saat ini";
+        }
       },
     },
     {
@@ -127,8 +157,27 @@ export const TabelPejabatPerbendaharaan = ({
   const handleOnSave = async (row: PejabatPerbendaharaanWithStringDate) => {
     console.log("Save row:", row);
     // Implement your save logic here
-    setIsEditing(false);
-    setEditableRowIndex(null);
+
+    try {
+      const parsed = pejabatPerbendaharaanSchema.parse(row);
+      const update = await simpanPejabatPerbendaharaan(parsed);
+      if (update.success) {
+        console.log("Data berhasil disimpan");
+        alert("Data berhasil disimpan");
+      } else {
+        console.error("Data gagal disimpan");
+        alert("Data gagal disimpan");
+      }
+      setEditableRowIndex(null);
+      setIsEditing(false);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        setErrors(error);
+      } else {
+        console.error("Error saving row:", error);
+      }
+      console.error("Error saving row:", error);
+    }
   };
 
   const handleUndoEdit = (row: PejabatPerbendaharaanWithStringDate) => {
@@ -139,6 +188,7 @@ export const TabelPejabatPerbendaharaan = ({
         prevData.map((item) => (item.id === row.id ? originalData : item))
       );
     }
+    setErrors(null);
     setIsEditing(false);
     setEditableRowIndex(null);
   };
@@ -168,12 +218,15 @@ export const TabelPejabatPerbendaharaan = ({
   }, [initialData]);
 
   return (
-    <TabelGeneric
-      data={data}
-      columns={columns}
-      frozenColumnCount={frozenColumnCount}
-      isEditing={isEditing}
-      editableRowId={editableRowId}
-    />
+    <>
+      {errors && <ZodErrorList error={errors} />}
+      <TabelGeneric
+        data={data}
+        columns={columns}
+        frozenColumnCount={frozenColumnCount}
+        isEditing={isEditing}
+        editableRowId={editableRowId}
+      />
+    </>
   );
 };

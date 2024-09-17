@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { PejabatPerbendaharaan } from "@/zod/schemas/pejabat-perbendaharaan";
+import { PejabatPerbendaharaan as ZPejabatPerbendaharaan } from "@/zod/schemas/pejabat-perbendaharaan";
 import { Contact, GraduationCap, Plus, Signature } from "lucide-react";
 import { useState } from "react";
 
@@ -20,24 +20,11 @@ export const DialogFormPejabatPerbendaharaan = () => {
     setOpen(false);
   };
 
-  const onSubmit = async (data: PejabatPerbendaharaan) => {
-    // Call API to save data
-    // convert data dari zod schema ke FormData, g bisa langsung karena ada file, klo tidak ada file bisa langsung simpan data
-    const formData = new FormData();
-    // append the data to the form data
-    // formData.append("data", JSON.stringify(dataWithoutFile));
-    // dataWithoutFile
-    for (const [key, value] of Object.entries(data)) {
-      if (typeof value === "string") {
-        formData.append(key, value);
-      } else {
-        formData.append(key, JSON.stringify(value));
-      }
-    }
-
-    const simpan = await simpanPejabatPerbendaharaan(formData);
+  const onSubmit = async (data: ZPejabatPerbendaharaan) => {
+    // tidak ada file makan tidak perlu diubah menjadi form data
+    const simpan = await simpanPejabatPerbendaharaan(data);
     if (!simpan.success) {
-      console.error("Error saving pejabatPerbendaharaan:", simpan.error);
+      console.error("Gagal menyimpan pejabatPerbendaharaan:", simpan.error);
       alert(`Gagal menyimpan pejabatPerbendaharaan ${simpan.message}`);
       return;
     } else {

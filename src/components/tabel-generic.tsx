@@ -80,6 +80,7 @@ export const TabelGeneric = <T,>({
     columnId: string
   ) => {
     const { value } = e.target;
+    console.log("value", value);
     setUpdatedValues((prev) => ({
       ...prev,
       [`${rowIndex}-${columnId}`]: value,
@@ -88,11 +89,16 @@ export const TabelGeneric = <T,>({
 
   // Handle saving the updated value
   const handleSave = (rowIndex: number, columnId: string) => {
+    console.log("[handleSave]", rowIndex, columnId);
     // Update the data with the new value
     const key = `${rowIndex}-${columnId}`;
     if (updatedValues[key] === undefined) {
+      console.log("No changes detected");
       return;
     }
+
+    console.log("[updatedValues]", updatedValues);
+
     const updatedRow = {
       ...data[rowIndex],
       [columnId]: updatedValues[`${rowIndex}-${columnId}`],
@@ -319,6 +325,11 @@ export const TabelGeneric = <T,>({
                           if (
                             cell.column.columnDef.meta?.inputType === "select"
                           ) {
+                            if (!field) {
+                              // If field is undefined, return null to avoid errors
+                              return null;
+                            }
+                            console.log("field", field);
                             return (
                               <select
                                 value={
@@ -332,16 +343,13 @@ export const TabelGeneric = <T,>({
                                 }
                                 onChange={(e) => {
                                   handleChange(e, rowIndex, cell.column.id);
+                                  handleChange(e, rowIndex, field);
                                   //console.log("e", e);
                                 }}
-                                onBlur={() =>
-                                  handleSave(rowIndex, cell.column.id)
-                                }
-                                onKeyDown={(e) => {
-                                  if (e.key === "Enter")
-                                    handleSave(rowIndex, cell.column.id);
-                                  if (e.key === "Escape") handleCancel();
-                                }}
+                                onBlur={() => {
+                                  handleSave(rowIndex, cell.column.id);
+                                  handleSave(rowIndex, field);
+                                }} // Use field here
                                 // autoFocus
                                 className="p-2"
                               >

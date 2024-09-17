@@ -53,8 +53,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           // kemudian sesuaikan dengan model user yang ada di aplikasi dengan memodifikasi `src/next-auth.d.ts`
           return {
             ...user,
-            unitKerjaId: "pusdiklat", // TODO contoh unit kerja id nanti diambil dari user.unitKerjaId
-            unitKerjaNama: "Pusdiklat", // TODO contoh unit kerja nama nanti diambil dari user.unitKerjaNama
+            organisasiId: "pusdiklat", // TODO contoh unit kerja id nanti diambil dari user.organisasiId
+            organisasiNama: "Pusdiklat", // TODO contoh unit kerja nama nanti diambil dari user.organisasiNama
           };
         }
         return null;
@@ -77,8 +77,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.user.id = token.sub as string;
       session.user.name = token.name;
       session.user.nip = token.nip as string;
-      session.user.unitKerjaId = token.unitKerjaId as string;
-      session.user.unitKerjaNama = token.unitKerjaNama as string;
+      session.user.organisasiId = token.organisasiId as string;
+      session.user.organisasiNama = token.organisasiNama as string;
       session.user.roles = token.roles as string[];
       session.user.permissions = token.permissions as string[];
       return session;
@@ -87,11 +87,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       //console.log("[jwt] token", token);
       //console.log("[jwt] account", account);
       if (user) {
+        console.log("[jwt] user", user);
         token.id = user.id;
         token.name = user.name;
         token.nip = user.nip;
-        token.unitKerjaId = user.unitKerjaId;
-        token.unitKerjaNama = user.unitKerjaNama;
+        token.organisasiId = user.organisasiId;
+        token.organisasiNama = user.organisasiNama;
         token.roles = user.roles;
         token.permissions = user.permissions;
       }

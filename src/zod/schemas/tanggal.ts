@@ -7,15 +7,28 @@ export const isValidDateString = (value: string) => {
   return isValid(parsedDate);
 };
 
-export const tanggalSchema = z
-  .string()
-  .min(10, {
-    message: "please complete the date",
-  })
-  .max(10, {
-    message: "please use valid date format",
-  })
-  .refine(isValidDateString, {
-    message: "Invalid, use format as yyyy-mm-dd.",
-  })
-  .transform((value) => new Date(value));
+// Transform function to convert a valid date string to a Date object
+const transformToDate = (value: string) => new Date(value.substring(0, 10));
+
+// Non-optional schema: the value must be a valid date string or a Date object
+export const tanggalSchema = z.union([
+  z
+    .string()
+    .refine(isValidDateString, {
+      message: "Invalid, use format as yyyy-mm-dd.",
+    })
+    .transform(transformToDate),
+  z.date(),
+]);
+
+// Optional schema: allows undefined or an empty string, but validates if provided
+export const tanggalSchemaOptional = z.union([
+  z
+    .string()
+    .refine((value) => value === "" || isValidDateString(value), {
+      message: "Invalid, use format as yyyy-mm-dd.",
+    })
+    .transform((value) => (value ? transformToDate(value) : undefined))
+    .optional(), // Allow optional strings or undefined
+  z.date().optional(),
+]);

@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { fileSchema } from "./file-schema";
 import { golonganRuangSchema } from "./golongan-ruang";
-import { tanggalSchema } from "./tanggal";
+import { tanggalSchema, tanggalSchemaOptional } from "./tanggal";
 
 export const pejabatPerbendaharaanSchema = z.object({
+  id: z.number().optional(),
   NIK: z
     .string()
     .min(16, {
@@ -11,7 +12,7 @@ export const pejabatPerbendaharaanSchema = z.object({
     })
     .max(16)
     .optional(), // id adalah NIK 16 digit jika paspor untuk nonwni maka 16 digit dimulai dari 9 dan 7 digit pertama adalah nomor paspor dan 9 digit terakhir adalah tanggal lahir di format yyyymmdd contoh dipisah dengan strip
-  nama: z.string(),
+  nama: z.string().min(3).max(255),
   NIP: z.union([
     z
       .string()
@@ -28,7 +29,7 @@ export const pejabatPerbendaharaanSchema = z.object({
   pangkatGolonganId: golonganRuangSchema,
   satkerId: z.string(),
   tmtMulai: tanggalSchema,
-  tmtSelesai: tanggalSchema.optional(),
+  tmtSelesai: tanggalSchemaOptional,
 });
 
 export type PejabatPerbendaharaan = z.infer<typeof pejabatPerbendaharaanSchema>;

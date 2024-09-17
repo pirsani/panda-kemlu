@@ -68,6 +68,7 @@ model User {
   emailVerified        DateTime?       @map("email_verified")
   image                String?
   sessions             Session[]
+  nip                  String?         @unique
   organisasiId         String?         @map("organisasi_id")
   organisasi           Organisasi?     @relation(fields: [organisasiId], references: [id])
   createdAt            DateTime        @default(now()) @map("created_at")
@@ -737,7 +738,7 @@ enum StatusAktif {
 }
 
 model Organisasi {
-  id                     String                  @id @default(uuid())
+  id                     String                  @id @default(cuid())
   nama                   String
   singkatan              String?
   status                 StatusAktif             @default(AKTIF) // Mengganti aktif dengan enum status
