@@ -3,6 +3,7 @@ import {
   getOptionsSatkerAnggaran,
 } from "@/actions/organisasi";
 import { getOptionsJenisJabatanPerbendaharaan } from "@/actions/pejabat-perbendaharaan";
+import FormPejabatPerbendaharaanContainer from "@/approute/data-referensi/pejabat-perbendaharaan/_components/form-pejabat-perbendaharaan-container";
 import {
   convertPejabatPerbendaharaanToStringDate,
   getPejabatPerbenaharaanBySatkerId,
@@ -17,6 +18,7 @@ const ReferensiPejabataPerbendaharaanPage = async () => {
   return (
     <div className="p-4 pb-24 h-auto min-h-full flex flex-col">
       <h1 className="m-2">Tabel Referensi &gt; Pejabat Perbendaharaan</h1>
+      <FormPejabatPerbendaharaanContainer />
       <TabelPejabatPerbendaharaan
         data={convertedData}
         optionsJenisJabatan={optionsJenisJabatan}

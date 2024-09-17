@@ -25,3 +25,22 @@ export const getOptionsJenisJabatanPerbendaharaan = async () => {
 
   return optionsJenisJabatanPerbendaharaan;
 };
+
+export const simpanPejabatPerbendaharaan = async (
+  data: FormData
+): Promise<ActionResponse<PejabatPerbendaharaan>> => {
+  try {
+    const response = await fetch("/api/pejabat-perbendaharaan", {
+      method: "POST",
+      body: data,
+    });
+    const responseData = await response.json();
+    return responseData;
+  } catch (error) {
+    return {
+      success: false,
+      message: "Error saving pejabatPerbendaharaan",
+      error: "Error saving pejabatPerbendaharaan",
+    };
+  }
+};

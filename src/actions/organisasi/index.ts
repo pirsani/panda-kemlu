@@ -1,3 +1,4 @@
+"use server";
 import { ActionResponse } from "@/actions/response";
 import { dbHonorarium } from "@/lib/db-honorarium";
 import { Organisasi } from "@prisma-honorarium/client";
