@@ -10,8 +10,7 @@ const ReferensiNarasumberPage = async () => {
     <div className="p-4 pb-24 h-auto min-h-full 200 flex flex-col">
       <div className="flex-grow w-full">
         <h1>Tabel Referensi &gt; Narasumber</h1>
-        <FormNarasumberContainer />
-        <TabelNarasumber data={narasumber} />
+        <FormNarasumberContainer data={narasumber} />
         <FormUploadExcelNarasumber />
       </div>
     </div>
