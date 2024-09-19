@@ -18,14 +18,32 @@ interface FormNarasumberProps {
   onCancel?: () => void;
   onSubmit?: (data: Narasumber) => void;
   className?: string;
+  narasumber?: Partial<Narasumber>; // Allow partial initial data
 }
 const FormNarasumber = ({
   className,
   onCancel,
   onSubmit = () => {}, // Provide a default no-op function
+  narasumber: initialData = {}, // Provide an empty object as default value
 }: FormNarasumberProps) => {
   const form = useForm<Narasumber>({
     resolver: zodResolver(narasumberSchema),
+    defaultValues: {
+      id: "",
+      nama: "",
+      NIP: "",
+      NPWP: "",
+      jabatan: "",
+      eselon: "",
+      pangkatGolonganId: "", // Use empty string instead of null
+      email: "",
+      bank: "",
+      namaRekening: "",
+      nomorRekening: "",
+      nomorTelepon: "",
+      dokumenPeryataanRekeningBerbeda: null,
+      ...initialData, // Override defaults with initialData if provided
+    },
   });
   const { control, handleSubmit } = form;
 
@@ -108,7 +126,11 @@ const FormNarasumber = ({
               <FormItem>
                 <FormLabel>Gol/Ruang</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="format III/A IV/C" />
+                  <Input
+                    {...field}
+                    value={field.value ?? ""} // Convert null to empty string
+                    placeholder="format III/A IV/C"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -137,7 +159,11 @@ const FormNarasumber = ({
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input {...field} autoComplete="off" />
+                  <Input
+                    {...field}
+                    value={field.value ?? ""} // Convert null to empty string
+                    autoComplete="off"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -150,7 +176,10 @@ const FormNarasumber = ({
               <FormItem>
                 <FormLabel>Nomor Telepon</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input
+                    {...field}
+                    value={field.value ?? ""} // Convert null to empty string
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -166,7 +195,10 @@ const FormNarasumber = ({
               <FormItem className="sm:w-2/12">
                 <FormLabel>Bank</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input
+                    {...field}
+                    value={field.value ?? ""} // Convert null to empty string
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -179,7 +211,10 @@ const FormNarasumber = ({
               <FormItem className="sm:w-7/12">
                 <FormLabel>Nama Rekening</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input
+                    {...field}
+                    value={field.value ?? ""} // Convert null to empty string
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -192,7 +227,10 @@ const FormNarasumber = ({
               <FormItem className="sm:w-3/12">
                 <FormLabel>Nomor Rekening</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input
+                    {...field}
+                    value={field.value ?? ""} // Convert null to empty string
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

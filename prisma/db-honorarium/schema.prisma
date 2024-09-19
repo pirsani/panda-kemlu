@@ -133,10 +133,10 @@ model PangkatGolongan {
 model Narasumber {
   id                              String             @id // id narasumber adalah NIK
   nama                            String
-  NIP                             String?            @map("nip")
-  NPWP                            String?            @map("npwp")
-  jabatan                         String?
-  eselon                          String?
+  NIP                             String             @default("-") @map("nip")
+  NPWP                            String             @default("-") @map("npwp")
+  jabatan                         String             @default("-")
+  eselon                          String             @default("-")
   pangkatGolonganId               String?            @map("pangkat_golongan_id")
   pangkatGolongan                 PangkatGolongan?   @relation(fields: [pangkatGolonganId], references: [id])
   jenisHonorariumId               Int?               @map("jenis_honorarium_id") // ini hanya jadi catatan jenis yang sekarang saat pengajuan,bisa saja berubah krn kenaikan pangkat dll,  sehingga ketika pencatatan transaksi honorarium harus diacu ke jenis honorarium yg ada di sbm_honorarium dan dicatat di tabel jadwal_narasumber

@@ -20,38 +20,59 @@ const TambahNarasumber = () => {
     setOpen(false);
   };
 
-  const onSubmit = async (data: Narasumber) => {
-    // Call API to save data
-    // convert data dari zod schema ke FormData, g bisa langsung karena ada file, klo tidak ada file bisa langsung simpan data
-    const formData = new FormData();
-    // append the data to the form data
-    // formData.append("data", JSON.stringify(dataWithoutFile));
-    // dataWithoutFile
-    const { dokumenPeryataanRekeningBerbeda, ...dataWithoutFile } = data;
-    for (const [key, value] of Object.entries(dataWithoutFile)) {
-      if (typeof value === "string") {
-        formData.append(key, value);
-      } else {
-        formData.append(key, JSON.stringify(value));
-      }
-    }
+  // Type guard to check if a value is a Date object
+  const isDate = (value: any): value is Date => value instanceof Date;
 
-    formData.append(
-      "dokumenPeryataanRekeningBerbeda",
-      dokumenPeryataanRekeningBerbeda as File
-    );
-    const simpan = await simpanNarasumber(formData);
-    if (!simpan.success) {
-      console.error("Error saving narasumber:", simpan.error);
-      alert(`Gagal menyimpan narasumber ${simpan.message}`);
-      return;
-    } else {
-      alert("Berhasil menyimpan narasumber");
-      console.log("Berhasil menyimpan narasumber");
+  const onSubmit = async (data: Narasumber) => {
+    try {
+      const formData = new FormData();
+      const { dokumenPeryataanRekeningBerbeda, ...dataWithoutFile } = data;
+
+      // Append non-file fields to formData
+      for (const [key, value] of Object.entries(dataWithoutFile)) {
+        if (value !== null && value !== undefined) {
+          // type inputan tidak ada date, jadi g perlu cek date
+          if (typeof value === "string") {
+            formData.append(key, value);
+          } else {
+            formData.append(key, JSON.stringify(value));
+          }
+        } else {
+          // karena pada prisma boleh null, maka yg null g perlu di append
+          console.warn(`Field '${key}' is null or undefined, skipping...`);
+        }
+      }
+
+      // Append the file field (check if file is provided)
+      // file di treat berbeda, karena file tidak bisa di stringify
+      if (dokumenPeryataanRekeningBerbeda) {
+        formData.append(
+          "dokumenPeryataanRekeningBerbeda",
+          dokumenPeryataanRekeningBerbeda as File
+        );
+      } else {
+        console.warn("No file provided for 'dokumenPeryataanRekeningBerbeda'.");
+      }
+
+      // Call API to save the data
+      const simpan = await simpanNarasumber(formData);
+
+      // Handle API response
+      if (!simpan.success) {
+        console.error("Error saving narasumber:", simpan.error);
+        alert(`Gagal menyimpan narasumber: ${simpan.message}`);
+      } else {
+        alert("Berhasil menyimpan narasumber");
+        console.log("Berhasil menyimpan narasumber:", data);
+        setOpen(false);
+      }
+    } catch (error) {
+      // Generic error handling
+      console.error("An error occurred while saving narasumber:", error);
+      alert("Terjadi kesalahan, gagal menyimpan data.");
+    } finally {
+      //
     }
-    console.log(data);
-    // Close dialog
-    setOpen(false);
   };
 
   return (

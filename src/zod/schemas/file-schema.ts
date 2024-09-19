@@ -29,5 +29,5 @@ export const fileSchema = ({
       message: `Format file harus salah satu dari: ${allowedTypes.join(", ")}`,
     });
 
-  return required ? baseSchema : z.union([baseSchema, z.undefined()]);
+  return required ? baseSchema : z.union([baseSchema, z.undefined(), z.null()]);
 };

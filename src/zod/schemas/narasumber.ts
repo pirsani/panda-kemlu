@@ -1,6 +1,13 @@
 import { z } from "zod";
 import { fileSchema } from "./file-schema";
-import { golonganRuangSchema } from "./golongan-ruang";
+import {
+  golonganRuangSchema,
+  pangkatGolonganOptionalNullableSchema,
+} from "./golongan-ruang";
+
+const emptyStringToNull = z
+  .string()
+  .transform((val) => (val === "" ? null : val));
 
 export const narasumberSchema = z.object({
   id: z
@@ -10,7 +17,7 @@ export const narasumberSchema = z.object({
         "NIK harus 16 digit, jika paspor setelah nomor paspor diikuti tanda strip dan angka 0 sampai penuh 16 digit",
     })
     .max(16), // id adalah NIK 16 digit jika paspor untuk nonwni maka 16 digit dimulai dari 9 dan 7 digit pertama adalah nomor paspor dan 9 digit terakhir adalah tanggal lahir di format yyyymmdd contoh dipisah dengan strip
-  nama: z.string(),
+  nama: z.string().min(3).max(150),
   NIP: z.union([
     z
       .string()
@@ -40,14 +47,29 @@ export const narasumberSchema = z.object({
       .max(16)
       .regex(/^\d{15,16}$/), // 15 to 16 characters, all digits
   ]),
-  jabatan: z.string().optional(),
-  eselon: z.string().optional(),
-  pangkatGolonganId: golonganRuangSchema,
-  email: z.string().email().optional(),
-  nomorTelepon: z.string().optional(),
-  bank: z.string(),
-  namaRekening: z.string(),
-  nomorRekening: z.string(),
+  jabatan: z.string().length(1, {
+    message: "isi dengan '-' jika tidak ada jabatan",
+  }),
+  eselon: z.string().length(1, {
+    message: "isi dengan '-' jika bukan pejabat eselon",
+  }),
+  pangkatGolonganId: pangkatGolonganOptionalNullableSchema,
+  email: emptyStringToNull
+    .nullable()
+    .optional()
+    .refine(
+      (val) =>
+        val === null ||
+        val === undefined ||
+        z.string().email().safeParse(val).success,
+      {
+        message: "Invalid email address",
+      }
+    ),
+  nomorTelepon: emptyStringToNull.nullable().optional(),
+  bank: emptyStringToNull.nullable().optional(),
+  namaRekening: emptyStringToNull.nullable().optional(),
+  nomorRekening: emptyStringToNull.nullable().optional(),
   dokumenPeryataanRekeningBerbeda: fileSchema({ required: false }),
 });
 
