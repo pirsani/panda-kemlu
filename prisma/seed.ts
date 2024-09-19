@@ -624,7 +624,8 @@ async function main() {
     nama: faker.person.fullName(), // Generate a random full name
     NIP: faker.string.numeric(18), // Generate a random 18-digit string
     jabatan: faker.person.jobTitle(), // Generate a random job title
-    eselon: faker.helpers.arrayElement(["", "I", "II", "III"]), // Generate a random eselon
+    //eselon: faker.helpers.arrayElement(["", "I", "II", "III"]), // Generate a random eselon
+    eselon: faker.helpers.arrayElement([null, 1, 2, 3, 4]), // Generate a random eselon
     pangkatGolonganId: faker.helpers.arrayElement([
       "IV/A",
       "IV/B",

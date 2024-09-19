@@ -2,11 +2,14 @@
 import { ActionResponse } from "@/actions";
 import { dbHonorarium, Prisma } from "@/lib/db-honorarium";
 import { CustomPrismaClientError } from "@/types/custom-prisma-client-error";
+import saveFile from "@/utils/file-operations/save";
 import {
   narasumberSchema,
   Narasumber as ZNarasumber,
 } from "@/zod/schemas/narasumber";
 import { Narasumber } from "@prisma-honorarium/client";
+import { nanoid } from "nanoid";
+import { basename, extname, join } from "path";
 import { ZodError } from "zod";
 
 const simpanNarasumber = async (
@@ -18,6 +21,35 @@ const simpanNarasumber = async (
 
   try {
     const data = narasumberSchema.parse(obj);
+
+    const file = data.dokumenPeryataanRekeningBerbeda;
+    let uniqueFilename: string | null = null;
+    const saveto = join("dokumen-pernyataan-rekening-berbeda", data.id);
+    if (file) {
+      // Save the file to disk
+      // Extract the file extension
+      const fileExtension = extname(file.name);
+      // Generate a unique filename using nanoid
+      uniqueFilename = `${nanoid()}${fileExtension}`;
+
+      const { filePath, relativePath, fileHash, fileType } = await saveFile({
+        file,
+        fileName: uniqueFilename,
+        directory: saveto,
+      });
+      console.log("File saved at:", filePath);
+      const savedFile = await logUploadedFile(
+        file.name,
+        relativePath,
+        fileHash,
+        fileType.mime,
+        "admin"
+      );
+      console.log("File saved to database:", savedFile);
+
+      // log saved file to database
+    }
+
     const saved = await saveDataToDatabase(data, "admin");
     return {
       success: true,
@@ -78,6 +110,27 @@ const saveDataToDatabase = async (data: ZNarasumber, createdBy: string) => {
     console.error("Error saving data to database:", e);
     throw new Error(e.message);
   }
+};
+
+const logUploadedFile = async (
+  filename: string,
+  filePath: string,
+  fileHash: string,
+  mimeType: string,
+  createdBy: string
+) => {
+  // Save the file path to the database
+  const uploadedFile = await dbHonorarium.uploadedFile.create({
+    data: {
+      originalFilename: filename,
+      filePath,
+      hash: fileHash,
+      mimeType,
+      createdBy,
+      createdAt: new Date(),
+    },
+  });
+  return uploadedFile;
 };
 
 export default simpanNarasumber;

@@ -7,7 +7,7 @@ import {
 
 const emptyStringToNull = z
   .string()
-  .transform((val) => (val === "" ? null : val));
+  .transform((val) => (val === "" || val === "-" ? null : val));
 
 export const narasumberSchema = z.object({
   id: z
@@ -50,9 +50,16 @@ export const narasumberSchema = z.object({
   jabatan: z.string().length(1, {
     message: "isi dengan '-' jika tidak ada jabatan",
   }),
-  eselon: z.string().length(1, {
-    message: "isi dengan '-' jika bukan pejabat eselon",
-  }),
+  eselon: z
+    .preprocess((val) => {
+      if (val === "" || val === "-" || val === undefined) return null;
+      return typeof val === "string" ? parseInt(val, 10) : val;
+    }, z.union([z.number().min(1).max(4), z.null()]))
+    .refine((val) => val === null || [1, 2, 3, 4].includes(val), {
+      message: "isi dengan 1, 2, 3, atau 4 jika pejabat eselon",
+    })
+    .nullable()
+    .optional(),
   pangkatGolonganId: pangkatGolonganOptionalNullableSchema,
   email: emptyStringToNull
     .nullable()

@@ -64,7 +64,7 @@ const TambahNarasumber = () => {
       } else {
         alert("Berhasil menyimpan narasumber");
         console.log("Berhasil menyimpan narasumber:", data);
-        setOpen(false);
+        //setOpen(false);
       }
     } catch (error) {
       // Generic error handling

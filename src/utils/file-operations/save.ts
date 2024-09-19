@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import { fileTypeFromBuffer } from "file-type";
 import { promises as fs } from "fs";
 import path from "path";
@@ -49,12 +50,18 @@ interface SaveFileOptions {
 const saveFile = async ({
   file,
   fileName,
-  directory = BASE_PATH_UPLOAD,
+  directory,
   allowedMimeTypes = ["application/pdf", "image/jpeg", "image/png"],
 }: SaveFileOptions) => {
   // Check if the input is a file
   if (!(file instanceof File)) {
     throw new Error("The provided input is not a file.");
+  }
+
+  if (!directory) {
+    directory = BASE_PATH_UPLOAD;
+  } else {
+    directory = path.join(BASE_PATH_UPLOAD, directory);
   }
 
   // Ensure the directory exists
@@ -77,7 +84,15 @@ const saveFile = async ({
 
   const filePath = path.join(dirPath, fileName);
   await fs.writeFile(filePath, Buffer.from(buffer));
-  return filePath;
+  // Calculate the hash of the file using SHA-256
+  const hashSum = createHash("sha256");
+  hashSum.update(Buffer.from(buffer));
+  const fileHash = hashSum.digest("hex");
+
+  // Calculate the relative path from the base path
+  const relativePath = path.relative(BASE_PATH_UPLOAD, filePath);
+
+  return { filePath, relativePath, fileType, fileHash };
 };
 
 export default saveFile;

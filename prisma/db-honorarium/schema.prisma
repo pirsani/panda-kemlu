@@ -136,7 +136,7 @@ model Narasumber {
   NIP                             String             @default("-") @map("nip")
   NPWP                            String             @default("-") @map("npwp")
   jabatan                         String             @default("-")
-  eselon                          String             @default("-")
+  eselon                          Int?
   pangkatGolonganId               String?            @map("pangkat_golongan_id")
   pangkatGolongan                 PangkatGolongan?   @relation(fields: [pangkatGolonganId], references: [id])
   jenisHonorariumId               Int?               @map("jenis_honorarium_id") // ini hanya jadi catatan jenis yang sekarang saat pengajuan,bisa saja berubah krn kenaikan pangkat dll,  sehingga ketika pencatatan transaksi honorarium harus diacu ke jenis honorarium yg ada di sbm_honorarium dan dicatat di tabel jadwal_narasumber
@@ -796,4 +796,18 @@ model PejabatPerbendaharaan {
   kegiatanKpa       Kegiatan[]                 @relation("kpa_kegiatan")
 
   @@map("pejabat_perbendaharaan")
+}
+
+model UploadedFile {
+  id               Int      @id @default(autoincrement())
+  originalFilename String   @map("original_filename")
+  filePath         String   @map("file_path")
+  mimeType         String?  @map("mime_type")
+  encoding         String?
+  notes            String?
+  hash             String?
+  createdBy        String   @map("created_by")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@map("uploaded_file")
 }
