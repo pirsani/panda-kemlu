@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { fileSchema } from "./file-schema";
-import { golonganRuangSchema } from "./golongan-ruang";
+import {
+  golonganRuangSchema,
+  pangkatGolonganOptionalNullableSchema,
+} from "./golongan-ruang";
 import { tanggalSchema, tanggalSchemaOptional } from "./tanggal";
 
 export const pejabatPerbendaharaanSchema = z.object({
@@ -26,7 +29,7 @@ export const pejabatPerbendaharaanSchema = z.object({
       .regex(/^\d{18}$/), // 18-character number
   ]),
   jabatanId: z.string(),
-  pangkatGolonganId: golonganRuangSchema,
+  pangkatGolonganId: pangkatGolonganOptionalNullableSchema,
   satkerId: z.string(),
   tmtMulai: tanggalSchema,
   tmtSelesai: tanggalSchemaOptional,

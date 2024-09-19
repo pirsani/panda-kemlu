@@ -1,5 +1,10 @@
+import { NarasumberWithStringDate } from "@/data/narasumber";
 import { cn } from "@/lib/utils";
-import { Narasumber, narasumberSchema } from "@/zod/schemas/narasumber";
+import {
+  Narasumber,
+  NarasumberForEditing,
+  narasumberSchema,
+} from "@/zod/schemas/narasumber";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "../ui/button";
@@ -18,7 +23,7 @@ interface FormNarasumberProps {
   onCancel?: () => void;
   onSubmit?: (data: Narasumber) => void;
   className?: string;
-  narasumber?: Partial<Narasumber>; // Allow partial initial data
+  narasumber?: Partial<NarasumberForEditing>; // Allow partial initial data
 }
 const FormNarasumber = ({
   className,
@@ -26,7 +31,7 @@ const FormNarasumber = ({
   onSubmit = () => {}, // Provide a default no-op function
   narasumber: initialData = {}, // Provide an empty object as default value
 }: FormNarasumberProps) => {
-  const form = useForm<Narasumber>({
+  const form = useForm<NarasumberForEditing>({
     resolver: zodResolver(narasumberSchema),
     defaultValues: {
       id: "",
@@ -34,7 +39,7 @@ const FormNarasumber = ({
       NIP: "",
       NPWP: "",
       jabatan: "",
-      eselon: "",
+      eselon: null,
       pangkatGolonganId: "", // Use empty string instead of null
       email: "",
       bank: "",
@@ -144,7 +149,10 @@ const FormNarasumber = ({
               <FormItem>
                 <FormLabel>Eselon</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input
+                    {...field}
+                    value={field.value ?? ""} // Convert null to empty string
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

@@ -190,12 +190,14 @@ async function main() {
       {
         nama: "Sekretariat Jenderal",
         singkatan: "Setjen",
+        isSatkerAnggaran: true,
         eselon: 1,
         createdBy: "init",
       },
       {
         nama: "Pusat Pendidikan dan Pelatihan",
         singkatan: "Pusdiklat",
+        isSatkerAnggaran: true,
         createdBy: "init",
         eselon: 2,
       },
@@ -239,6 +241,13 @@ async function main() {
         nama: "UPT Sesparlu",
         singkatan: "UPT Sesparlu",
         createdBy: "init",
+      },
+      {
+        nama: "Pusat TIK KP",
+        singkatan: "Pusat TIK KP",
+        isSatkerAnggaran: true,
+        createdBy: "init",
+        eselon: 2,
       },
     ],
   });

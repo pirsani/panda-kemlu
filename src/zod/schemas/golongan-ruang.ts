@@ -3,11 +3,11 @@ import { z } from "zod";
 // karena golongan ruang ada data refenrensi, maka kita harus memastikan bahwa data yang diinputkan sesuai dengan data referensi, karakter "-" juga dianggap valid dan di transform menjadi null untuk memudahkan user mengingat bahwa data tersebut tidak ada
 const emptyStringToNull = z
   .string()
-  .transform((val) => (val === "" || val === "-" ? null : val));
+  .transform((val) => (val === "" || val === "-" ? null : val.toUpperCase()));
 
 // Define the Zod enum with the desired values
 const golonganRuangEnum = z.enum([
-  "-",
+  //"-",
   "I/A",
   "I/B",
   "I/C",

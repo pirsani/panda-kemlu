@@ -9,10 +9,11 @@ import {
 } from "@/zod/schemas/narasumber";
 import { Narasumber } from "@prisma-honorarium/client";
 import { nanoid } from "nanoid";
+import { revalidatePath } from "next/cache";
 import { basename, extname, join } from "path";
 import { ZodError } from "zod";
 
-const simpanNarasumber = async (
+export const simpanNarasumber = async (
   formData: FormData
 ): Promise<ActionResponse<Narasumber>> => {
   // step 1: parse the form data
@@ -51,6 +52,68 @@ const simpanNarasumber = async (
     }
 
     const saved = await saveDataToDatabase(data, "admin");
+    revalidatePath("/data-referensi/narasumber");
+
+    return {
+      success: true,
+      data: saved,
+    };
+  } catch (error) {
+    if (error instanceof ZodError) {
+      console.error("Validation failed:", error.errors);
+    } else {
+      console.error("Unexpected error:", error);
+    }
+    const e = error as Error;
+    return {
+      success: false,
+      error: "Error saving data to database",
+      message: e.message,
+    };
+  }
+};
+
+export const updateNarasumber = async (
+  formData: FormData,
+  id: string
+): Promise<ActionResponse<Narasumber>> => {
+  // step 1: parse the form data
+  const obj = formDataToObject(formData);
+  console.log("[parsedForm]", obj);
+
+  try {
+    const data = narasumberSchema.parse(obj);
+
+    const file = data.dokumenPeryataanRekeningBerbeda;
+    let uniqueFilename: string | null = null;
+    const saveto = join("dokumen-pernyataan-rekening-berbeda", data.id);
+    if (file) {
+      // Save the file to disk
+      // Extract the file extension
+      const fileExtension = extname(file.name);
+      // Generate a unique filename using nanoid
+      uniqueFilename = `${nanoid()}${fileExtension}`;
+
+      const { filePath, relativePath, fileHash, fileType } = await saveFile({
+        file,
+        fileName: uniqueFilename,
+        directory: saveto,
+      });
+      console.log("File saved at:", filePath);
+      const savedFile = await logUploadedFile(
+        file.name,
+        relativePath,
+        fileHash,
+        fileType.mime,
+        "admin"
+      );
+      console.log("File saved to database:", savedFile);
+
+      // log saved file to database
+    }
+
+    const saved = await updateDataToDatabase(data, id, "admin");
+    revalidatePath("/data-referensi/narasumber");
     return {
       success: true,
       data: saved,
@@ -112,6 +175,48 @@ const saveDataToDatabase = async (data: ZNarasumber, createdBy: string) => {
   }
 };
 
+const updateDataToDatabase = async (
+  data: ZNarasumber,
+  id: string,
+  updatedBy: string
+) => {
+  const dataUpdatedBy = {
+    ...data,
+    dokumenPeryataanRekeningBerbeda: data.dokumenPeryataanRekeningBerbeda?.name,
+    updatedBy,
+  };
+  // Save data to database
+  try {
+    //const result = await dbHonorarium.$transaction(async (prisma) => {
+    const newNarasumber = await dbHonorarium.narasumber.update({
+      where: {
+        id,
+      },
+      data: dataUpdatedBy,
+    });
+    // Save data to database
+    return newNarasumber;
+    // });
+    // return result;
+  } catch (error) {
+    const e = error as CustomPrismaClientError;
+    switch (e.code) {
+      case "P2002":
+        console.log("There is a unique constraint violation");
+        throw new Error("Narasumber dengan NIK yang sama sudah ada");
+        break;
+      case "P2025":
+        console.log("There is a foreign key constraint violation");
+        throw new Error("Narasumber tidak ditemukan");
+        break;
+      default:
+        break;
+    }
+    console.error("Error saving data to database:", e);
+    throw new Error(e.message);
+  }
+};
+
 const logUploadedFile = async (
   filename: string,
   filePath: string,
@@ -131,6 +236,28 @@ const logUploadedFile = async (
     },
   });
   return uploadedFile;
+};
+
+export const deleteNarasumber = async (id: string) => {
+  try {
+    const deleted = await dbHonorarium.narasumber.delete({
+      where: {
+        id,
+      },
+    });
+    return {
+      success: true,
+      data: deleted,
+    };
+  } catch (error) {
+    const e = error as CustomPrismaClientError;
+    console.error("Error deleting narasumber:", error);
+    return {
+      success: false,
+      error: "Error deleting narasumber",
+      message: e.message,
+    };
+  }
 };
 
 export default simpanNarasumber;

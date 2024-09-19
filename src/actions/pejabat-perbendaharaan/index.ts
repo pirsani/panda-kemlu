@@ -133,15 +133,27 @@ export const simpanPejabatPerbendaharaan = async (
         createdBy: userId,
       };
 
+      let pejabatPerbendaharaan;
+
       console.log("objReadyToSave", objReadyToSave);
-      const pejabatPerbendaharaan =
-        await dbHonorarium.pejabatPerbendaharaan.upsert({
-          where: {
-            id: objReadyToSave.id,
-          },
-          create: objReadyToSave,
-          update: objReadyToSave,
-        });
+      if (objReadyToSave.id) {
+        pejabatPerbendaharaan = await dbHonorarium.pejabatPerbendaharaan.upsert(
+          {
+            where: {
+              id: objReadyToSave.id,
+            },
+            create: objReadyToSave,
+            update: objReadyToSave,
+          }
+        );
+      } else {
+        pejabatPerbendaharaan = await dbHonorarium.pejabatPerbendaharaan.create(
+          {
+            data: objReadyToSave,
+          }
+        );
+      }
+
       revalidatePath("/data-referensi/pejabat-perbendaharaan");
       return {
         success: true,

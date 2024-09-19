@@ -68,6 +68,10 @@ const PengajuanContainer = () => {
     useFileStore.setState({ isPreviewHidden: true });
   };
 
+  useEffect(() => {
+    useFileStore.setState({ isPreviewHidden: true });
+  }, []);
+
   return (
     <div className="relative flex flex-col w-full gap-6 pb-20">
       <div className="w-full sm:w-1/2 flex flex-col gap-2 ">

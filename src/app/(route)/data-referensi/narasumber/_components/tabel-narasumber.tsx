@@ -1,5 +1,5 @@
 "use client";
-import simpanNarasumber from "@/actions/narasumber";
+import { deleteNarasumber, simpanNarasumber } from "@/actions/narasumber";
 import {
   KolomAksi,
   PaginationControls,
@@ -31,9 +31,11 @@ const columnHelper = createColumnHelper<NarasumberWithStringDate>();
 
 interface TabelNarasumberProps {
   data: NarasumberWithStringDate[];
+  onEdit: (row: NarasumberWithStringDate) => void;
 }
 export const TabelNarasumber = ({
   data: initialData,
+  onEdit = () => {},
 }: TabelNarasumberProps) => {
   const [data, setData] = useState<NarasumberWithStringDate[]>(initialData);
   const [isEditing, setIsEditing] = useState(false);
@@ -146,7 +148,9 @@ export const TabelNarasumber = ({
     console.log("Edit row:", row);
     // Implement your edit logic here
     setOriginalData(row.original); // Store the original data
-    alert("I will be edited");
+    //alert("I will be edited");
+    onEdit(row.original);
+    //console.log("onEdit tabel-narasumber", row.original);
     // setIsEditing(true);
     // setEditableRowIndex(row.id);
   };

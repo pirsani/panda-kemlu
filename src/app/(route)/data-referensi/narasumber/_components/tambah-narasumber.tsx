@@ -78,7 +78,10 @@ const TambahNarasumber = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={"outline"} className="gap-1">
+        <Button
+          variant={"outline"}
+          className="gap-1 bg-blue-600 hover:bg-blue-700 text-white"
+        >
           <Plus size={12} />
           <span className="hidden sm:block">Narasumber</span>
           <GraduationCap size={24} />

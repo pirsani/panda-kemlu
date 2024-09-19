@@ -47,7 +47,7 @@ export const narasumberSchema = z.object({
       .max(16)
       .regex(/^\d{15,16}$/), // 15 to 16 characters, all digits
   ]),
-  jabatan: z.string().length(1, {
+  jabatan: z.string().min(1, {
     message: "isi dengan '-' jika tidak ada jabatan",
   }),
   eselon: z
@@ -81,3 +81,25 @@ export const narasumberSchema = z.object({
 });
 
 export type Narasumber = z.infer<typeof narasumberSchema>;
+
+export const narasumberEditModeSchema = narasumberSchema.extend({
+  dokumenPeryataanRekeningBerbeda: z.union([
+    fileSchema({ required: false }),
+    z.undefined(),
+    z.null(),
+  ]),
+});
+
+export type NarasumberForEditing = z.infer<typeof narasumberEditModeSchema>;
+// export type NarasumberForEditing = Omit<
+//   NarasumberWithStringDate,
+//   "dokumenPeryataanRekeningBerbeda"
+// > & { dokumenPeryataanRekeningBerbeda: File | string | null | undefined };
+
+export type NarasumberWithStringDate = Omit<
+  Narasumber,
+  "createdAt" | "updatedAt"
+> & {
+  createdAt: Date | string | null;
+  updatedAt: Date | string | null;
+};

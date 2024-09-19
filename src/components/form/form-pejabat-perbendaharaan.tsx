@@ -88,7 +88,11 @@ const FormPejabatPerbendaharaan = ({
               <FormItem>
                 <FormLabel>Gol/Ruang</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="format III/A IV/C" />
+                  <Input
+                    {...field}
+                    placeholder="format III/A IV/C"
+                    value={field.value ?? ""}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
