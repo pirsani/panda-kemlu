@@ -7,6 +7,7 @@ import {
   mapColumnExcelToField,
 } from "@/constants/excel/narasumber";
 import { dbHonorarium } from "@/lib/db-honorarium";
+import { CustomPrismaClientError } from "@/types/custom-prisma-client-error";
 import parseExcelOnServer, {
   ParseExcelOptions,
 } from "@/utils/excel/parse-excel-on-server";
@@ -34,25 +35,26 @@ export const importExcelNarasumber = async (
     if (file) {
       const rows = await parseDataNarasumberDariExcel(file);
       const result = await saveDataNarasumberToDatabase(rows);
-      if (!result) {
-        return {
-          success: false,
-          error: "No result Error saving data to database",
-          message: "No result Error saving data to database",
-        };
-      } else {
+      if (result)
         return {
           success: true,
           data: result,
           message: "Data narasumber berhasil diimport",
         };
-      }
     }
   } catch (error) {
     if (error instanceof ZodError) {
       console.error("[ZodError]", error.errors);
     } else {
-      console.error("[UnknownError]", error);
+      const customError = error as CustomPrismaClientError;
+      if (customError.code === "P2002") {
+        return {
+          success: false,
+          error: customError.code,
+          message: "Narasumber dengan NIK yang sama sudah ada",
+        };
+      }
+      console.error("[customError]", customError.code, customError.message);
     }
     return {
       success: false,
@@ -113,6 +115,18 @@ async function parseDataNarasumberDariExcel(file: File) {
   }
 }
 
+const emptyStringToNull = (data: Record<string, any>) => {
+  const newData: Record<string, any> = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (value === "") {
+      newData[key] = null;
+    } else {
+      newData[key] = value;
+    }
+  }
+  return newData;
+};
+
 async function saveDataNarasumberToDatabase(
   data: Record<string, any>[],
   createdBy: string = "admin"
@@ -126,7 +140,10 @@ async function saveDataNarasumberToDatabase(
       // Delete the NIK property from mappedData karena sudah dijadikan id
       delete mappedData.NIK;
 
-      return mappedData as Narasumber;
+      // convert empty string to null
+      const cleanedData = emptyStringToNull(mappedData);
+
+      return cleanedData as Narasumber;
     });
 
     const result = await dbHonorarium.$transaction(async (prisma) => {
@@ -146,7 +163,8 @@ async function saveDataNarasumberToDatabase(
     });
     return result;
   } catch (error) {
-    console.error("Error saving data to database:", error);
-    throw new Error("Error saving data to database");
+    throw error;
+    // console.error("Error saving data to database:", error);
+    // throw new Error("Error saving data to database");
   }
 }

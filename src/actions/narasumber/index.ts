@@ -238,24 +238,50 @@ const logUploadedFile = async (
   return uploadedFile;
 };
 
-export const deleteNarasumber = async (id: string) => {
+export const deleteNarasumber = async (
+  id: string
+): Promise<ActionResponse<Narasumber>> => {
   try {
     const deleted = await dbHonorarium.narasumber.delete({
       where: {
         id,
       },
     });
+    revalidatePath("/data-referensi/narasumber");
     return {
       success: true,
       data: deleted,
     };
   } catch (error) {
     const e = error as CustomPrismaClientError;
+    switch (e.code) {
+      case "P2025":
+        console.error("Narasumber not found");
+        return {
+          success: false,
+          error: "Narasumber not found",
+          message: "Narasumber not found",
+        };
+        break;
+
+      case "P2003":
+        console.error("Narasumber is being referenced by other data");
+        return {
+          success: false,
+          error: "Narasumber is being referenced by other data",
+          message: "Narasumber is being referenced by other data",
+        };
+        break;
+
+      default:
+        break;
+    }
+
     console.error("Error deleting narasumber:", error);
     return {
       success: false,
       error: "Error deleting narasumber",
-      message: e.message,
+      message: e.code,
     };
   }
 };

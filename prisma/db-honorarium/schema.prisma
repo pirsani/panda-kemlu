@@ -547,7 +547,7 @@ model RiwayatProses {
 model Kelas {
   id         Int       @id @default(autoincrement())
   nama       String
-  kode       String?
+  kode       String?   @unique
   kegiatanId Int       @map("kegiatan_id")
   kegiatan   Kegiatan  @relation(fields: [kegiatanId], references: [id])
   createdBy  String    @map("created_by")

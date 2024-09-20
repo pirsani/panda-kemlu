@@ -1,5 +1,5 @@
 "use client";
-import { getOptionsKelas } from "@/actions/honorarium";
+import { getOptionsKelas } from "@/actions/kelas";
 import { useEffect, useState } from "react";
 import Select, { SingleValue } from "react-select";
 

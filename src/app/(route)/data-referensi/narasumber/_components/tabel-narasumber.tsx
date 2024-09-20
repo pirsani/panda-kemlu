@@ -1,12 +1,15 @@
 "use client";
 import { deleteNarasumber, simpanNarasumber } from "@/actions/narasumber";
+import ConfirmDialog from "@/components/confirm-dialog";
 import {
   KolomAksi,
   PaginationControls,
-  TabelGeneric,
-} from "@/components/tabel-generic";
+  TabelGenericWithoutInlineEdit,
+} from "@/components/tabel-generic-without-inline-edit";
 import { Button } from "@/components/ui/button";
 import { NarasumberWithStringDate } from "@/data/narasumber";
+import { useSearchTerm } from "@/hooks/use-search-term";
+import { cn } from "@/lib/utils";
 import { narasumberSchema } from "@/zod/schemas/narasumber";
 import { Narasumber } from "@prisma-honorarium/client";
 import {
@@ -23,6 +26,7 @@ import {
 } from "@tanstack/react-table";
 import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { ZodError } from "zod";
 
 const data: Narasumber[] | NarasumberWithStringDate = [];
@@ -43,6 +47,28 @@ export const TabelNarasumber = ({
   const [originalData, setOriginalData] =
     useState<NarasumberWithStringDate | null>(null);
   const [errors, setErrors] = useState<ZodError | null>(null);
+  const { searchTerm } = useSearchTerm();
+
+  const filteredData = data.filter((row) => {
+    if (!searchTerm || searchTerm === "") return true;
+    const lowercasedSearchTerm = searchTerm.toLowerCase();
+    //const searchWords = lowercasedSearchTerm.split(" ").filter(Boolean);
+    const searchWords =
+      lowercasedSearchTerm
+        .match(/"[^"]+"|\S+/g)
+        ?.map((word) => word.replace(/"/g, "")) || [];
+
+    return searchWords.every(
+      (word) =>
+        row.NIP?.toLowerCase().includes(word) ||
+        row.nama?.toLowerCase().includes(word) ||
+        row.id?.toLowerCase().includes(word) ||
+        row.jabatan?.toLowerCase().includes(word) ||
+        row.jabatan?.toString().toLowerCase().includes(word) ||
+        row.pangkatGolonganId?.toLowerCase().includes(word) ||
+        row.bank?.toLowerCase().includes(word)
+    );
+  });
 
   const columns: ColumnDef<NarasumberWithStringDate>[] = [
     {
@@ -122,26 +148,12 @@ export const TabelNarasumber = ({
           info,
           handleEdit,
           handleDelete,
-          handleOnSave,
-          handleUndoEdit,
+          handleView,
           isEditing
         ),
       meta: { isKolomAksi: true },
       enableSorting: false, // Disable sorting for this column
     },
-    // {
-    //   accessorKey: "createdBy",
-    //   header: "Dibuat Oleh",
-    //   cell: (info) => info.getValue(),
-    // },
-    // {
-    //   accessorKey: "createdAt",
-    //   header: "Tanggal input",
-    //   cell: (info) => {
-    //     const date = new Date(info.getValue() as string);
-    //     return format(date, "dd/MM/yyyy HH:mm:ss");
-    //   },
-    // },
   ];
 
   const handleEdit = (row: Row<NarasumberWithStringDate>) => {
@@ -155,40 +167,39 @@ export const TabelNarasumber = ({
     // setEditableRowIndex(row.id);
   };
 
-  const handleOnSave = async (row: NarasumberWithStringDate) => {
-    console.log("Save row:", row);
-    // Implement your save logic here
-  };
-
-  const handleUndoEdit = (row: NarasumberWithStringDate) => {
-    console.log("Undo edit row:", row);
-    // Implement your undo edit logic here
-    if (originalData) {
-      setData((prevData) =>
-        prevData.map((item) => (item.id === row.id ? originalData : item))
-      );
-    }
-    setErrors(null);
-    // setIsEditing(false);
-    // setEditableRowIndex(null);
-  };
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
 
   const handleDelete = async (row: NarasumberWithStringDate) => {
-    console.log("Delete row:", row);
-    const cfm = confirm(`Apakah Anda yakin ingin menghapus data ${row.nama} ?`);
-    if (cfm) {
-      const deleted = await deleteNarasumber(row.id);
-      if (deleted.success) {
-        //alert("Data berhasil dihapus");
-        console.log("Data dihapus");
-      } else {
-        console.log("Data tidak dihapus");
-      }
-      //alert(deleted.message);
+    setIsConfirmDialogOpen(true);
+    setOriginalData(row);
+  };
+
+  const handleConfirm = async () => {
+    if (!originalData) {
+      toast.error("Data tidak ditemukan");
+      return;
+    }
+    const deleted = await deleteNarasumber(originalData.id);
+    if (deleted.success) {
+      //alert("Data berhasil dihapus");
+      toast.success(`Data ${originalData.nama} berhasil dihapus`);
+      setIsConfirmDialogOpen(false);
+      console.log("Data dihapus");
     } else {
       console.log("Data tidak dihapus");
+      toast.error(`Data ${originalData.nama} gagal dihapus ${deleted.message}`);
     }
-    // Implement your delete logic here
+  };
+
+  const handleView = (row: NarasumberWithStringDate) => {
+    console.log("View row:", row);
+    // Implement your view logic here
+    // view pdf
+  };
+
+  const handleCancel = () => {
+    setIsConfirmDialogOpen(false);
+    console.log("Cancelled!");
   };
 
   useEffect(() => {
@@ -196,12 +207,20 @@ export const TabelNarasumber = ({
   }, [initialData]);
 
   return (
-    <TabelGeneric
-      data={data}
-      columns={columns}
-      frozenColumnCount={2}
-      isEditing={isEditing}
-      editableRowId={editableRowId}
-    />
+    <>
+      <TabelGenericWithoutInlineEdit
+        data={filteredData}
+        columns={columns}
+        frozenColumnCount={2}
+        isEditing={isEditing}
+        editableRowId={editableRowId}
+      />
+      <ConfirmDialog
+        message={`Apakah anda yakin menghapus data ${originalData?.nama} ?`}
+        isOpen={isConfirmDialogOpen}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
+    </>
   );
 };

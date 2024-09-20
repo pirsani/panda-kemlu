@@ -19,6 +19,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Delete,
+  Eye,
   Pencil,
   Save,
   Trash,
@@ -34,7 +35,7 @@ interface RowData {
   [key: string]: any; // Replace with actual field names and types if known
 }
 
-interface TabelGenericProps<T> {
+interface TabelGenericWithoutInlineEditProps<T> {
   data: T[];
   columns: ColumnDef<T>[];
   frozenColumnCount?: number;
@@ -42,13 +43,13 @@ interface TabelGenericProps<T> {
   editableRowId?: string | null;
 }
 
-export const TabelGeneric = <T,>({
+export const TabelGenericWithoutInlineEdit = <T,>({
   data: initialData,
   columns,
   frozenColumnCount = 1,
   isEditing = false,
   editableRowId = null,
-}: TabelGenericProps<T>) => {
+}: TabelGenericWithoutInlineEditProps<T>) => {
   const [data, setData] = useState(initialData); // Assuming `initialData` is your table data
   //const [isEditing, setIsEditing] = useState(initialIsEditing);
   // const [editableRowId, setEditableRowId] = useState<string | null>(
@@ -65,58 +66,6 @@ export const TabelGeneric = <T,>({
   const [updatedValues, setUpdatedValues] = useState<{ [key: string]: any }>(
     {}
   );
-
-  const handleCellEdit = (rowIndex: number, columnId: string, value: any) => {
-    setEditingCell({ rowIndex, columnId });
-    setUpdatedValues((prev) => ({
-      ...prev,
-      [`${rowIndex}-${columnId}`]: value,
-    }));
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-    rowIndex: number,
-    columnId: string
-  ) => {
-    const { value } = e.target;
-    console.log("value", value);
-    setUpdatedValues((prev) => ({
-      ...prev,
-      [`${rowIndex}-${columnId}`]: value,
-    }));
-  };
-
-  // Handle saving the updated value
-  const handleSave = (rowIndex: number, columnId: string) => {
-    console.log("[handleSave]", rowIndex, columnId);
-    // Update the data with the new value
-    const key = `${rowIndex}-${columnId}`;
-    if (updatedValues[key] === undefined) {
-      console.log("No changes detected");
-      return;
-    }
-
-    console.log("[updatedValues]", updatedValues);
-
-    const updatedRow = {
-      ...data[rowIndex],
-      [columnId]: updatedValues[`${rowIndex}-${columnId}`],
-    };
-
-    // Update the data array with the modified row
-    const updatedData = [...data];
-    updatedData[rowIndex] = updatedRow;
-
-    setData(updatedData); // Update the table data
-    //setEditableRowId(null); // Exit edit mode for the row
-    setUpdatedValues({}); // Clear the updated values
-    console.log("updatedData", updatedData);
-  };
-
-  const handleCancel = () => {
-    setEditingCell(null);
-  };
 
   const [cumulativeWidths, setCumulativeWidths] = useState<number[]>([]);
   const colRefs = useRef<HTMLTableCellElement[]>([]);
@@ -316,86 +265,6 @@ export const TabelGeneric = <T,>({
                           );
                         }
 
-                        if (isEditing && editableRowId === row.id) {
-                          // If in edit mode, render an editable input
-                          console.log(
-                            "cell.column.columnDef.meta",
-                            cell.column.columnDef.meta
-                          );
-                          if (
-                            cell.column.columnDef.meta?.inputType === "select"
-                          ) {
-                            if (!field) {
-                              // If field is undefined, return null to avoid errors
-                              return null;
-                            }
-                            console.log("field", field);
-                            return (
-                              <select
-                                value={
-                                  updatedValues[
-                                    `${rowIndex}-${cell.column.id}`
-                                  ] !== undefined
-                                    ? updatedValues[
-                                        `${rowIndex}-${cell.column.id}`
-                                      ]
-                                    : String(fieldValue || "")
-                                }
-                                onChange={(e) => {
-                                  handleChange(e, rowIndex, cell.column.id);
-                                  handleChange(e, rowIndex, field);
-                                  //console.log("e", e);
-                                }}
-                                onBlur={() => {
-                                  handleSave(rowIndex, cell.column.id);
-                                  handleSave(rowIndex, field);
-                                }} // Use field here
-                                // autoFocus
-                                className="p-2 w-full"
-                              >
-                                {cell.column.columnDef.meta?.options?.map(
-                                  (option) => (
-                                    <option
-                                      key={option.value}
-                                      value={option.value}
-                                    >
-                                      {option.label}
-                                    </option>
-                                  )
-                                )}
-                              </select>
-                            );
-                          }
-
-                          return (
-                            <input
-                              type="text"
-                              value={
-                                updatedValues[
-                                  `${rowIndex}-${cell.column.id}`
-                                ] !== undefined
-                                  ? updatedValues[
-                                      `${rowIndex}-${cell.column.id}`
-                                    ]
-                                  : String(cell.getValue() || "")
-                              }
-                              onChange={(e) =>
-                                handleChange(e, rowIndex, cell.column.id)
-                              }
-                              onBlur={() =>
-                                handleSave(rowIndex, cell.column.id)
-                              }
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter")
-                                  handleSave(rowIndex, cell.column.id);
-                                if (e.key === "Escape") handleCancel();
-                              }}
-                              // autoFocus
-                              className="px-2 m-0 h-10 border border-blue-700 w-auto min-w-10"
-                            />
-                          );
-                        }
-
                         // Display the cell value if not in edit mode
                         return flexRender(
                           cell.column.columnDef.cell,
@@ -488,8 +357,7 @@ export const KolomAksi = <T,>(
   info: CellContext<T, unknown>,
   onEdit?: (row: Row<T>) => void,
   onDelete?: (row: T) => void,
-  onSave?: (row: T) => void,
-  onUndo?: (row: T) => void,
+  onView?: (row: T) => void,
   isEditing?: boolean
 ) => {
   const [oldRow, setOldRow] = useState<T>(info.row.original);
@@ -499,53 +367,29 @@ export const KolomAksi = <T,>(
     onEdit && onEdit(info.row);
   };
 
-  const handleOnClickSave = () => {
-    console.log("Save clicked");
-    onSave && onSave(info.row.original);
-  };
-
   const handleOnClickDelete = () => {
     console.log("Delete clicked");
     onDelete && onDelete(info.row.original);
   };
 
-  const handleOnClickUndo = () => {
-    onUndo && onUndo(oldRow);
-    console.log("Undo clicked");
+  const handleOnClickView = () => {
+    console.log("View clicked");
+    onView && onView(info.row.original);
   };
 
   return (
     <>
-      {isEditing && (
-        <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            className="bg-blue-600 hover:bg-blue-700 text-white hover:text-white"
-            onClick={handleOnClickSave}
-          >
-            <Save size={20} />
-          </Button>
-          <Button
-            variant="outline"
-            size={"sm"}
-            className="bg-green-600 hover:bg-green-700 text-white hover:text-white"
-            onClick={handleOnClickUndo}
-          >
-            <Undo2 size={20} />
-          </Button>
-        </div>
-      )}
-      {!isEditing && (
-        <div className="flex gap-2">
-          <Button variant="secondary" size="sm" onClick={handleOnClickEdit}>
-            <Pencil size={20} />
-          </Button>
-          <Button variant="secondary" size="sm" onClick={handleOnClickDelete}>
-            <Trash2 size={20} />
-          </Button>
-        </div>
-      )}
+      <div className="flex gap-2">
+        <Button variant="secondary" size="sm" onClick={handleOnClickEdit}>
+          <Pencil size={20} />
+        </Button>
+        <Button variant="secondary" size="sm" onClick={handleOnClickDelete}>
+          <Trash2 size={20} />
+        </Button>
+        <Button variant="secondary" size="sm" onClick={handleOnClickView}>
+          <Eye size={20} />
+        </Button>
+      </div>
     </>
   );
 };

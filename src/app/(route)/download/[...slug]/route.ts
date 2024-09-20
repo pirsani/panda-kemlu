@@ -3,6 +3,7 @@ import generatorDokumenPengadaan, {
   downloadDokumenPengadaan,
 } from "./generator-dokumen-pengadaan";
 import { downloadDokumenRampungan } from "./generator-rampungan";
+import { downloadTemplateExcel } from "./template-excel";
 
 export async function GET(
   req: Request,
@@ -19,6 +20,8 @@ export async function GET(
       return downloadDokumenPengadaan(req, slug);
     case "dokumen-rampungan":
       return downloadDokumenRampungan(req, slug);
+    case "template-excel":
+      return downloadTemplateExcel(req, slug);
     default:
       return new NextResponse(`Download ${params.slug.join("/")}`);
   }

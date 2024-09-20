@@ -22,6 +22,7 @@ import { Narasumber } from "@/zod/schemas/narasumber";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import ExcelContainer, { ParseResult } from "../../_components/excel-container";
 
 const FormUploadExcelNarasumber = () => {
@@ -41,29 +42,6 @@ const FormUploadExcelNarasumber = () => {
     trigger,
   } = form;
 
-  // const extractFromColumns = [
-  //   "ID",
-  //   "Nama",
-  //   "NIP",
-  //   "NIK",
-  //   "NPWP",
-  //   "Golongan/Ruang",
-  //   "Jabatan",
-  //   "Eselon",
-  //   "Nama Rekening",
-  //   "Bank",
-  //   "Nomor Rekening",
-  // ];
-  // const columnsWithEmptyValueAllowed = [
-  //   "NIP",
-  //   "Eselon",
-  //   "Golongan/Ruang",
-  //   "NPWP",
-  //   "Nama Rekening",
-  //   "Bank",
-  //   "Nomor Rekening",
-  // ];
-
   const onSubmit = async (data: excelDataReferensi) => {
     // disubmit excel / data ke backend ?
     // harus tidak ada error dulu
@@ -76,10 +54,17 @@ const FormUploadExcelNarasumber = () => {
     formData.append("file", data.file);
     const importedData = await importExcelNarasumber(formData);
     if (importedData.success) {
+      toast.success("Data berhasil diimport");
       console.log("Data berhasil diimport", importedData.data);
+      // always reset the form after submit
+      reset(); // this will reset file input, then chaining to reset TabelDariExcel
+      setIsReadyToSubmit(false);
     } else {
+      toast.error(`Data gagal diimport ${importedData.message}`);
       console.log("Data gagal diimport ", importedData.error);
+      // kalo gagal harusnya bisa chek dengan cari mana yg sudah ada di db
     }
+
     console.log(data);
   };
 
@@ -105,7 +90,7 @@ const FormUploadExcelNarasumber = () => {
             <FormItem>
               <FormControl>
                 <ExcelContainer
-                  templateXlsx="/template-narasumber.xlsx"
+                  templateXlsx="/download/template-excel/narasumber"
                   name={field.name}
                   value={field.value}
                   extractFromColumns={extractFromColumns}

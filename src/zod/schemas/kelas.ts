@@ -10,6 +10,7 @@ export const kelasSchema = z.object({
     .max(128, {
       message: "Nama kelas maksimal 128 karakter",
     }),
+  kegiatanId: z.number().int(),
 });
 
 export type Kelas = z.infer<typeof kelasSchema>;

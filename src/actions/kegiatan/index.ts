@@ -32,7 +32,8 @@ export const getOptionsKegiatan = async () => {
   // map dataKegiatan to options
   const optionsKegiatan = dataKegiatan.map((kegiatan) => ({
     value: kegiatan.id,
-    label: kegiatan.status + "-" + kegiatan.nama,
+    // label: kegiatan.status + "-" + kegiatan.nama,
+    label: kegiatan.nama,
   }));
 
   return optionsKegiatan;

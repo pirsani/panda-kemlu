@@ -16,6 +16,7 @@ import { NarasumberWithStringDate } from "@/data/narasumber";
 import { Narasumber } from "@/zod/schemas/narasumber";
 import { GraduationCap, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface EditNarasumberProps {
   narasumber: NarasumberForEditing | null;
@@ -74,7 +75,7 @@ const EditNarasumber = ({
 
       if (!narasumber) {
         console.error("Narasumber data is missing.");
-        alert("Data narasumber tidak ditemukan.");
+        toast.error("Data narasumber tidak ditemukan.");
         return;
       }
 
@@ -84,16 +85,16 @@ const EditNarasumber = ({
       // Handle API response
       if (!simpan.success) {
         console.error("Error saving narasumber:", simpan.error);
-        alert(`Gagal menyimpan narasumber: ${simpan.message}`);
+        toast.error(`Gagal menyimpan narasumber: ${simpan.message}`);
       } else {
-        alert("Berhasil menyimpan narasumber");
+        toast.success("Berhasil menyimpan narasumber");
         console.log("Berhasil menyimpan narasumber:", data);
         //setOpen(false);
       }
     } catch (error) {
       // Generic error handling
       console.error("An error occurred while saving narasumber:", error);
-      alert("Terjadi kesalahan, gagal menyimpan data.");
+      toast.error("Terjadi kesalahan, gagal menyimpan data.");
     } finally {
       //
     }

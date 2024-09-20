@@ -90,6 +90,22 @@ export const dataReferensiRoutes: RouteItem[] = [
     displayAsMenu: true,
   },
   {
+    name: "referensi-materi",
+    title: "Materi",
+    href: "/data-referensi/materi",
+    icon: "book-open",
+    order: 0,
+    displayAsMenu: true,
+  },
+  {
+    name: "referensi-kelas",
+    title: "Kelas",
+    href: "/data-referensi/kelas",
+    icon: "grid",
+    order: 0,
+    displayAsMenu: true,
+  },
+  {
     name: "referensi-sbm-honorarium",
     title: "SBM Honorarium",
     href: "/data-referensi/sbm/honorarium",

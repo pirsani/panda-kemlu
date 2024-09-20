@@ -5,6 +5,7 @@ import { RouteItem } from "@/route";
 import {
   AlertTriangle,
   Banknote,
+  BookOpen,
   BrickWall,
   CheckCircle2,
   Circle,
@@ -14,6 +15,7 @@ import {
   Flag,
   Gauge,
   GraduationCap,
+  Grid,
   Home,
   Hourglass,
   Key,
@@ -59,6 +61,8 @@ const iconMap: { [key: string]: LucideIcon } = {
   "file-badge": FileBadge,
   "map-pinned": MapPinned,
   flag: Flag,
+  "book-open": BookOpen,
+  grid: Grid,
 };
 
 interface SidebarItemProps {
