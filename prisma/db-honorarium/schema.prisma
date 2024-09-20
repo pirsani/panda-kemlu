@@ -309,7 +309,7 @@ model SbmTiketPesawat {
 model SbmTiketPesawatLuarNegeri {
   id             Int     @id @default(autoincrement())
   kotaAsalId     Int     @map("kota_asal_id")
-  negaraId       Int     @map("negara_id")
+  negaraId       String  @map("negara_id")
   negara         Negara  @relation(fields: [negaraId], references: [id])
   tiketEksekutif Decimal @map("tiket_eksekutif") @db.Decimal(5, 0)
   tiketBisnis    Decimal @map("tiket_bisnis") @db.Decimal(5, 0)
@@ -325,8 +325,8 @@ model SbmTiketPesawatLuarNegeri {
 }
 
 model SbmUhLuarNegeri {
-  id           Int            @id @default(autoincrement())
-  negaraId     Int            @map("negara_id")
+  id           String         @id @default(cuid())
+  negaraId     String         @map("negara_id")
   negara       Negara         @relation(fields: [negaraId], references: [id])
   satuan       String
   golonganA    Decimal        @map("golongan_a") @db.Decimal(4, 0)
@@ -341,6 +341,7 @@ model SbmUhLuarNegeri {
   itinerary    Itinerary[]
   uhLuarNegeri UhLuarNegeri[]
 
+  @@unique([negaraId, tahun])
   @@map("sbm_uh_luar_negeri")
 }
 
@@ -483,7 +484,7 @@ model UhLuarNegeri {
   tanggalMulai           DateTime        @map("tanggal_mulai")
   tanggalSelesai         DateTime        @map("tanggal_selesai")
   jumlahHari             Int             @map("jumlah_hari") // harus di kasih trigger biar otomatis dihitung dari tanggal mulai dan selesai
-  sbmUhLuarNegeriId      Int             @map("sbm_uh_luar_negeri_id") // akan mengacu ke id yg pencariannya berdasarkan negara dan golongan
+  sbmUhLuarNegeriId      String          @map("sbm_uh_luar_negeri_id") // akan mengacu ke id yg pencariannya berdasarkan negara dan golongan
   sbmUhLuarNegeri        SbmUhLuarNegeri @relation(fields: [sbmUhLuarNegeriId], references: [id])
   golonganUh             String          @map("golongan_uh") // enum A, B, C, D
   nominalGolonganUh      Int             @map("nominal_golongan_uh") // sesuai dengan golongan yg ada di SbmUhLuarNegeri, karena bersifat historis maka diambil dari SbmUhLuarNegeri, resiko perubahan nilai nominal golongan di SbmUhLuarNegeri harus dihandle di aplikasi
@@ -505,7 +506,7 @@ model UhLuarNegeri {
 
 model Itinerary {
   id                Int             @id @default(autoincrement())
-  sbmUhLuarNegeriId Int             @map("sbm_uh_luar_negeri_id")
+  sbmUhLuarNegeriId String          @map("sbm_uh_luar_negeri_id")
   lokasi            SbmUhLuarNegeri @relation(fields: [sbmUhLuarNegeriId], references: [id])
   tanggalMulai      DateTime
   tanggalSelesai    DateTime
@@ -699,8 +700,10 @@ model Provinsi {
 }
 
 model Negara {
-  id          Int    @id @default(autoincrement())
-  nama        String
+  id          String @id // ISO 3166-1 alpha-3 code
+  urutan      Int?   @default(autoincrement()) // menurut SBM
+  nama        String @map("nama")
+  namaInggris String @map("nama_inggris")
   kodeAlpha2  String @map("kode_alpha_2") // ISO 3166-1 alpha-2 code
   kodeAlpha3  String @map("kode_alpha_3") // ISO 3166-1 alpha-3 code
   kodeNumeric String @map("kode_numeric") // ISO 3166-1 numeric code

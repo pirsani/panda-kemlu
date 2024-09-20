@@ -15,5 +15,6 @@ declare module "@tanstack/react-table" {
     inputType?: "text" | "number" | "select" | "checkbox";
     options?: { value: string | number; label: string }[];
     field?: string; // Field name that need to be updated when the value option changes
+    isCellEditable?: boolean;
   }
 }

@@ -295,7 +295,9 @@ export const TabelGeneric = <T,>({
                       })}
                       style={
                         index < frozenColumnCount
-                          ? { left: `${cumulativeWidths[index] || 0}px` }
+                          ? {
+                              left: `${cumulativeWidths[index] || 0}px`,
+                            }
                           : undefined
                       }
                     >
@@ -310,6 +312,16 @@ export const TabelGeneric = <T,>({
                           if (isEditing && editableRowId !== row.id) {
                             return null;
                           }
+                          return flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          );
+                        }
+
+                        // Check if the cell is editable
+                        if (
+                          cell.column.columnDef.meta?.isCellEditable === false
+                        ) {
                           return flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()
@@ -351,7 +363,12 @@ export const TabelGeneric = <T,>({
                                   handleSave(rowIndex, field);
                                 }} // Use field here
                                 // autoFocus
-                                className="p-2 w-full"
+                                className="p-2 flex w-full"
+                                style={{
+                                  width:
+                                    cumulativeWidths[index + 1] -
+                                    (cumulativeWidths[index] || 0),
+                                }} // Set the width to match the column width
                               >
                                 {cell.column.columnDef.meta?.options?.map(
                                   (option) => (
@@ -550,13 +567,28 @@ export const KolomAksi = <T,>(
   );
 };
 
-export const formatCurrency = <T,>(info: CellContext<T, unknown>) => {
+const validCurrencyCodes = new Set([
+  "USD",
+  "EUR",
+  "IDR",
+  // Add other valid ISO 4217 currency codes as needed
+]);
+
+export const formatCurrency = <T,>(
+  info: CellContext<T, unknown>,
+  currency: string = "IDR"
+) => {
   const value = info.getValue() as number;
 
+  // Validate the currency code
+  if (!validCurrencyCodes.has(currency)) {
+    console.error(`Invalid currency code: ${currency}. Falling back to IDR.`);
+    currency = "IDR";
+  }
   // Format the value as currency
   const formattedValue = new Intl.NumberFormat("id-ID", {
     style: "currency",
-    currency: "IDR",
+    currency: currency,
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(value);

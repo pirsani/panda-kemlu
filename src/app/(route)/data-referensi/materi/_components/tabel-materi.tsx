@@ -27,12 +27,8 @@ import { ZodError } from "zod";
 
 interface TabelMateriProps {
   data: Materi[];
-  optionsKegiatan: { value: number; label: string }[];
 }
-export const TabelMateri = ({
-  data: initialData,
-  optionsKegiatan,
-}: TabelMateriProps) => {
+export const TabelMateri = ({ data: initialData }: TabelMateriProps) => {
   const [data, setData] = useState<Materi[]>(initialData);
   const [isEditing, setIsEditing] = useState(false);
   const [editableRowId, setEditableRowIndex] = useState<string | null>(null);

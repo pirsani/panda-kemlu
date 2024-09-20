@@ -110,7 +110,7 @@ const RowItineraryEditMode = ({
   const [endDate, setEndDate] = useState(new Date());
   const [negara, setNegara] = useState(data.negara);
 
-  const handleChangeNegara = (value: number | null) => {
+  const handleChangeNegara = (value: string | null) => {
     if (value) setNegara(value);
   };
 
