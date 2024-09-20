@@ -4,7 +4,7 @@ import { get } from "lodash";
 import FormKelas from "./_components/form-kelas";
 import { TabelKelas } from "./_components/tabel-kelas";
 
-const ReferensiSbmHonorariumPage = async () => {
+const KelasPage = async () => {
   const data = await getKelas();
   const optionsKegiatan = await getOptionsKegiatan();
   return (
@@ -16,4 +16,4 @@ const ReferensiSbmHonorariumPage = async () => {
   );
 };
 
-export default ReferensiSbmHonorariumPage;
+export default KelasPage;
