@@ -14,6 +14,24 @@ export const downloadTemplateExcel = async (req: Request, slug: string[]) => {
     case "peserta":
       template = "peserta.xlsx";
       break;
+    case "sbm-uh-dalam-negeri":
+      template = "sbm_uh_dalam_negeri.xlsx";
+      break;
+    case "sbm-uh-luar-negeri":
+      template = "sbm_uh_luar_negeri.xlsx";
+      break;
+    case "sbm-honorarium":
+      template = "sbm_honorarium.xlsx";
+      break;
+    case "sbm-uang-representasi":
+      template = "sbm_uang_representasi.xlsx";
+      break;
+    case "sbm-tiket-pesawat":
+      template = "sbm_tiket_pesawat.xlsx";
+      break;
+    case "sbm-taksi":
+      template = "sbm_taksi.xlsx";
+      break;
     default:
       break;
   }

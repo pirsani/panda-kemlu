@@ -92,7 +92,7 @@ export const FormUploadExcelSbmUhDalamNegeri = () => {
             <FormItem>
               <FormControl>
                 <ExcelContainer
-                  templateXlsx="/templates/sbm_uh_dalam_negeri.xlsx"
+                  templateXlsx="/download/template-excel/sbm-uh-dalam-negeri"
                   name={field.name}
                   value={field.value}
                   extractFromColumns={extractFromColumns}

@@ -93,7 +93,7 @@ export const FormUploadExcelSbmHonorarium = () => {
             <FormItem>
               <FormControl>
                 <ExcelContainer
-                  templateXlsx="/templates/sbm_honorarium.xlsx"
+                  templateXlsx="/download/template-excel/sbm-honorarium"
                   name={field.name}
                   value={field.value}
                   extractFromColumns={extractFromColumns}
