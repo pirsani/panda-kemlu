@@ -58,6 +58,7 @@ const seedProvinsi = async (): Promise<void> => {
       .on("error", (error) => reject(error));
   });
 };
+
 const deleteExisting = async (): Promise<void> => {
   // Truncate the table
   try {
@@ -89,6 +90,8 @@ const deleteExisting = async (): Promise<void> => {
     await dbHonorarium.user.deleteMany({});
     await dbHonorarium.userRole.deleteMany({});
     await dbHonorarium.role.deleteMany({});
+    await dbHonorarium.sbmUangRepresentasi.deleteMany({});
+    await dbHonorarium.pejabat.deleteMany({});
 
     console.log("Existing data deleted successfully");
   } catch (error) {
@@ -839,6 +842,67 @@ async function main() {
       },
     ],
   });
+
+  const pejabat = await dbHonorarium.pejabat.createMany({
+    data: [
+      {
+        id: 0,
+        nama: "PEJABAT NEGARA",
+        eselon: 0,
+      },
+      {
+        id: 1,
+        nama: "PEJABAT ESELON I",
+        eselon: 1,
+      },
+      {
+        id: 2,
+        nama: "PEJABAT ESELON II",
+        eselon: 2,
+      },
+      {
+        id: 3,
+        nama: "PEJABAT ESELON III",
+        eselon: 3,
+      },
+      {
+        id: 4,
+        nama: "PEJABAT ESELON IV",
+        eselon: 4,
+      },
+    ],
+  });
+
+  const sbmUangRepresentasi = await dbHonorarium.sbmUangRepresentasi.createMany(
+    {
+      data: [
+        {
+          tahun: 2024,
+          pejabatId: 0,
+          satuan: "OH",
+          luarKota: 250000,
+          dalamKota: 125000,
+          createdBy: "init",
+        },
+        {
+          tahun: 2024,
+          pejabatId: 1,
+          satuan: "OH",
+          luarKota: 200000,
+          dalamKota: 100000,
+          createdBy: "init",
+        },
+        {
+          tahun: 2024,
+          pejabatId: 2,
+          satuan: "OH",
+          luarKota: 150000,
+          dalamKota: 75000,
+          createdBy: "init",
+        },
+      ],
+    }
+  );
 }
 
 main()

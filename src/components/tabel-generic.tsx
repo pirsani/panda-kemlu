@@ -576,14 +576,14 @@ const validCurrencyCodes = new Set([
 
 export const formatCurrency = <T,>(
   info: CellContext<T, unknown>,
-  currency: string = "IDR"
+  currency?: string
 ) => {
   const value = info.getValue() as number;
 
-  // Validate the currency code
-  if (!validCurrencyCodes.has(currency)) {
-    console.error(`Invalid currency code: ${currency}. Falling back to IDR.`);
-    currency = "IDR";
+  // Use default currency if not provided or invalid
+  const defaultCurrency = "IDR";
+  if (!currency || !validCurrencyCodes.has(currency)) {
+    currency = defaultCurrency;
   }
   // Format the value as currency
   const formattedValue = new Intl.NumberFormat("id-ID", {

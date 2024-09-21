@@ -75,3 +75,26 @@ export const getOptionsSbmHonorarium = async () => {
 
   return convertedData;
 };
+
+export const getPejabat = async (negara?: string) => {
+  const dataNegara = await dbHonorarium.pejabat.findMany({});
+  return dataNegara;
+};
+
+// eselon 0,1,2
+export const getOptionsPejabatEselon2keAtas = async () => {
+  const dataPejabat = await dbHonorarium.pejabat.findMany({
+    where: {
+      eselon: {
+        lte: 2,
+      },
+    },
+  });
+  // map dataNegara to options
+  const optionsPejabat = dataPejabat.map((pejabat) => ({
+    value: pejabat.id,
+    label: pejabat.nama,
+  }));
+
+  return optionsPejabat;
+};

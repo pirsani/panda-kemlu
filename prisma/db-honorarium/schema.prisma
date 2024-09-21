@@ -347,16 +347,29 @@ model SbmUhLuarNegeri {
 
 model SbmUangRepresentasi {
   id        Int       @id @default(autoincrement())
-  pejabat   String
+  pejabatId Int       @map("pejabat_id")
+  pejabat   Pejabat   @relation(fields: [pejabatId], references: [id])
   satuan    String
   luarKota  Int       @map("luar_kota")
   dalamKota Int       @map("dalam_kota")
+  tahun     Int       @map("tahun")
   createdBy String    @map("created_by")
   createdAt DateTime  @default(now()) @map("created_at")
   updatedBy String?   @map("updated_by")
   updatedAt DateTime? @updatedAt @map("updated_at")
 
   @@map("sbm_uang_representasi")
+}
+
+model Pejabat {
+  id                  Int                   @id @default(autoincrement())
+  nama                String
+  eselon              Int                   @default(0)
+  SbmUangRepresentasi SbmUangRepresentasi[]
+  createdBy           String                @default("init") @map("created_by")
+  createdAt           DateTime              @default(now()) @map("created_at")
+
+  @@map("pejabat")
 }
 
 // enum 0, 1, 2 as DALAM_KOTA, LUAR_KOTA, LUAR_NEGERI
