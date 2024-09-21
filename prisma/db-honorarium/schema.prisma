@@ -693,9 +693,10 @@ model NominatifHonorarium {
 // berdasarkan data dari https://e-database.kemendagri.go.id/kemendagri/dataset/1121/tabel-data
 model Provinsi {
   id               Int                @id @default(autoincrement())
-  tahun            Int
+  tahun            Int?
   kode             Int
   nama             String
+  urutan           Int?               @default(autoincrement()) // menurut SBM
   singkatan        String?            @map("singkatan")
   aktif            Boolean            @default(true)
   createdBy        String             @default("init") @map("created_by")
