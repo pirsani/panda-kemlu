@@ -138,6 +138,14 @@ export const dataReferensiRoutes: RouteItem[] = [
     displayAsMenu: true,
   },
   {
+    name: "referensi-sbm-taksi",
+    title: "SBM Taksi",
+    href: "/data-referensi/sbm/taksi",
+    icon: "banknote",
+    order: 5,
+    displayAsMenu: true,
+  },
+  {
     name: "referensi-pph",
     title: "PPH",
     href: "/data-referensi/pph",

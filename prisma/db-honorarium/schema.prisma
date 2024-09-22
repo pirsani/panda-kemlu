@@ -207,6 +207,7 @@ model SbmUhDalamNegeri {
   updatedBy String?   @map("updated_by")
   updatedAt DateTime? @updatedAt @map("updated_at")
 
+  @@unique([provinsiId, tahun])
   @@map("sbm_uh_dalam_negeri")
 }
 
@@ -235,6 +236,7 @@ model SbmPaketRapat {
   updatedBy  String?           @map("updated_by")
   updatedAt  DateTime?         @updatedAt @map("updated_at")
 
+  @@unique([provinsiId, tingkat, tahun])
   @@map("sbm_rapat")
 }
 
@@ -258,7 +260,7 @@ model SbmUhRapat {
 }
 
 model SbmTaksi {
-  id         Int       @id @default(autoincrement())
+  id         String    @id @default(cuid()) // format id: tahun nomor urut pada sbm contoh untuk aceh tahun 2024 nomor urut 1 maka id: 01-2024
   provinsiId Int       @map("provinsi_id")
   provinsi   Provinsi  @relation(fields: [provinsiId], references: [id])
   satuan     String
@@ -269,6 +271,7 @@ model SbmTaksi {
   updatedBy  String?   @map("updated_by")
   updatedAt  DateTime? @updatedAt @map("updated_at")
 
+  @@unique([provinsiId, tahun])
   @@map("sbm_taksi")
 }
 
@@ -303,6 +306,7 @@ model SbmTiketPesawat {
   updatedBy String?   @map("updated_by")
   updatedAt DateTime? @updatedAt @map("updated_at")
 
+  @@unique([kotaAsalId, kotaTujuanId, tahun])
   @@map("sbm_tiket_pesawat")
 }
 
