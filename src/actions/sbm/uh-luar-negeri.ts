@@ -128,13 +128,13 @@ export const deleteDataSbmUhLuarNegeri = async (
 export const getOptionsSbmUhLuarNegeri = async () => {
   const dataSbmUhLuarNegeri = await dbHonorarium.sbmUhLuarNegeri.findMany({
     include: {
-      provinsi: true,
+      negara: true,
     },
   });
   // map dataSbmUhLuarNegeri to options
   const optionsSbmUhLuarNegeri = dataSbmUhLuarNegeri.map((sbmUhLuarNegeri) => ({
     value: sbmUhLuarNegeri.id,
-    label: sbmUhLuarNegeri.provinsi.nama,
+    label: sbmUhLuarNegeri.negara.nama,
   }));
 
   return optionsSbmUhLuarNegeri;
