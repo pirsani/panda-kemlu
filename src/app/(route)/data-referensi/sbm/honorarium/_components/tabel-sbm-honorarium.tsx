@@ -1,5 +1,8 @@
 "use client";
 import { deleteDataSbmHonorarium } from "@/actions/excel/sbm/honorarium";
+import { updateDataSbmHonorarium } from "@/actions/sbm/honorarium";
+import ZodErrorList from "@/approute/data-referensi/_components/zod-error-list";
+import ConfirmDialog from "@/components/confirm-dialog";
 import {
   formatCurrency,
   KolomAksi,
@@ -7,9 +10,8 @@ import {
   TabelGeneric,
 } from "@/components/tabel-generic";
 import { Button } from "@/components/ui/button";
-import { NarasumberWithStringDate } from "@/data/narasumber";
-import { SbmHonorariumWithNumber } from "@/data/sbm-honorarum";
-import { SbmHonorarium } from "@prisma-honorarium/client";
+import { SbmHonorariumPlainObject } from "@/data/sbm-honorarium";
+import { sbmHonorariumSchema } from "@/zod/schemas/sbm-honorarium";
 import {
   ColumnDef,
   createColumnHelper,
@@ -24,24 +26,27 @@ import {
 } from "@tanstack/react-table";
 import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { ZodError } from "zod";
 
-const data: SbmHonorariumWithNumber[] = [];
+const data: SbmHonorariumPlainObject[] = [];
 
 interface TabelSbmHonorariumProps {
-  data: SbmHonorariumWithNumber[];
+  data: SbmHonorariumPlainObject[];
 }
 export const TabelSbmHonorarium = ({
   data: initialData,
 }: TabelSbmHonorariumProps) => {
-  const [data, setData] = useState<SbmHonorariumWithNumber[]>(initialData);
+  const [data, setData] = useState<SbmHonorariumPlainObject[]>(initialData);
   const [isEditing, setIsEditing] = useState(false);
   const [editableRowId, setEditableRowIndex] = useState<string | null>(null);
   const [originalData, setOriginalData] =
-    useState<SbmHonorariumWithNumber | null>(null);
+    useState<SbmHonorariumPlainObject | null>(null);
+  const [errors, setErrors] = useState<ZodError | null>(null);
 
-  const columnHelper = createColumnHelper<SbmHonorariumWithNumber>();
+  const columnHelper = createColumnHelper<SbmHonorariumPlainObject>();
 
-  const columns: ColumnDef<SbmHonorariumWithNumber>[] = [
+  const columns: ColumnDef<SbmHonorariumPlainObject>[] = [
     {
       id: "rowNumber",
       header: "#",
@@ -62,7 +67,7 @@ export const TabelSbmHonorarium = ({
     {
       accessorKey: "besaran",
       header: "Besaran",
-      cell: formatCurrency<SbmHonorariumWithNumber>,
+      cell: formatCurrency<SbmHonorariumPlainObject>,
     },
     {
       accessorKey: "uraian",
@@ -78,7 +83,7 @@ export const TabelSbmHonorarium = ({
       accessorKey: "_additionalKolomAksi",
       header: "Aksi",
       cell: (info) =>
-        KolomAksi<SbmHonorariumWithNumber>(
+        KolomAksi<SbmHonorariumPlainObject>(
           info,
           handleEdit,
           handleDelete,
@@ -91,7 +96,35 @@ export const TabelSbmHonorarium = ({
     },
   ];
 
-  const handleEdit = (row: Row<SbmHonorariumWithNumber>) => {
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+
+  const handleDelete = async (row: SbmHonorariumPlainObject) => {
+    setIsConfirmDialogOpen(true);
+    setOriginalData(row);
+  };
+
+  const handleConfirm = async () => {
+    if (!originalData) {
+      toast.error("Data tidak ditemukan");
+      return;
+    }
+    const deleted = await deleteDataSbmHonorarium(originalData.id);
+    if (deleted.success) {
+      //alert("Data berhasil dihapus");
+      toast.success(
+        `Data ${originalData.jenis} ${originalData.uraian} berhasil dihapus`
+      );
+      setIsConfirmDialogOpen(false);
+      console.log("Data dihapus");
+    } else {
+      console.log("Data tidak dihapus");
+      toast.error(
+        `Data  ${originalData.jenis} ${originalData.uraian} gagal dihapus ${deleted.message}`
+      );
+    }
+  };
+
+  const handleEdit = (row: Row<SbmHonorariumPlainObject>) => {
     console.log("Edit row:", row);
     // Implement your edit logic here
     setOriginalData(row.original); // Store the original data
@@ -100,14 +133,34 @@ export const TabelSbmHonorarium = ({
     setEditableRowIndex(row.id);
   };
 
-  const handleOnSave = async (row: SbmHonorariumWithNumber) => {
+  const handleOnSave = async (row: SbmHonorariumPlainObject) => {
     console.log("Save row:", row);
     // Implement your save logic here
-    setIsEditing(false);
-    setEditableRowIndex(null);
+    try {
+      const parsed = sbmHonorariumSchema.parse(row);
+      const update = await updateDataSbmHonorarium(parsed, row.id);
+      if (update.success) {
+        console.log("Data berhasil disimpan");
+        toast.success("Data berhasil disimpan");
+        console.log("[updated]", update.data);
+      } else {
+        console.error("Data gagal disimpan");
+        toast.error("Data gagal disimpan");
+      }
+      setEditableRowIndex(null);
+      setIsEditing(false);
+      setErrors(null);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        setErrors(error);
+      } else {
+        console.error("Error saving row:", error);
+        toast.error("Error saving row");
+      }
+    }
   };
 
-  const handleUndoEdit = (row: SbmHonorariumWithNumber) => {
+  const handleUndoEdit = (row: SbmHonorariumPlainObject) => {
     console.log("Undo edit row:", row);
     // Implement your undo edit logic here
     if (originalData) {
@@ -119,24 +172,9 @@ export const TabelSbmHonorarium = ({
     setEditableRowIndex(null);
   };
 
-  const handleDelete = async (row: SbmHonorariumWithNumber) => {
-    console.log("Delete row:", row);
-    const cfm = confirm(
-      `Apakah Anda yakin ingin menghapus data ${row.jenis} ${row.uraian}?`
-    );
-    if (cfm) {
-      const deleted = await deleteDataSbmHonorarium(row.id);
-      if (deleted.success) {
-        //alert("Data berhasil dihapus");
-        console.log("Data dihapus");
-      } else {
-        console.log("Data tidak dihapus");
-      }
-      //alert(deleted.message);
-    } else {
-      console.log("Data tidak dihapus");
-    }
-    // Implement your delete logic here
+  const handleCancel = () => {
+    setIsConfirmDialogOpen(false);
+    console.log("Cancelled!");
   };
 
   useEffect(() => {
@@ -144,12 +182,21 @@ export const TabelSbmHonorarium = ({
   }, [initialData]);
 
   return (
-    <TabelGeneric
-      data={data}
-      columns={columns}
-      frozenColumnCount={1}
-      isEditing={isEditing}
-      editableRowId={editableRowId}
-    />
+    <div>
+      {errors && <ZodErrorList error={errors} />}
+      <TabelGeneric
+        data={data}
+        columns={columns}
+        frozenColumnCount={1}
+        isEditing={isEditing}
+        editableRowId={editableRowId}
+      />
+      <ConfirmDialog
+        message={`Apakah anda yakin menghapus data ${originalData?.jenis} ${originalData?.uraian} ?`}
+        isOpen={isConfirmDialogOpen}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
+    </div>
   );
 };

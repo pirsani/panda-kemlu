@@ -8,7 +8,7 @@ import {
 } from "@/constants/excel/sbm-honorarium";
 import getReferensiSbmHonorarium, {
   SbmHonorariumWithNumber,
-} from "@/data/sbm-honorarum";
+} from "@/data/sbm-honorarium";
 import { dbHonorarium } from "@/lib/db-honorarium";
 import parseExcelOnServer, {
   ParseExcelOptions,
@@ -45,6 +45,7 @@ export const importExcelSbmHonorarium = async (
           message: "No result Error saving data to database",
         };
       } else {
+        revalidatePath("/data-referensi/sbm/honorarium", "page");
         return {
           success: true,
           data: result,

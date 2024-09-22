@@ -9,6 +9,15 @@ export type SbmHonorariumWithNumber = Omit<
   besaran: Decimal | number;
 };
 
+export type SbmHonorariumPlainObject = Omit<
+  SbmHonorarium,
+  "besaran" | "createdAt" | "updatedAt"
+> & {
+  besaran: Decimal | number;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+};
+
 const getReferensiSbmHonorarium = async () => {
   const sbmHonorarium = await dbHonorarium.sbmHonorarium.findMany({
     orderBy: {

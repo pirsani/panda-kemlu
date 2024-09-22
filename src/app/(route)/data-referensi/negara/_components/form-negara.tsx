@@ -37,7 +37,7 @@ const FormNegara = () => {
       const negara = await simpanDataNegara(data);
       if (negara.success) {
         toast.success(
-          `Berhasil menyimpan data negara ${negara.data?.kode} ${negara.data?.nama}`
+          `Berhasil menyimpan data negara ${negara.data?.kodeAlpha3} ${negara.data?.nama}`
         );
         form.reset();
       }

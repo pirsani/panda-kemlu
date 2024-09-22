@@ -130,12 +130,21 @@ export const deleteDataSbmUangRepresentasi = async (
 
 export const getOptionsSbmUangRepresentasi = async () => {
   const dataSbmUangRepresentasi =
-    await dbHonorarium.sbmUangRepresentasi.findMany({});
+    await dbHonorarium.sbmUangRepresentasi.findMany({
+      include: {
+        pejabat: true,
+      },
+    });
   // map dataSbmUangRepresentasi to options
   const optionsSbmUangRepresentasi = dataSbmUangRepresentasi.map(
     (sbmUangRepresentasi) => ({
       value: sbmUangRepresentasi.id,
-      label: sbmUangRepresentasi.kode + "-" + sbmUangRepresentasi.nama,
+      label:
+        sbmUangRepresentasi.pejabat.nama +
+        "-" +
+        sbmUangRepresentasi.luarKota +
+        "-" +
+        sbmUangRepresentasi.dalamKota,
     })
   );
 

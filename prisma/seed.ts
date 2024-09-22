@@ -7,6 +7,55 @@ import { tr } from "date-fns/locale";
 import fs from "fs";
 import path, { resolve } from "path";
 
+interface NegaraRow {
+  id: string;
+  urutan: string;
+  nama: string;
+  nama_inggris: string;
+  kode_alpha_2: string;
+  kode_alpha_3: string;
+  kode_numeric: string;
+}
+const seedNegara = async (): Promise<void> => {
+  console.log("Seeding Negara data");
+  const results: NegaraRow[] = [];
+
+  const csvPath = "docs/data-referensi/negara.csv";
+  const negaraDataPath = path.resolve(process.cwd(), csvPath);
+  return new Promise((resolve, reject) => {
+    fs.createReadStream(negaraDataPath)
+      .pipe(csv({ separator: ";" }))
+      .on("data", (data) => results.push(data))
+      .on("end", async () => {
+        try {
+          for (const row of results) {
+            //console.log(row);
+            await dbHonorarium.negara.create({
+              data: {
+                id: row.id,
+                urutan: parseInt(row.urutan) || null,
+                nama: row.nama,
+                namaInggris: row.nama_inggris,
+                kodeAlpha2: row.kode_alpha_2,
+                kodeAlpha3: row.kode_alpha_3,
+                kodeNumeric: row.kode_numeric,
+                createdBy: "init",
+                createdAt: new Date(),
+                //updatedBy: null,
+                //updatedAt: null,
+              },
+            });
+          }
+          console.log("Data Negara seeded successfully");
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      })
+      .on("error", (error) => reject(error));
+  });
+};
+
 interface ProvinsiRow {
   id: string;
   tahun: string;
@@ -37,15 +86,57 @@ const seedProvinsi = async (): Promise<void> => {
             await dbHonorarium.provinsi.create({
               data: {
                 id: parseInt(row.id),
-                tahun: parseInt(row.tahun),
+                tahun: parseInt(row.tahun || "2022"),
                 kode: parseInt(row.kode),
                 nama: row.nama,
                 singkatan: row.nama_singkatan || null,
-                aktif: row.aktif === "true",
-                createdBy: row.created_by,
-                createdAt: new Date(row.created_at),
-                updatedBy: row.updated_by || null,
-                updatedAt: row.updated_at ? new Date(row.updated_at) : null,
+                aktif: true,
+                createdBy: "init",
+                createdAt: new Date(),
+                //updatedBy: null,
+                //updatedAt: null,
+              },
+            });
+          }
+          console.log("Data Provinsi seeded successfully");
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      })
+      .on("error", (error) => reject(error));
+  });
+};
+
+interface KotaRow {
+  id: string;
+  provinsi_id: string;
+  nama: string;
+}
+const seedKota = async (): Promise<void> => {
+  console.log("Seeding Kota data");
+  const results: KotaRow[] = [];
+
+  const csvPath = "docs/data-referensi/kota.csv";
+  const kotaDataPath = path.resolve(process.cwd(), csvPath);
+  return new Promise((resolve, reject) => {
+    fs.createReadStream(kotaDataPath)
+      .pipe(csv({ separator: ";" }))
+      .on("data", (data) => results.push(data))
+      .on("end", async () => {
+        try {
+          for (const row of results) {
+            //console.log(row);
+            await dbHonorarium.kota.create({
+              data: {
+                id: parseInt(row.id),
+                provinsiId: parseInt(row.provinsi_id),
+                nama: row.nama,
+                aktif: true,
+                createdBy: "init",
+                createdAt: new Date(),
+                //updatedBy: null,
+                //updatedAt: null,
               },
             });
           }
@@ -67,8 +158,6 @@ const deleteExisting = async (): Promise<void> => {
     await dbHonorarium.sbmHonorarium.deleteMany({});
     await dbHonorarium.sbmUhDalamNegeri.deleteMany({});
     await dbHonorarium.sbmUhLuarNegeri.deleteMany({});
-    await dbHonorarium.kota.deleteMany({});
-    await dbHonorarium.provinsi.deleteMany({});
     await dbHonorarium.jadwalNarasumber.deleteMany({});
     await dbHonorarium.jadwal.deleteMany({});
     await dbHonorarium.materi.deleteMany({});
@@ -92,6 +181,9 @@ const deleteExisting = async (): Promise<void> => {
     await dbHonorarium.role.deleteMany({});
     await dbHonorarium.sbmUangRepresentasi.deleteMany({});
     await dbHonorarium.pejabat.deleteMany({});
+    await dbHonorarium.kota.deleteMany({});
+    await dbHonorarium.provinsi.deleteMany({});
+    await dbHonorarium.negara.deleteMany({});
 
     console.log("Existing data deleted successfully");
   } catch (error) {
@@ -102,7 +194,9 @@ const deleteExisting = async (): Promise<void> => {
 
 async function main() {
   await deleteExisting();
+  await seedNegara();
   await seedProvinsi();
+  await seedKota();
 
   const routes = await dbHonorarium.jadwal.findMany({});
   console.log(routes);

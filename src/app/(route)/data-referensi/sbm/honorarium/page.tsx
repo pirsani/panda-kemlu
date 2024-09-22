@@ -1,13 +1,12 @@
-import getReferensiSbmHonorarium from "@/data/sbm-honorarum";
-import { get } from "lodash";
+import getReferensiSbmHonorarium from "@/data/sbm-honorarium";
+import { convertSpecialTypesToPlain } from "@/utils/convert-obj-to-plain";
 import FormUploadExcelSbmHonorarium from "./_components/form-upload-excel-sbm-honorarium";
 import { TabelSbmHonorarium } from "./_components/tabel-sbm-honorarium";
 
 const ReferensiSbmHonorariumPage = async () => {
   const data = await getReferensiSbmHonorarium();
   const convertedData = data.map((item) => ({
-    ...item,
-    besaran: item.besaran.toNumber(), // Convert Decimal to number
+    ...convertSpecialTypesToPlain(item),
   }));
   return (
     <div className="p-4 pb-24 h-auto min-h-full flex flex-col">

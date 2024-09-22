@@ -121,7 +121,7 @@ export const getOptionsNegara = async () => {
   // map dataNegara to options
   const optionsNegara = dataNegara.map((negara) => ({
     value: negara.id,
-    label: negara.kode + "-" + negara.nama,
+    label: negara.kodeAlpha3 + "-" + negara.nama,
   }));
 
   return optionsNegara;

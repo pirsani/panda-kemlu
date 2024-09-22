@@ -25,6 +25,7 @@ import { Narasumber } from "@/zod/schemas/narasumber";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export const FormUploadExcelSbmHonorarium = () => {
   const form = useForm<excelDataReferensi>({
@@ -54,7 +55,7 @@ export const FormUploadExcelSbmHonorarium = () => {
     formData.append("file", data.file);
     const importedData = await importExcelSbmHonorarium(formData);
     if (importedData.success) {
-      alert("Data berhasil diimport");
+      toast.success("Data berhasil diimport");
       console.log("Data berhasil diimport", importedData.data);
       setData(null);
       setIsReadyToSubmit(false);

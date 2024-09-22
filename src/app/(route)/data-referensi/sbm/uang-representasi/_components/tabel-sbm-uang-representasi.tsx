@@ -5,6 +5,7 @@ import {
   simpanDataSbmUangRepresentasi,
   updateDataSbmUangRepresentasi,
 } from "@/actions/sbm/uang-representasi";
+import ZodErrorList from "@/approute/data-referensi/_components/zod-error-list";
 import ConfirmDialog from "@/components/confirm-dialog";
 import {
   formatCurrency,
@@ -47,6 +48,8 @@ export const TabelSbmUangRepresentasi = ({
   const [editableRowId, setEditableRowIndex] = useState<string | null>(null);
   const [originalData, setOriginalData] =
     useState<sbmUangRepresentasiWithPejabat | null>(null);
+  const [errors, setErrors] = useState<ZodError | null>(null);
+
   const columns: ColumnDef<sbmUangRepresentasiWithPejabat>[] = [
     {
       id: "rowNumber",
@@ -154,10 +157,10 @@ export const TabelSbmUangRepresentasi = ({
     console.log("Save row:", row);
     // Implement your save logic here
     //convert back kegiatanId as number
-    row.kegiatanId = Number(row.kegiatanId);
+    row.pejabatId = Number(row.pejabatId);
 
     try {
-      const parsed = kelasSchema.parse(row);
+      const parsed = sbmUangRepresentasiSchema.parse(row);
       const update = await updateDataSbmUangRepresentasi(parsed, row.id);
       if (update.success) {
         console.log("Data berhasil disimpan");
@@ -168,11 +171,13 @@ export const TabelSbmUangRepresentasi = ({
       }
       setEditableRowIndex(null);
       setIsEditing(false);
+      setErrors(null);
     } catch (error) {
       if (error instanceof ZodError) {
-        //setErrors(error);
+        setErrors(error);
       } else {
         console.error("Error saving row:", error);
+        toast.error("Error saving row");
       }
       console.error("Error saving row:", error);
     }
@@ -200,6 +205,7 @@ export const TabelSbmUangRepresentasi = ({
   }, [initialData]);
   return (
     <div>
+      {errors && <ZodErrorList error={errors} />}
       <TabelGeneric
         data={data}
         columns={columns}
@@ -208,7 +214,7 @@ export const TabelSbmUangRepresentasi = ({
         editableRowId={editableRowId}
       />
       <ConfirmDialog
-        message={`Apakah anda yakin menghapus data ${originalData?.nama} ?`}
+        message={`Apakah anda yakin menghapus data ${originalData?.pejabat.nama} ?`}
         isOpen={isConfirmDialogOpen}
         onConfirm={handleConfirm}
         onCancel={handleCancel}
