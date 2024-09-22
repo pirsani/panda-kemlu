@@ -97,22 +97,20 @@ export const deleteDataSbmUhDalamNegeri = async (
     const customError = error as CustomPrismaClientError;
     switch (customError.code) {
       case "P2025":
-        console.error("Sbm Uang Representasi not found");
+        console.error("Sbm UHDalam Negeri not found");
         return {
           success: false,
-          error: "Sbm Uang Representasi not found",
-          message: "Sbm Uang Representasi not found",
+          error: "Sbm UHDalam Negeri not found",
+          message: "Sbm UHDalam Negeri not found",
         };
         break;
 
       case "P2003":
-        console.error(
-          "Sbm Uang Representasi is being referenced by other data"
-        );
+        console.error("Sbm UHDalam Negeri is being referenced by other data");
         return {
           success: false,
-          error: "Sbm Uang Representasi is being referenced by other data",
-          message: "Sbm Uang Representasi is being referenced by other data",
+          error: "Sbm UHDalam Negeri is being referenced by other data",
+          message: "Sbm UHDalam Negeri is being referenced by other data",
         };
         break;
 

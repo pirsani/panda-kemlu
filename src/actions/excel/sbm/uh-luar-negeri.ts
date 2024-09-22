@@ -7,7 +7,7 @@ import {
   mapColumnExcelToField,
 } from "@/constants/excel/sbm-uh-luar-negeri";
 import getReferensiSbmUhLuarNegeri, {
-  SbmUhLuarNegeriWithNumber,
+  SbmUhLuarNegeriPlainObject,
 } from "@/data/sbm-uh-luar-negeri";
 import { dbHonorarium } from "@/lib/db-honorarium";
 import parseExcelOnServer, {
@@ -21,8 +21,8 @@ import { ZodError } from "zod";
 
 export const importExcelSbmUhLuarNegeri = async (
   formData: FormData
-): Promise<ActionResponse<SbmUhLuarNegeriWithNumber[]>> => {
-  let data: SbmUhLuarNegeriWithNumber[];
+): Promise<ActionResponse<SbmUhLuarNegeriPlainObject[]>> => {
+  let data: SbmUhLuarNegeriPlainObject[];
 
   // step 1: parse the form data
   try {
@@ -127,7 +127,7 @@ async function parseDataSbmUhLuarNegeriDariExcel(file: File) {
 async function saveDataSbmUhLuarNegeriToDatabase(
   data: Record<string, any>[],
   createdBy: string = "admin"
-): Promise<SbmUhLuarNegeriWithNumber[] | void> {
+): Promise<SbmUhLuarNegeriPlainObject[] | void> {
   // loop over the data and save it to the database, convert into SbmUhLuarNegeri object
   try {
     const sbmUhLuarNegeri: SbmUhLuarNegeri[] = data.map((row) => {
@@ -161,7 +161,7 @@ async function saveDataSbmUhLuarNegeriToDatabase(
 
     revalidatePath("/data-referensi/sbm/uh-luar-negeri", "page");
 
-    return convertedData as SbmUhLuarNegeriWithNumber[];
+    return convertedData as SbmUhLuarNegeriPlainObject[];
   } catch (error) {
     console.error("Error saving data to database:", error);
     throw new Error("Error saving data to database");
@@ -170,7 +170,7 @@ async function saveDataSbmUhLuarNegeriToDatabase(
 
 export const deleteDataSbmUhLuarNegeri = async (
   id: string
-): Promise<ActionResponse<SbmUhLuarNegeriWithNumber>> => {
+): Promise<ActionResponse<SbmUhLuarNegeriPlainObject>> => {
   // check user permission
   // if (!userCanDeleteData) {}
 
@@ -196,7 +196,7 @@ export const deleteDataSbmUhLuarNegeri = async (
 
     return {
       success: true,
-      data: convertedData as SbmUhLuarNegeriWithNumber,
+      data: convertedData as SbmUhLuarNegeriPlainObject,
       message: "Data sbmUhLuarNegeri berhasil dihapus",
     };
   } catch (error) {

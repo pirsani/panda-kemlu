@@ -1,5 +1,8 @@
 "use client";
 import { deleteDataSbmUhLuarNegeri } from "@/actions/excel/sbm/uh-luar-negeri";
+import { updateDataSbmUhLuarNegeri } from "@/actions/sbm/uh-luar-negeri";
+import ZodErrorList from "@/approute/data-referensi/_components/zod-error-list";
+import ConfirmDialog from "@/components/confirm-dialog";
 import {
   formatCurrency,
   KolomAksi,
@@ -8,8 +11,9 @@ import {
 } from "@/components/tabel-generic";
 import { Button } from "@/components/ui/button";
 import { NarasumberWithStringDate } from "@/data/narasumber";
-import { SbmUhLuarNegeriWithNumber } from "@/data/sbm-uh-luar-negeri";
+import { SbmUhLuarNegeriPlainObject } from "@/data/sbm-uh-luar-negeri";
 import { useSearchTerm } from "@/hooks/use-search-term";
+import { sbmUhLuarNegeriSchema } from "@/zod/schemas/sbm-uh-luar-negeri";
 import { SbmUhLuarNegeri } from "@prisma-honorarium/client";
 import {
   ColumnDef,
@@ -26,12 +30,13 @@ import {
 import { info } from "console";
 import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { ZodError } from "zod";
 
-const data: SbmUhLuarNegeriWithNumber[] = [];
+const data: SbmUhLuarNegeriPlainObject[] = [];
 
 interface TabelSbmUhLuarNegeriProps {
-  data: SbmUhLuarNegeriWithNumber[];
+  data: SbmUhLuarNegeriPlainObject[];
   optionsNegara: { value: string; label: string }[];
   frozenColumnCount?: number;
 }
@@ -40,14 +45,14 @@ export const TabelSbmUhLuarNegeri = ({
   optionsNegara,
   frozenColumnCount = 2,
 }: TabelSbmUhLuarNegeriProps) => {
-  const [data, setData] = useState<SbmUhLuarNegeriWithNumber[]>(initialData);
+  const [data, setData] = useState<SbmUhLuarNegeriPlainObject[]>(initialData);
   const [isEditing, setIsEditing] = useState(false);
   const [editableRowId, setEditableRowIndex] = useState<string | null>(null);
   const [originalData, setOriginalData] =
-    useState<SbmUhLuarNegeriWithNumber | null>(null);
+    useState<SbmUhLuarNegeriPlainObject | null>(null);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [errors, setErrors] = useState<ZodError | null>(null);
   const { searchTerm } = useSearchTerm();
-  const columnHelper = createColumnHelper<SbmUhLuarNegeriWithNumber>();
 
   const filteredData = data.filter((row) => {
     if (!searchTerm || searchTerm === "") return true;
@@ -65,7 +70,8 @@ export const TabelSbmUhLuarNegeri = ({
     );
   });
 
-  const columns: ColumnDef<SbmUhLuarNegeriWithNumber>[] = [
+  const columnHelper = createColumnHelper<SbmUhLuarNegeriPlainObject>();
+  const columns: ColumnDef<SbmUhLuarNegeriPlainObject>[] = [
     {
       id: "rowNumber",
       header: "#",
@@ -89,22 +95,22 @@ export const TabelSbmUhLuarNegeri = ({
     {
       accessorKey: "golonganA",
       header: "Golongan A",
-      cell: (info) => formatCurrency<SbmUhLuarNegeriWithNumber>(info, "USD"),
+      cell: (info) => formatCurrency<SbmUhLuarNegeriPlainObject>(info, "USD"),
     },
     {
       accessorKey: "golonganB",
       header: "Golongan B",
-      cell: (info) => formatCurrency<SbmUhLuarNegeriWithNumber>(info, "USD"),
+      cell: (info) => formatCurrency<SbmUhLuarNegeriPlainObject>(info, "USD"),
     },
     {
       accessorKey: "golonganC",
       header: "Golongan C",
-      cell: (info) => formatCurrency<SbmUhLuarNegeriWithNumber>(info, "USD"),
+      cell: (info) => formatCurrency<SbmUhLuarNegeriPlainObject>(info, "USD"),
     },
     {
       accessorKey: "golonganD",
       header: "Golongan D",
-      cell: (info) => formatCurrency<SbmUhLuarNegeriWithNumber>(info, "USD"),
+      cell: (info) => formatCurrency<SbmUhLuarNegeriPlainObject>(info, "USD"),
     },
     {
       accessorKey: "tahun",
@@ -115,7 +121,7 @@ export const TabelSbmUhLuarNegeri = ({
       accessorKey: "_additionalKolomAksi",
       header: "Aksi",
       cell: (info) =>
-        KolomAksi<SbmUhLuarNegeriWithNumber>(
+        KolomAksi<SbmUhLuarNegeriPlainObject>(
           info,
           handleEdit,
           handleDelete,
@@ -128,7 +134,7 @@ export const TabelSbmUhLuarNegeri = ({
     },
   ];
 
-  const handleEdit = (row: Row<SbmUhLuarNegeriWithNumber>) => {
+  const handleEdit = (row: Row<SbmUhLuarNegeriPlainObject>) => {
     console.log("Edit row:", row);
     // Implement your edit logic here
     setOriginalData(row.original); // Store the original data
@@ -137,14 +143,44 @@ export const TabelSbmUhLuarNegeri = ({
     setEditableRowIndex(row.id);
   };
 
-  const handleOnSave = async (row: SbmUhLuarNegeriWithNumber) => {
-    console.log("Save row:", row);
-    // Implement your save logic here
-    setIsEditing(false);
-    setEditableRowIndex(null);
+  const handleDelete = async (row: SbmUhLuarNegeriPlainObject) => {
+    setIsConfirmDialogOpen(true);
+    setOriginalData(row);
   };
 
-  const handleUndoEdit = (row: SbmUhLuarNegeriWithNumber) => {
+  const handleCancel = () => {
+    setIsConfirmDialogOpen(false);
+    console.log("Cancelled!");
+  };
+
+  const handleOnSave = async (row: SbmUhLuarNegeriPlainObject) => {
+    console.log("Save row:", row);
+    // Implement your save logic here
+    try {
+      const parsed = sbmUhLuarNegeriSchema.parse(row);
+      const update = await updateDataSbmUhLuarNegeri(parsed, row.id);
+      if (update.success) {
+        console.log("Data berhasil disimpan");
+        toast.success("Data berhasil disimpan");
+        console.log("[updated]", update.data);
+      } else {
+        console.error("Data gagal disimpan");
+        toast.error("Data gagal disimpan");
+      }
+      setEditableRowIndex(null);
+      setIsEditing(false);
+      setErrors(null);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        setErrors(error);
+      } else {
+        console.error("Error saving row:", error);
+        toast.error("Error saving row");
+      }
+    }
+  };
+
+  const handleUndoEdit = (row: SbmUhLuarNegeriPlainObject) => {
     console.log("Undo edit row:", row);
     // Implement your undo edit logic here
     if (originalData) {
@@ -156,24 +192,25 @@ export const TabelSbmUhLuarNegeri = ({
     setEditableRowIndex(null);
   };
 
-  const handleDelete = async (row: SbmUhLuarNegeriWithNumber) => {
-    console.log("Delete row:", row);
-    const cfm = confirm(
-      `Apakah Anda yakin ingin menghapus data sbm ${row.negara.nama} ?`
-    );
-    if (cfm) {
-      const deleted = await deleteDataSbmUhLuarNegeri(row.id);
-      if (deleted.success) {
-        //alert("Data berhasil dihapus");
-        console.log("Data dihapus");
-      } else {
-        console.log("Data tidak dihapus");
-      }
-      //alert(deleted.message);
+  const handleConfirm = async () => {
+    if (!originalData) {
+      toast.error("Data tidak ditemukan");
+      return;
+    }
+    const deleted = await deleteDataSbmUhLuarNegeri(originalData.id);
+    if (deleted.success) {
+      //alert("Data berhasil dihapus");
+      toast.success(
+        `Data ${originalData.negara.nama} ${originalData.tahun} berhasil dihapus`
+      );
+      setIsConfirmDialogOpen(false);
+      console.log("Data dihapus");
     } else {
       console.log("Data tidak dihapus");
+      toast.error(
+        `Data  ${originalData.negara.nama} ${originalData.tahun} gagal dihapus ${deleted.message}`
+      );
     }
-    // Implement your delete logic here
   };
 
   useEffect(() => {
@@ -181,12 +218,21 @@ export const TabelSbmUhLuarNegeri = ({
   }, [initialData]);
 
   return (
-    <TabelGeneric
-      data={filteredData}
-      columns={columns}
-      frozenColumnCount={frozenColumnCount}
-      isEditing={isEditing}
-      editableRowId={editableRowId}
-    />
+    <div>
+      {errors && <ZodErrorList error={errors} />}
+      <TabelGeneric
+        data={filteredData}
+        columns={columns}
+        frozenColumnCount={frozenColumnCount}
+        isEditing={isEditing}
+        editableRowId={editableRowId}
+      />
+      <ConfirmDialog
+        message={`Apakah anda yakin menghapus data ${originalData?.negara.nama}  ?`}
+        isOpen={isConfirmDialogOpen}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
+    </div>
   );
 };

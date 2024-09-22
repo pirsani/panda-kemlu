@@ -24,6 +24,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export const FormUploadExcelSbmUhLuarNegeri = () => {
   const form = useForm<excelDataReferensi>({
@@ -53,12 +54,13 @@ export const FormUploadExcelSbmUhLuarNegeri = () => {
     formData.append("file", data.file);
     const importedData = await importExcelSbmUhLuarNegeri(formData);
     if (importedData.success) {
-      alert("Data berhasil diimport");
+      toast.success("Data berhasil diimport");
       console.log("Data berhasil diimport", importedData.data);
       setData(null);
       setIsReadyToSubmit(false);
       reset();
     } else {
+      toast.error("Data gagal diimport");
       console.log("Data gagal diimport ", importedData.error);
     }
     console.log(data);

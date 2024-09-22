@@ -68,8 +68,8 @@ export const TabelSbmUhDalamNegeri = ({
       row.provinsi.nama.toLowerCase().includes(word)
     );
   });
-  const columnHelper = createColumnHelper<SbmUhDalamNegeriPlainObject>();
 
+  const columnHelper = createColumnHelper<SbmUhDalamNegeriPlainObject>();
   const columns: ColumnDef<SbmUhDalamNegeriPlainObject>[] = [
     {
       id: "rowNumber",
