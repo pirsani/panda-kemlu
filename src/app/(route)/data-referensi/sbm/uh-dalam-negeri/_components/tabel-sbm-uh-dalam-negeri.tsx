@@ -1,5 +1,10 @@
 "use client";
-import { deleteDataSbmUhDalamNegeri } from "@/actions/excel/sbm/uh-dalam-negeri";
+import {
+  deleteDataSbmUhDalamNegeri,
+  updateDataSbmUhDalamNegeri,
+} from "@/actions/sbm/uh-dalam-negeri";
+import ZodErrorList from "@/approute/data-referensi/_components/zod-error-list";
+import ConfirmDialog from "@/components/confirm-dialog";
 import {
   formatCurrency,
   KolomAksi,
@@ -8,7 +13,9 @@ import {
 } from "@/components/tabel-generic";
 import { Button } from "@/components/ui/button";
 import { NarasumberWithStringDate } from "@/data/narasumber";
-import { SbmUhDalamNegeriWithNumber } from "@/data/sbm-uh-dalam-negeri";
+import { SbmUhDalamNegeriPlainObject } from "@/data/sbm-uh-dalam-negeri";
+import { useSearchTerm } from "@/hooks/use-search-term";
+import { sbmUhDalamNegeriSchema } from "@/zod/schemas/sbm-uh-dalam-negeri";
 import { SbmUhDalamNegeri } from "@prisma-honorarium/client";
 import {
   ColumnDef,
@@ -24,11 +31,13 @@ import {
 } from "@tanstack/react-table";
 import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { ZodError } from "zod";
 
-const data: SbmUhDalamNegeriWithNumber[] = [];
+const data: SbmUhDalamNegeriPlainObject[] = [];
 
 interface TabelSbmUhDalamNegeriProps {
-  data: SbmUhDalamNegeriWithNumber[];
+  data: SbmUhDalamNegeriPlainObject[];
   optionsProvinsi: { value: number; label: string }[];
   frozenColumnCount?: number;
 }
@@ -37,15 +46,31 @@ export const TabelSbmUhDalamNegeri = ({
   optionsProvinsi,
   frozenColumnCount = 2,
 }: TabelSbmUhDalamNegeriProps) => {
-  const [data, setData] = useState<SbmUhDalamNegeriWithNumber[]>(initialData);
+  const [data, setData] = useState<SbmUhDalamNegeriPlainObject[]>(initialData);
   const [isEditing, setIsEditing] = useState(false);
   const [editableRowId, setEditableRowIndex] = useState<string | null>(null);
   const [originalData, setOriginalData] =
-    useState<SbmUhDalamNegeriWithNumber | null>(null);
+    useState<SbmUhDalamNegeriPlainObject | null>(null);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [errors, setErrors] = useState<ZodError | null>(null);
+  const { searchTerm } = useSearchTerm();
 
-  const columnHelper = createColumnHelper<SbmUhDalamNegeriWithNumber>();
+  const filteredData = data.filter((row) => {
+    if (!searchTerm || searchTerm === "") return true;
+    const lowercasedSearchTerm = searchTerm.toLowerCase();
+    //const searchWords = lowercasedSearchTerm.split(" ").filter(Boolean);
+    const searchWords =
+      lowercasedSearchTerm
+        .match(/"[^"]+"|\S+/g)
+        ?.map((word) => word.replace(/"/g, "")) || [];
 
-  const columns: ColumnDef<SbmUhDalamNegeriWithNumber>[] = [
+    return searchWords.every((word) =>
+      row.provinsi.nama.toLowerCase().includes(word)
+    );
+  });
+  const columnHelper = createColumnHelper<SbmUhDalamNegeriPlainObject>();
+
+  const columns: ColumnDef<SbmUhDalamNegeriPlainObject>[] = [
     {
       id: "rowNumber",
       header: "#",
@@ -72,27 +97,27 @@ export const TabelSbmUhDalamNegeri = ({
     {
       accessorKey: "fullboard",
       header: "Fullboard",
-      cell: formatCurrency<SbmUhDalamNegeriWithNumber>,
+      cell: formatCurrency<SbmUhDalamNegeriPlainObject>,
     },
     {
       accessorKey: "fulldayHalfday",
       header: "Fullday/Halfday",
-      cell: formatCurrency<SbmUhDalamNegeriWithNumber>,
+      cell: formatCurrency<SbmUhDalamNegeriPlainObject>,
     },
     {
       accessorKey: "luarKota",
       header: "Luar Kota",
-      cell: formatCurrency<SbmUhDalamNegeriWithNumber>,
+      cell: formatCurrency<SbmUhDalamNegeriPlainObject>,
     },
     {
       accessorKey: "dalamKota",
       header: "Dalam Kota",
-      cell: formatCurrency<SbmUhDalamNegeriWithNumber>,
+      cell: formatCurrency<SbmUhDalamNegeriPlainObject>,
     },
     {
       accessorKey: "diklat",
       header: "diklat",
-      cell: formatCurrency<SbmUhDalamNegeriWithNumber>,
+      cell: formatCurrency<SbmUhDalamNegeriPlainObject>,
     },
     {
       accessorKey: "tahun",
@@ -103,7 +128,7 @@ export const TabelSbmUhDalamNegeri = ({
       accessorKey: "_additionalKolomAksi",
       header: "Aksi",
       cell: (info) =>
-        KolomAksi<SbmUhDalamNegeriWithNumber>(
+        KolomAksi<SbmUhDalamNegeriPlainObject>(
           info,
           handleEdit,
           handleDelete,
@@ -116,7 +141,7 @@ export const TabelSbmUhDalamNegeri = ({
     },
   ];
 
-  const handleEdit = (row: Row<SbmUhDalamNegeriWithNumber>) => {
+  const handleEdit = (row: Row<SbmUhDalamNegeriPlainObject>) => {
     console.log("Edit row:", row);
     // Implement your edit logic here
     setOriginalData(row.original); // Store the original data
@@ -125,14 +150,63 @@ export const TabelSbmUhDalamNegeri = ({
     setEditableRowIndex(row.id);
   };
 
-  const handleOnSave = async (row: SbmUhDalamNegeriWithNumber) => {
-    console.log("Save row:", row);
-    // Implement your save logic here
-    setIsEditing(false);
-    setEditableRowIndex(null);
+  const handleDelete = async (row: SbmUhDalamNegeriPlainObject) => {
+    setIsConfirmDialogOpen(true);
+    setOriginalData(row);
   };
 
-  const handleUndoEdit = (row: SbmUhDalamNegeriWithNumber) => {
+  const handleConfirm = async () => {
+    if (!originalData) {
+      toast.error("Data tidak ditemukan");
+      return;
+    }
+    const deleted = await deleteDataSbmUhDalamNegeri(originalData.id);
+    if (deleted.success) {
+      //alert("Data berhasil dihapus");
+      toast.success(`Data sbm ${originalData.provinsi.nama}  berhasil dihapus`);
+      setIsConfirmDialogOpen(false);
+      console.log("Data dihapus");
+    } else {
+      console.log("Data tidak dihapus");
+      toast.error(
+        `Data  ${originalData.provinsi.nama} } gagal dihapus ${deleted.message}`
+      );
+    }
+  };
+
+  const handleCancel = () => {
+    setIsConfirmDialogOpen(false);
+    console.log("Cancelled!");
+  };
+
+  const handleOnSave = async (row: SbmUhDalamNegeriPlainObject) => {
+    console.log("Save row:", row);
+    // Implement your save logic here
+    try {
+      const parsed = sbmUhDalamNegeriSchema.parse(row);
+      const update = await updateDataSbmUhDalamNegeri(parsed, row.id);
+      if (update.success) {
+        console.log("Data berhasil disimpan");
+        toast.success("Data berhasil disimpan");
+        console.log("[updated]", update.data);
+      } else {
+        console.error("Data gagal disimpan");
+        toast.error("Data gagal disimpan");
+      }
+      setEditableRowIndex(null);
+      setIsEditing(false);
+      setErrors(null);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        setErrors(error);
+      } else {
+        console.error("Error saving row:", error);
+        toast.error("Error saving row");
+      }
+    }
+  };
+
+  const handleUndoEdit = (row: SbmUhDalamNegeriPlainObject) => {
     console.log("Undo edit row:", row);
     // Implement your undo edit logic here
     if (originalData) {
@@ -144,37 +218,26 @@ export const TabelSbmUhDalamNegeri = ({
     setEditableRowIndex(null);
   };
 
-  const handleDelete = async (row: SbmUhDalamNegeriWithNumber) => {
-    console.log("Delete row:", row);
-    const cfm = confirm(
-      `Apakah Anda yakin ingin menghapus data ${row.provinsi.nama} ?`
-    );
-    if (cfm) {
-      const deleted = await deleteDataSbmUhDalamNegeri(row.id);
-      if (deleted.success) {
-        //alert("Data berhasil dihapus");
-        console.log("Data dihapus");
-      } else {
-        console.log("Data tidak dihapus");
-      }
-      //alert(deleted.message);
-    } else {
-      console.log("Data tidak dihapus");
-    }
-    // Implement your delete logic here
-  };
-
   useEffect(() => {
     setData(initialData);
   }, [initialData]);
 
   return (
-    <TabelGeneric
-      data={data}
-      columns={columns}
-      frozenColumnCount={frozenColumnCount}
-      isEditing={isEditing}
-      editableRowId={editableRowId}
-    />
+    <div>
+      {errors && <ZodErrorList error={errors} />}
+      <TabelGeneric
+        data={filteredData}
+        columns={columns}
+        frozenColumnCount={frozenColumnCount}
+        isEditing={isEditing}
+        editableRowId={editableRowId}
+      />
+      <ConfirmDialog
+        message={`Apakah anda yakin menghapus data ${originalData?.provinsi.nama}  ?`}
+        isOpen={isConfirmDialogOpen}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
+    </div>
   );
 };

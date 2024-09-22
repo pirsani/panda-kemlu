@@ -2,15 +2,23 @@ import { dbHonorarium } from "@/lib/db-honorarium";
 import { Provinsi, SbmUhDalamNegeri } from "@prisma-honorarium/client";
 import Decimal from "decimal.js";
 
-export type SbmUhDalamNegeriWithNumber = Omit<
+export type SbmUhDalamNegeriPlainObject = Omit<
   SbmUhDalamNegeri,
-  "fullboard" | "fulldayHalfday" | "luarKota" | "dalamKota" | "diklat" // kita omit karena klo decimal dia g bs di passing dari server ke client component
+  | "fullboard"
+  | "fulldayHalfday"
+  | "luarKota"
+  | "dalamKota"
+  | "diklat"
+  | "createdAt"
+  | "updatedAt" // kita omit karena klo decimal dia g bs di passing dari server ke client component
 > & {
   fullboard: Decimal | number;
   fulldayHalfday: Decimal | number;
   luarKota: Decimal | number;
   dalamKota: Decimal | number;
   diklat: Decimal | number;
+  createdAt: Date | string;
+  updatedAt: Date | string;
   provinsi: Provinsi;
 };
 

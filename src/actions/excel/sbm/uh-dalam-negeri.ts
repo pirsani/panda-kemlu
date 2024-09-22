@@ -7,9 +7,11 @@ import {
   mapColumnExcelToField,
 } from "@/constants/excel/sbm-uh-dalam-negeri";
 import getReferensiSbmUhDalamNegeri, {
-  SbmUhDalamNegeriWithNumber,
+  SbmUhDalamNegeriPlainObject,
 } from "@/data/sbm-uh-dalam-negeri";
 import { dbHonorarium } from "@/lib/db-honorarium";
+import { CustomPrismaClientError } from "@/types/custom-prisma-client-error";
+import { convertSpecialTypesToPlain } from "@/utils/convert-obj-to-plain";
 import parseExcelOnServer, {
   ParseExcelOptions,
 } from "@/utils/excel/parse-excel-on-server";
@@ -21,8 +23,8 @@ import { ZodError } from "zod";
 
 export const importExcelSbmUhDalamNegeri = async (
   formData: FormData
-): Promise<ActionResponse<SbmUhDalamNegeriWithNumber[]>> => {
-  let data: SbmUhDalamNegeriWithNumber[];
+): Promise<ActionResponse<SbmUhDalamNegeriPlainObject[]>> => {
+  let data: SbmUhDalamNegeriPlainObject[];
 
   // step 1: parse the form data
   try {
@@ -56,6 +58,16 @@ export const importExcelSbmUhDalamNegeri = async (
     if (error instanceof ZodError) {
       console.error("[ZodError]", error.errors);
     } else {
+      const customError = error as CustomPrismaClientError;
+      if (customError.code === "P2002") {
+        return {
+          success: false,
+          error: customError.code,
+          message:
+            "Sbm Uh Dalam Negeri dengan provinsi dan tahun yang sama sudah ada",
+        };
+      }
+
       console.error("[UnknownError]", error);
     }
     return {
@@ -124,8 +136,9 @@ async function parseDataSbmUhDalamNegeriDariExcel(file: File) {
 async function saveDataSbmUhDalamNegeriToDatabase(
   data: Record<string, any>[],
   createdBy: string = "admin"
-): Promise<SbmUhDalamNegeriWithNumber[] | void> {
+): Promise<SbmUhDalamNegeriPlainObject[] | void> {
   // loop over the data and save it to the database, convert into SbmUhDalamNegeri object
+  // manual id creation
   try {
     const sbmUhDalamNegeri: SbmUhDalamNegeri[] = data.map((row) => {
       const mappedData = mapColumnExcelToField(row, columnsMap);
@@ -147,12 +160,7 @@ async function saveDataSbmUhDalamNegeriToDatabase(
     // Fetch the created records
     const createdSbmUhDalamNegeri = await getReferensiSbmUhDalamNegeri();
     const convertedData = createdSbmUhDalamNegeri.map((item) => ({
-      ...item,
-      fullboard: item.fullboard.toNumber(),
-      fulldayHalfday: item.fulldayHalfday.toNumber(),
-      luarKota: item.luarKota.toNumber(),
-      dalamKota: item.dalamKota.toNumber(),
-      diklat: item.diklat.toNumber(),
+      ...convertSpecialTypesToPlain<SbmUhDalamNegeriPlainObject>(item),
     }));
 
     revalidatePath("/data-referensi/sbm/uh-dalam-negeri", "page");
@@ -160,47 +168,6 @@ async function saveDataSbmUhDalamNegeriToDatabase(
     return convertedData;
   } catch (error) {
     console.error("Error saving data to database:", error);
-    throw new Error("Error saving data to database");
+    throw error;
   }
 }
-
-export const deleteDataSbmUhDalamNegeri = async (
-  id: string
-): Promise<ActionResponse<SbmUhDalamNegeriWithNumber>> => {
-  // check user permission
-  // if (!userCanDeleteData) {}
-
-  try {
-    const deleted = await dbHonorarium.sbmUhDalamNegeri.delete({
-      where: {
-        id,
-      },
-      include: {
-        provinsi: true,
-      },
-    });
-
-    const convertedData = {
-      ...deleted,
-      fullboard: deleted.fullboard.toNumber(),
-      fulldayHalfday: deleted.fulldayHalfday.toNumber(),
-      luarKota: deleted.luarKota.toNumber(),
-      dalamKota: deleted.dalamKota.toNumber(),
-      diklat: deleted.diklat.toNumber(),
-    };
-    revalidatePath("/data-referensi/sbm/uh-dalam-negeri", "page");
-    console.log("[deleted]", convertedData);
-
-    return {
-      success: true,
-      data: convertedData,
-      message: "Data sbmUhDalamNegeri berhasil dihapus",
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: "Error deleting data from database",
-      message: "Error deleting data from database",
-    };
-  }
-};
