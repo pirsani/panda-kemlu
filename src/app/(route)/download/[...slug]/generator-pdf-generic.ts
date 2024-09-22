@@ -1,4 +1,3 @@
-import { once } from "events";
 import fs from "fs";
 import { max } from "lodash";
 import { NextResponse } from "next/server";
@@ -305,35 +304,37 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
   // Buffers to hold PDF data
   const buffers: Buffer[] = [];
 
-  // Listen for data and end events
-  doc.on("data", buffers.push.bind(buffers));
-
-  // Generate PDF content
-  try {
-    doc.fontSize(18).text("Payroll Report", { align: "center" });
-    doc.moveDown();
-    generateTable(doc, columns, rows, 20, 100, 20);
-    doc
-      .moveDown()
-      .text("Officer Signature: ____________________", { align: "left" });
-    doc.end();
-
-    // Wait for 'end' event to ensure the document generation is complete
-    await once(doc, "end");
-    // Concatenate the buffers once the PDF generation is complete
-    const pdfBuffer = Buffer.concat(buffers);
-
-    // Return a NextResponse with the PDF content
-    return new NextResponse(pdfBuffer, {
-      status: 200,
-      headers: {
-        "Content-Type": "application/pdf",
-        // "Content-Disposition": 'attachment; filename="payroll.pdf"',
-      },
+  // Return a new Promise
+  return new Promise<NextResponse>((resolve, reject) => {
+    // Listen for data and end events
+    doc.on("data", buffers.push.bind(buffers));
+    doc.on("end", () => {
+      const pdfBuffer = Buffer.concat(buffers);
+      resolve(
+        new NextResponse(pdfBuffer, {
+          status: 200,
+          headers: {
+            "Content-Type": "application/pdf",
+            // "Content-Disposition": 'attachment; filename="payroll.pdf"',
+          },
+        })
+      );
     });
-  } catch (error) {
-    throw new Error("Failed to generate PDF");
-  }
+    doc.on("error", reject);
+
+    // Generate PDF content
+    try {
+      doc.fontSize(18).text("Payroll Report", { align: "center" });
+      doc.moveDown();
+      generateTable(doc, columns, rows, 20, 100, 20);
+      doc
+        .moveDown()
+        .text("Officer Signature: ____________________", { align: "left" });
+      doc.end();
+    } catch (error) {
+      reject(error);
+    }
+  });
 }
 
 export async function downloadDaftarNominatif(req: Request, slug: string[]) {
