@@ -1,12 +1,13 @@
 import { once } from "events";
 import fs from "fs";
-import { max } from "lodash";
+import { concat, max } from "lodash";
 import { NextResponse } from "next/server";
 import path from "path";
 import PDFDocument from "pdfkit"; // Importing PDFDocument as a value
 
 interface TableColumn {
   header: string;
+  headerNumberingString?: string;
   field?: String;
   level: number;
   width: number;
@@ -66,19 +67,19 @@ const isHasSubHeader = (column: TableColumn): boolean => {
   return !!(column.subHeader && column.subHeader.length > 0);
 };
 
-const getMaxHeaderHeight = (
-  columns: TableColumn[],
-  rowHeight: number
-): number => {
-  let maxHeight = rowHeight;
-  columns.forEach((column) => {
-    if (column.subHeader) {
-      const subHeaderHeight = getMaxHeaderHeight(column.subHeader, rowHeight);
-      maxHeight = Math.max(maxHeight, rowHeight + subHeaderHeight);
-    }
-  });
-  return maxHeight;
-};
+// const getMaxHeaderHeight = (
+//   columns: TableColumn[],
+//   rowHeight: number
+// ): number => {
+//   let maxHeight = rowHeight;
+//   columns.forEach((column) => {
+//     if (column.subHeader) {
+//       const subHeaderHeight = getMaxHeaderHeight(column.subHeader, rowHeight);
+//       maxHeight = Math.max(maxHeight, rowHeight + subHeaderHeight);
+//     }
+//   });
+//   return maxHeight;
+// };
 
 const drawCell = (
   doc: InstanceType<typeof PDFDocument>,
@@ -86,12 +87,50 @@ const drawCell = (
   x: number,
   y: number,
   width: number,
-  align: "left" | "center" | "right"
+  align: "left" | "center" | "right",
+  padding: number = 5, // Default padding value
+  lineSpacing: number = 10 // Default line spacing value
 ) => {
-  const padding = align === "right" ? -5 : 5;
-  doc.fontSize(10).text(text, x + padding, y + 10, {
-    width: width - 10,
-    align: align,
+  const adjustedX = align === "right" ? x - padding : x + padding;
+  const adjustedWidth = width - 2 * padding;
+  const adjustedY = y + padding; // Add vertical padding if needed
+
+  const lines = text.split("\n");
+  let currentY = adjustedY;
+
+  lines.forEach((line) => {
+    doc.fontSize(10).text(line, adjustedX, currentY, {
+      width: adjustedWidth,
+      align: align,
+    });
+    currentY +=
+      doc.heightOfString(line, { width: adjustedWidth }) + lineSpacing;
+  });
+};
+
+const generateNumberingHeader = (
+  doc: InstanceType<typeof PDFDocument>,
+  flatColumns: TableColumn[],
+  startX: number,
+  startY: number,
+  rowHeight: number = 20
+) => {
+  flatColumns.forEach((column, index) => {
+    const columnXOffset = getColumnXOffset(flatColumns, index);
+    const columnStartX = startX + columnXOffset;
+    const columnStartY = startY + rowHeight;
+
+    // Draw the header text
+    drawCell(
+      doc,
+      column.headerNumberingString || String(index + 1),
+      columnStartX,
+      columnStartY,
+      column.width,
+      "center"
+    );
+
+    doc.rect(columnStartX, columnStartY, column.width, rowHeight).stroke();
   });
 };
 
@@ -147,6 +186,8 @@ const generateTableHeader = (
 
   // Start drawing the header
   drawHeader(columns, startX, startY);
+
+  // Draw the border around the header
 };
 
 const generateTableRow = (
@@ -170,7 +211,7 @@ const generateTableRow = (
         return;
       }
 
-      console.log("[column]", column);
+      //console.log("[column]", column);
 
       const columnXOffset = getColumnXOffset(columns, columns.indexOf(column));
       const columnStartX = startX + columnXOffset;
@@ -190,15 +231,21 @@ const generateTable = (
   rows: TableRow[],
   startX: number,
   startY: number,
+  headerRowHeight: number = 20,
   rowHeight: number = 20
 ) => {
-  generateTableHeader(doc, columns, startX, startY, rowHeight);
-
-  const totalHeight = getMaxHeaderHeight(columns, rowHeight);
-
-  // get the colum
-
   const deepestColumns = getDeepestColumns(columns);
+  const maxLevel = findMaxLevel(columns);
+  const totalHeightHeader = maxLevel * headerRowHeight;
+
+  generateTableHeader(doc, columns, startX, startY, headerRowHeight);
+  generateNumberingHeader(
+    doc,
+    deepestColumns,
+    startX,
+    startY + totalHeightHeader,
+    headerRowHeight
+  );
 
   rows.forEach((row, rowIndex) => {
     generateTableRow(
@@ -206,7 +253,12 @@ const generateTable = (
       row,
       deepestColumns,
       startX,
-      totalHeight + startY + rowHeight * (rowIndex + 1),
+      // startY + totalHeightHeader + rowHeight * (rowIndex + 1),
+      startY +
+        totalHeightHeader +
+        headerRowHeight +
+        headerRowHeight +
+        rowHeight * rowIndex,
       rowHeight
     );
   });
@@ -218,9 +270,18 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
     {
       level: 1,
       header: "No.",
+      headerNumberingString: "1",
       field: "no",
       width: 50,
       align: "center",
+    },
+    {
+      level: 1,
+      header: "NAMA/NIK/NPWP",
+      headerNumberingString: "2",
+      field: "concatedText",
+      width: 150,
+      align: "left",
     },
     {
       level: 1,
@@ -228,10 +289,18 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
       width: 250,
       align: "center",
       subHeader: [
-        { level: 2, header: "Name", field: "nama", width: 150, align: "left" },
+        {
+          level: 2,
+          header: "Name",
+          headerNumberingString: "3",
+          field: "nama",
+          width: 150,
+          align: "left",
+        },
         {
           level: 2,
           header: "Position",
+          headerNumberingString: "4",
           field: "posisi",
           width: 100,
           align: "left",
@@ -247,6 +316,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
         {
           level: 2,
           header: "Basic Salary",
+          headerNumberingString: "5",
           field: "basicSalary",
           width: 100,
           align: "right",
@@ -254,6 +324,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
         {
           level: 2,
           header: "Allowances",
+          headerNumberingString: "6=5-7",
           field: "allowances",
           width: 100,
           align: "right",
@@ -261,6 +332,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
         {
           level: 2,
           header: "Deductions",
+          headerNumberingString: "7",
           field: "deductions",
           width: 100,
           align: "right",
@@ -272,6 +344,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
   const rows: TableRow[] = [
     {
       no: 1,
+      concatedText: "John Doe panjang \n 1234567890 \n 1234567890",
       nama: "John Doe panjang",
       posisi: "Manager",
       basicSalary: "$5000",
@@ -280,6 +353,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
     },
     {
       no: 2,
+      concatedText: "John Doe panjang",
       nama: "John Doe panjang",
       posisi: "Manager",
       basicSalary: "$5000",
@@ -312,7 +386,8 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
   try {
     doc.fontSize(18).text("Payroll Report", { align: "center" });
     doc.moveDown();
-    generateTable(doc, columns, rows, 20, 100, 20);
+    generateTable(doc, columns, rows, 20, 100, 20, 100);
+    //generateTable(doc, columns, rows, 20, 100, 20, 60);
     doc
       .moveDown()
       .text("Officer Signature: ____________________", { align: "left" });
