@@ -296,7 +296,10 @@ export const TabelGeneric = <T,>({
                       style={
                         index < frozenColumnCount
                           ? {
-                              left: `${cumulativeWidths[index] || 0}px`,
+                              //left: `${cumulativeWidths[index] || 0}px`,
+                              width:
+                                cumulativeWidths[index + 1] -
+                                (cumulativeWidths[index] || 0),
                             }
                           : undefined
                       }
@@ -305,15 +308,7 @@ export const TabelGeneric = <T,>({
                         if (cell.column.id === "rowNumber") {
                           // Display the row number, considering pagination
                           return (
-                            <span
-                              style={{
-                                width:
-                                  cumulativeWidths[index + 1] -
-                                  (cumulativeWidths[index] || 0),
-                              }} // Set the width to match the column width
-                            >
-                              {rowIndex + 1 + pageSize * pageIndex}
-                            </span>
+                            <span>{rowIndex + 1 + pageSize * pageIndex}</span>
                           );
                         }
 
@@ -333,14 +328,7 @@ export const TabelGeneric = <T,>({
                           cell.column.columnDef.meta?.isCellEditable === false
                         ) {
                           return (
-                            <div
-                              className="flex flex-row w-full"
-                              style={{
-                                width:
-                                  cumulativeWidths[index + 1] -
-                                  (cumulativeWidths[index] || 0),
-                              }} // Set the width to match the column width
-                            >
+                            <div className="">
                               {flexRender(
                                 cell.column.columnDef.cell,
                                 cell.getContext()
