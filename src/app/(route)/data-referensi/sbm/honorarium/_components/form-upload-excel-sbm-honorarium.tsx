@@ -86,7 +86,7 @@ export const FormUploadExcelSbmHonorarium = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} className="border rounded-sm p-2">
         <FormField
           control={form.control}
           name="file"

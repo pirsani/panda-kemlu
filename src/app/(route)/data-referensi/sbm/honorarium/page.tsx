@@ -11,8 +11,8 @@ const ReferensiSbmHonorariumPage = async () => {
   return (
     <div className="p-4 pb-24 h-auto min-h-full flex flex-col">
       <h1 className="m-2">Tabel Referensi &gt; SBM Honorarium </h1>
-      <FormUploadExcelSbmHonorarium />
       <TabelSbmHonorarium data={convertedData} />
+      <FormUploadExcelSbmHonorarium />
     </div>
   );
 };

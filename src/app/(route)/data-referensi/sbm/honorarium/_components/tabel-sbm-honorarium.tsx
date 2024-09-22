@@ -11,6 +11,7 @@ import {
 } from "@/components/tabel-generic";
 import { Button } from "@/components/ui/button";
 import { SbmHonorariumPlainObject } from "@/data/sbm-honorarium";
+import { useSearchTerm } from "@/hooks/use-search-term";
 import { sbmHonorariumSchema } from "@/zod/schemas/sbm-honorarium";
 import {
   ColumnDef,
@@ -43,6 +44,24 @@ export const TabelSbmHonorarium = ({
   const [originalData, setOriginalData] =
     useState<SbmHonorariumPlainObject | null>(null);
   const [errors, setErrors] = useState<ZodError | null>(null);
+
+  const { searchTerm } = useSearchTerm();
+
+  const filteredData = data.filter((row) => {
+    if (!searchTerm || searchTerm === "") return true;
+    const lowercasedSearchTerm = searchTerm.toLowerCase();
+    //const searchWords = lowercasedSearchTerm.split(" ").filter(Boolean);
+    const searchWords =
+      lowercasedSearchTerm
+        .match(/"[^"]+"|\S+/g)
+        ?.map((word) => word.replace(/"/g, "")) || [];
+
+    return searchWords.every(
+      (word) =>
+        row.jenis.toLowerCase().includes(word) ||
+        row.uraian?.toLowerCase().includes(word)
+    );
+  });
 
   const columnHelper = createColumnHelper<SbmHonorariumPlainObject>();
 
@@ -185,7 +204,7 @@ export const TabelSbmHonorarium = ({
     <div>
       {errors && <ZodErrorList error={errors} />}
       <TabelGeneric
-        data={data}
+        data={filteredData}
         columns={columns}
         frozenColumnCount={1}
         isEditing={isEditing}
