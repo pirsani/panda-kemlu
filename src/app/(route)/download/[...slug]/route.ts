@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { downloadDaftarNominatif } from "./generator-daftar-nominatif";
 import generatorDokumenPengadaan, {
   downloadDokumenPengadaan,
 } from "./generator-dokumen-pengadaan";
@@ -22,6 +23,8 @@ export async function GET(
       return downloadDokumenRampungan(req, slug);
     case "template-excel":
       return downloadTemplateExcel(req, slug);
+    case "daftar-nominatif":
+      return downloadDaftarNominatif(req, slug);
     default:
       return new NextResponse(`Download ${params.slug.join("/")}`);
   }
