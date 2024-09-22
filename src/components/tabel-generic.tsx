@@ -288,7 +288,7 @@ export const TabelGeneric = <T,>({
                           colRefs.current[index] = el;
                         }
                       }}
-                      className={cn("px-2 border border-gray-300 ", {
+                      className={cn("h-10 px-2 border border-gray-300 ", {
                         [`sticky left-0 bg-gray-100 z-${10 - index}`]:
                           index < frozenColumnCount, // Sticky columns
                         "left-0": index >= frozenColumnCount, // Default position for other columns
@@ -304,7 +304,17 @@ export const TabelGeneric = <T,>({
                       {(() => {
                         if (cell.column.id === "rowNumber") {
                           // Display the row number, considering pagination
-                          return rowIndex + 1 + pageSize * pageIndex;
+                          return (
+                            <span
+                              style={{
+                                width:
+                                  cumulativeWidths[index + 1] -
+                                  (cumulativeWidths[index] || 0),
+                              }} // Set the width to match the column width
+                            >
+                              {rowIndex + 1 + pageSize * pageIndex}
+                            </span>
+                          );
                         }
 
                         if (cell.column.id === "_additionalKolomAksi") {
@@ -322,9 +332,20 @@ export const TabelGeneric = <T,>({
                         if (
                           cell.column.columnDef.meta?.isCellEditable === false
                         ) {
-                          return flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
+                          return (
+                            <div
+                              className="flex flex-row w-full"
+                              style={{
+                                width:
+                                  cumulativeWidths[index + 1] -
+                                  (cumulativeWidths[index] || 0),
+                              }} // Set the width to match the column width
+                            >
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext()
+                              )}
+                            </div>
                           );
                         }
 
@@ -408,7 +429,7 @@ export const TabelGeneric = <T,>({
                                 if (e.key === "Escape") handleCancel();
                               }}
                               // autoFocus
-                              className="px-2 m-0 h-10 border border-blue-700 w-auto min-w-10"
+                              className="px-2 py-1 border border-blue-700 w-auto w-full flex-wrap text-wrap"
                             />
                           );
                         }
