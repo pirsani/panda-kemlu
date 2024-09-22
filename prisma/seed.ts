@@ -155,6 +155,7 @@ const deleteExisting = async (): Promise<void> => {
   try {
     console.log("Deleting existing data");
 
+    await dbHonorarium.sbmTaksi.deleteMany({});
     await dbHonorarium.sbmHonorarium.deleteMany({});
     await dbHonorarium.sbmUhDalamNegeri.deleteMany({});
     await dbHonorarium.sbmUhLuarNegeri.deleteMany({});
