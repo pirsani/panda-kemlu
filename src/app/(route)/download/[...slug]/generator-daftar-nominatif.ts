@@ -88,10 +88,14 @@ const drawCell = (
   y: number,
   width: number,
   align: "left" | "center" | "right",
+  fontSize: number = 8, // Default font size value
   padding: number = 5, // Default padding value
   lineSpacing: number = 10 // Default line spacing value
 ) => {
-  const adjustedX = align === "right" ? x - padding : x + padding;
+  //const adjustedX = align === "right" ? x : x + padding;
+  const adjustedX = x + padding; // Add horizontal padding if needed
+
+  //const adjustedX = x; //+ padding; // Add horizontal padding if needed
   const adjustedWidth = width - 2 * padding;
   const adjustedY = y + padding; // Add vertical padding if needed
 
@@ -99,7 +103,7 @@ const drawCell = (
   let currentY = adjustedY;
 
   lines.forEach((line) => {
-    doc.fontSize(10).text(line, adjustedX, currentY, {
+    doc.fontSize(fontSize).text(line, adjustedX, currentY, {
       width: adjustedWidth,
       align: align,
     });
@@ -162,7 +166,7 @@ const generateTableHeader = (
         columnStartX,
         columnStartY,
         column.width,
-        column.align
+        "center" //column.align always center
       );
 
       // check if column has subheader
@@ -225,26 +229,37 @@ const generateTableRow = (
   drawRow(row, columns, startX, y, rowHeight);
 };
 
+interface Jadwal {
+  nama: string; // nama kelas
+  tanggal: string;
+  jam: string;
+  jadwalNarasumber: TableRow[]; // TableRow[] ini dari JadwalNarasumber
+}
+
 const generateTable = (
   doc: InstanceType<typeof PDFDocument>,
   columns: TableColumn[],
   rows: TableRow[],
   startX: number,
   startY: number,
-  headerRowHeight: number = 20,
-  rowHeight: number = 20
+  headerRowHeight: number = 25,
+  headerNumberingRowHeight: number = 20,
+  rowHeight: number = 25
 ) => {
   const deepestColumns = getDeepestColumns(columns);
   const maxLevel = findMaxLevel(columns);
   const totalHeightHeader = maxLevel * headerRowHeight;
+
+  // count total width
+  const totalWidth = getTotalTableWidth(deepestColumns);
 
   generateTableHeader(doc, columns, startX, startY, headerRowHeight);
   generateNumberingHeader(
     doc,
     deepestColumns,
     startX,
-    startY + totalHeightHeader,
-    headerRowHeight
+    startY + totalHeightHeader + headerRowHeight - headerNumberingRowHeight,
+    headerNumberingRowHeight
   );
 
   rows.forEach((row, rowIndex) => {
@@ -257,11 +272,97 @@ const generateTable = (
       startY +
         totalHeightHeader +
         headerRowHeight +
-        headerRowHeight +
+        headerNumberingRowHeight +
         rowHeight * rowIndex,
       rowHeight
     );
   });
+};
+
+export const generateReportHeader = (
+  doc: InstanceType<typeof PDFDocument>,
+  satker: string,
+  headerText: string,
+  subHeaderText: string
+) => {
+  drawCell(
+    doc,
+    `${satker} \n Kementerian Luar Negeri`,
+    25,
+    25,
+    200,
+    "center",
+    12,
+    0,
+    0
+  );
+
+  doc.moveDown();
+
+  doc.fontSize(11).text(headerText, { align: "center" });
+  doc.moveDown(0.2);
+  doc.fontSize(11).text(subHeaderText, {
+    align: "center",
+  });
+  doc.moveDown();
+};
+
+const generateReportFooter = (
+  doc: InstanceType<typeof PDFDocument>,
+  x1: number,
+  x2: number,
+  y1: number,
+  y2: number,
+  ppk: { nama: string; NIP: string },
+  bendahara: { nama: string; NIP: string }
+) => {
+  drawCell(
+    doc,
+    `Mengetahui, \n Pejabat Pembuat Komitmen`,
+    x1,
+    y1,
+    250,
+    "center",
+    12,
+    0,
+    0
+  );
+
+  drawCell(
+    doc,
+    `${ppk.nama} \n NIP. ${ppk.NIP}`,
+    x1,
+    y2,
+    250,
+    "center",
+    12,
+    0,
+    0
+  );
+
+  drawCell(
+    doc,
+    `Mengetahui, \n Pejabat Pembuat Komitmen`,
+    x2,
+    y1,
+    250,
+    "center",
+    12,
+    0,
+    0
+  );
+
+  drawCell(
+    doc,
+    `${ppk.nama} \n NIP. ${ppk.NIP}`,
+    x2,
+    y2,
+    250,
+    "center",
+    12,
+    0,
+    0
+  );
 };
 
 export async function generateDaftarNominatif(req: Request, slug: string[]) {
@@ -272,93 +373,135 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
       header: "No.",
       headerNumberingString: "1",
       field: "no",
-      width: 50,
+      width: 30,
       align: "center",
     },
     {
       level: 1,
       header: "NAMA/NIK/NPWP",
       headerNumberingString: "2",
-      field: "concatedText",
-      width: 150,
+      field: "namaNipNpwp",
+      width: 120,
       align: "left",
     },
     {
       level: 1,
-      header: "Employee Info",
-      width: 250,
+      header: "JABATAN",
+      headerNumberingString: "2",
+      field: "jabatan",
+      width: 90,
+      align: "left",
+    },
+    {
+      level: 1,
+      header: "HONORARIUM",
+      width: 185,
       align: "center",
       subHeader: [
         {
           level: 2,
-          header: "Name",
+          header: "JP",
           headerNumberingString: "3",
-          field: "nama",
-          width: 150,
-          align: "left",
+          field: "jp",
+          width: 35,
+          align: "center",
         },
         {
           level: 2,
-          header: "Position",
+          header: "BESARAN",
           headerNumberingString: "4",
-          field: "posisi",
-          width: 100,
-          align: "left",
+          field: "besaran",
+          width: 75,
+          align: "right",
+        },
+        {
+          level: 2,
+          header: "JUMLAH",
+          headerNumberingString: "4",
+          field: "jumlahBruto",
+          width: 75,
+          align: "right",
         },
       ],
     },
     {
       level: 1,
-      header: "Salary Details",
-      width: 300,
+      header: "PAJAK PENGHASILAN",
+      width: 200,
       align: "center",
       subHeader: [
         {
           level: 2,
-          header: "Basic Salary",
+          header: "DPP",
           headerNumberingString: "5",
-          field: "basicSalary",
-          width: 100,
+          field: "dpp",
+          width: 75,
           align: "right",
         },
         {
           level: 2,
-          header: "Allowances",
+          header: "TARIF",
           headerNumberingString: "6=5-7",
-          field: "allowances",
-          width: 100,
+          field: "tarif",
+          width: 50,
           align: "right",
         },
         {
           level: 2,
-          header: "Deductions",
+          header: "PPH 21 YANG DIPOTONG",
           headerNumberingString: "7",
-          field: "deductions",
-          width: 100,
+          field: "pph",
+          width: 75,
           align: "right",
         },
       ],
+    },
+    {
+      level: 1,
+      header: "JUMLAH YANG DITERIMA",
+      headerNumberingString: "7",
+      field: "jumlahNetto",
+      width: 75,
+      align: "center",
+    },
+    {
+      level: 1,
+      header: "NAMA DAN NOMOR REKENING",
+      headerNumberingString: "7",
+      field: "bankConcated",
+      width: 100,
+      align: "center",
     },
   ];
 
   const rows: TableRow[] = [
     {
       no: 1,
-      concatedText: "John Doe panjang \n 1234567890 \n 1234567890",
+      namaNipNpwp: "John Doe panjang \n 1234567890 \n 1234567890",
       nama: "John Doe panjang",
-      posisi: "Manager",
-      basicSalary: "$5000",
-      allowances: "$500",
-      deductions: "$200",
+      jabatan: "Manager",
+      jp: 2.3,
+      besaran: "Rp. 105.000.000",
+      jumlahBruto: "$500",
+      dpp: "Rp. 15.000.000",
+      tarif: "5%",
+      pph: "Rp. 750.000",
+      jumlahNetto: "$500",
+      bankConcated: "BCA \n fulan bin fulan \n 1234567890",
     },
     {
       no: 2,
-      concatedText: "John Doe panjang",
+      namaNipNpwp: "John Doe panjang",
       nama: "John Doe panjang",
-      posisi: "Manager",
-      basicSalary: "$5000",
-      allowances: "$500",
-      deductions: "$200",
+      jabatan: "Manager",
+      jp: 2.5,
+      besaran: "$5000",
+      jumlahBruto: "$500",
+      dpp: "$200",
+      tarif: "5%",
+      pph: "Rp. 750.000",
+      jumlahNetto: "$500",
+      bankConcated: "BCA \n fulan bin fulan \n 1234567890",
     },
   ];
 
@@ -370,7 +513,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
   const doc = new PDFDocument({
     font: customFontPath,
     size: "A4",
-    margins: { top: 10, bottom: 50, left: 10, right: 50 },
+    margins: { top: 15, bottom: 15, left: 10, right: 15 },
     layout: "landscape",
   });
   // doc.registerFont("CustomHelvetica", customFontPath);
@@ -383,16 +526,41 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
   doc.on("data", buffers.push.bind(buffers));
 
   // Generate PDF content
-  try {
-    doc.fontSize(18).text("Payroll Report", { align: "center" });
-    doc.moveDown();
-    generateTable(doc, columns, rows, 20, 100, 20, 100);
-    //generateTable(doc, columns, rows, 20, 100, 20, 60);
-    doc
-      .moveDown()
-      .text("Officer Signature: ____________________", { align: "left" });
-    doc.end();
+  const startX = 20; // x-coordinate for the start of the table
+  const startY = 75; // y-coordinate for the start of the table
+  const headerRowHeight = 25; // tinggi untuk masing-masing baris header
+  const headerNumberingRowHeight = 15; // tinggi untuk masing-masing baris header nomor
+  const rowHeight = 65; // tinggi untuk masing-masing row data
 
+  try {
+    generateReportHeader(
+      doc,
+      "Pusat Pendidikan dan Pelatihan",
+      "DAFTAR NOMINATIF HONORARIUM NARASUMBER/PEMBAHAS PAKAR/ PRAKTISI/ PROFESIONAL",
+      "KEGIATAN PELATIHAN DAN PENGEMBANGAN KOMPETENSI PEGAWAI"
+    );
+
+    generateTable(
+      doc,
+      columns,
+      rows,
+      startX,
+      startY,
+      headerRowHeight,
+      headerNumberingRowHeight,
+      rowHeight
+    );
+
+    const y1 = startY + 125 + rowHeight * rows.length; // startYFooter
+    const y2 = y1 + 75;
+    const x1 = 25;
+    const x2 = 600;
+    const ppk = { nama: "Fulan bin Fulan", NIP: "1234567890" };
+    const bendahara = { nama: "Fulan bin Fulan", NIP: "1234567890" };
+    generateReportFooter(doc, x1, x2, y1, y2, ppk, bendahara);
+    // how to detect last start y
+
+    doc.end();
     // Wait for 'end' event to ensure the document generation is complete
     await once(doc, "end");
     // Concatenate the buffers once the PDF generation is complete
