@@ -267,12 +267,53 @@ const generateTable = (
     const length = jadwal.jadwalNarasumber.length;
     const yBaseOnIndex = jadwalIndex * length * rowHeight;
     let baseStartY =
-      startY + totalHeightHeader + headerRowHeight + headerNumberingRowHeight;
+      startY +
+      totalHeightHeader +
+      headerRowHeight +
+      headerNumberingRowHeight +
+      yBaseOnIndex;
 
-    baseStartY += yBaseOnIndex;
+    // divider row dengan nama kelas
+    const heightDivider = 15;
+    const dividerStartY = baseStartY + 2 + jadwalIndex * heightDivider;
+
+    // Set the fill color for the rectangle
+    doc
+      .fillColor("#e9ecef") // Set the desired background color
+      .rect(
+        startX,
+        baseStartY + jadwalIndex * heightDivider,
+        totalWidth,
+        heightDivider
+      )
+      .fillAndStroke(); // Fill the rectangle with the background color and draw the border
+    // Reset the fill color to default (black) or transparent
+    doc.fillColor("black");
+
+    drawCell(
+      doc,
+      `${jadwal.nama} ${jadwal.tanggal} ${jadwal.jam}`,
+      startX,
+      dividerStartY,
+      totalWidth,
+      "center",
+      9,
+      0,
+      0
+    );
+
+    const startYRowjadwalNarasumber =
+      baseStartY + (jadwalIndex + 1) * heightDivider;
 
     jadwal.jadwalNarasumber.forEach((jadwalNarasumber, rowIndex) => {
-      const startYDynamic = baseStartY + rowHeight * rowIndex;
+      const startYDynamic = startYRowjadwalNarasumber + rowHeight * rowIndex;
+      // console.log("[startYDynamic]", startYDynamic);
+      console.log(
+        "[startY,baseStartY,startYRowjadwalNarasumber]",
+        startY,
+        baseStartY,
+        startYRowjadwalNarasumber
+      );
       generateTableRow(
         doc,
         jadwalNarasumber,
@@ -434,7 +475,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
     {
       level: 1,
       header: "PAJAK PENGHASILAN",
-      width: 200,
+      width: 180,
       align: "center",
       subHeader: [
         {
@@ -450,7 +491,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
           header: "TARIF",
           headerNumberingString: "6=5-7",
           field: "tarif",
-          width: 50,
+          width: 35,
           align: "right",
         },
         {
@@ -458,7 +499,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
           header: "PPH 21 YANG DIPOTONG",
           headerNumberingString: "7",
           field: "pph",
-          width: 75,
+          width: 70,
           align: "right",
         },
       ],
@@ -476,7 +517,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
       header: "NAMA DAN NOMOR REKENING",
       headerNumberingString: "7",
       field: "bankConcated",
-      width: 100,
+      width: 90,
       align: "center",
     },
   ];
@@ -519,7 +560,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
     jadwalNarasumber: rows,
   };
 
-  const jadwals = [jadwal, jadwal];
+  const jadwals = [jadwal, jadwal, jadwal, jadwal, jadwal, jadwal, jadwal];
 
   const customFontPath = path.resolve(
     process.cwd(),
@@ -549,6 +590,17 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
   const rowHeight = 50; // tinggi untuk masing-masing row data
 
   try {
+    //doc.rect(10, 10, 820, 560).stroke(); // reference
+    //  // Draw a horizontal line
+    const lineStartX = 10; // x-coordinate for the start of the line
+    const lineEndX = 820; // x-coordinate for the end of the line
+    const lineY = 560; // y-coordinate for the line
+
+    doc
+      .moveTo(lineStartX, lineY) // Move to the start of the line
+      .lineTo(lineEndX, lineY) // Draw the line to the end point
+      .stroke(); // Apply the stroke to draw the line
+
     generateReportHeader(
       doc,
       "Pusat Pendidikan dan Pelatihan",
