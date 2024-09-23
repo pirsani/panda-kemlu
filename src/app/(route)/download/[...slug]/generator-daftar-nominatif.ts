@@ -90,7 +90,7 @@ const drawCell = (
   align: "left" | "center" | "right",
   fontSize: number = 8, // Default font size value
   padding: number = 5, // Default padding value
-  lineSpacing: number = 10 // Default line spacing value
+  lineSpacing: number = 5 // Default line spacing value
 ) => {
   //const adjustedX = align === "right" ? x : x + padding;
   const adjustedX = x + padding; // Add horizontal padding if needed
@@ -239,7 +239,7 @@ interface Jadwal {
 const generateTable = (
   doc: InstanceType<typeof PDFDocument>,
   columns: TableColumn[],
-  rows: TableRow[],
+  rows: Jadwal[],
   startX: number,
   startY: number,
   headerRowHeight: number = 25,
@@ -262,20 +262,27 @@ const generateTable = (
     headerNumberingRowHeight
   );
 
-  rows.forEach((row, rowIndex) => {
-    generateTableRow(
-      doc,
-      row,
-      deepestColumns,
-      startX,
-      // startY + totalHeightHeader + rowHeight * (rowIndex + 1),
-      startY +
-        totalHeightHeader +
-        headerRowHeight +
-        headerNumberingRowHeight +
-        rowHeight * rowIndex,
-      rowHeight
-    );
+  // generate table row
+  rows.forEach((jadwal, jadwalIndex) => {
+    const length = jadwal.jadwalNarasumber.length;
+    const yBaseOnIndex = jadwalIndex * length * rowHeight;
+    let baseStartY =
+      startY + totalHeightHeader + headerRowHeight + headerNumberingRowHeight;
+
+    baseStartY += yBaseOnIndex;
+
+    jadwal.jadwalNarasumber.forEach((jadwalNarasumber, rowIndex) => {
+      const startYDynamic = baseStartY + rowHeight * rowIndex;
+      generateTableRow(
+        doc,
+        jadwalNarasumber,
+        deepestColumns,
+        startX,
+        // startY + totalHeightHeader + rowHeight * (rowIndex + 1),
+        startYDynamic,
+        rowHeight
+      );
+    });
   });
 };
 
@@ -505,6 +512,15 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
     },
   ];
 
+  const jadwal: Jadwal = {
+    nama: "Kelas A",
+    tanggal: "2021-10-10",
+    jam: "09:00 - 16:00",
+    jadwalNarasumber: rows,
+  };
+
+  const jadwals = [jadwal, jadwal];
+
   const customFontPath = path.resolve(
     process.cwd(),
     "fonts/helvetica/Helvetica.ttf"
@@ -530,7 +546,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
   const startY = 75; // y-coordinate for the start of the table
   const headerRowHeight = 25; // tinggi untuk masing-masing baris header
   const headerNumberingRowHeight = 15; // tinggi untuk masing-masing baris header nomor
-  const rowHeight = 65; // tinggi untuk masing-masing row data
+  const rowHeight = 50; // tinggi untuk masing-masing row data
 
   try {
     generateReportHeader(
@@ -543,7 +559,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
     generateTable(
       doc,
       columns,
-      rows,
+      jadwals,
       startX,
       startY,
       headerRowHeight,
@@ -557,7 +573,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
     const x2 = 600;
     const ppk = { nama: "Fulan bin Fulan", NIP: "1234567890" };
     const bendahara = { nama: "Fulan bin Fulan", NIP: "1234567890" };
-    generateReportFooter(doc, x1, x2, y1, y2, ppk, bendahara);
+    // generateReportFooter(doc, x1, x2, y1, y2, ppk, bendahara);
     // how to detect last start y
 
     doc.end();
