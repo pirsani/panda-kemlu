@@ -220,7 +220,17 @@ const generateTableRow = (
       const columnXOffset = getColumnXOffset(columns, columns.indexOf(column));
       const columnStartX = startX + columnXOffset;
 
-      drawCell(doc, String(value), columnStartX, y, column.width, column.align);
+      drawCell(
+        doc,
+        String(value),
+        columnStartX,
+        y,
+        column.width,
+        column.align,
+        8,
+        5,
+        5
+      );
 
       doc.rect(columnStartX, y, column.width, rowHeight).stroke();
     });
@@ -305,12 +315,12 @@ const generateTable = (
     );
 
     // divider row dengan nama kelas
-    let dividerStartY = baseStartY + 2 + jadwalIterator * heightDivider;
+    let dividerStartY = baseStartY + 3 + jadwalIterator * heightDivider;
 
     const isNewPageNeeded =
       dividerStartY + heightDivider + rowHeight > availableHeight;
     console.log(
-      "[dividerStartY = baseStartY + 2 + jadwalIterator * heightDivider]",
+      "[dividerStartY = baseStartY + 3 + jadwalIterator * heightDivider]",
       dividerStartY,
       baseStartY,
       jadwalIterator,
@@ -330,7 +340,7 @@ const generateTable = (
       page++;
       console.log("[NEW PAGE] on new divider", page);
       baseStartY = controlBaseStartY;
-      dividerStartY = baseStartY + 2;
+      dividerStartY = baseStartY + 3;
       generateTableHeader(doc, columns, startX, startY, headerRowHeight);
       generateNumberingHeader(
         doc,
@@ -350,6 +360,7 @@ const generateTable = (
       .rect(
         startX,
         baseStartY + jadwalIterator * heightDivider,
+        //dividerStartY,
         totalWidth,
         heightDivider
       )
@@ -364,7 +375,7 @@ const generateTable = (
       dividerStartY,
       totalWidth,
       "center",
-      9,
+      10,
       0,
       0
     );
@@ -778,6 +789,38 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
     jadwal2,
     jadwal1,
     jadwal2,
+    jadwal1,
+    jadwal2,
+    jadwal2,
+    jadwal2,
+    jadwal1,
+    jadwal3,
+    jadwal3,
+    jadwal2,
+    jadwal2,
+    jadwal1,
+    jadwal2,
+    jadwal2,
+    jadwal1,
+    jadwal2,
+    jadwal1,
+    jadwal3,
+    jadwal3,
+    jadwal2,
+    jadwal2,
+    jadwal1,
+    jadwal2,
+    jadwal2,
+    jadwal1,
+    jadwal2,
+    jadwal2,
+    jadwal1,
+    jadwal3,
+    jadwal3,
+    jadwal2,
+    jadwal2,
+    jadwal1,
+    jadwal3,
     jadwal2,
     jadwal1,
     jadwal2,
