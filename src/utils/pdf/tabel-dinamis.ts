@@ -1,15 +1,17 @@
+import Decimal from "decimal.js";
 import { once } from "events";
 import fs from "fs";
 import { concat, max } from "lodash";
 import { NextResponse } from "next/server";
 import path from "path";
 import PDFDocument from "pdfkit"; // Importing PDFDocument as a value
-import { height } from "pdfkit/js/page";
+import { height, width } from "pdfkit/js/page";
 
 export interface TableColumnHeader {
   header: string;
   headerNumberingString?: string;
   field?: String;
+  isSummable?: boolean; // Indicates if the column values can be summed
   level: number;
   width: number;
   align: "left" | "center" | "right";
@@ -74,20 +76,6 @@ const getDeepestColumns = (
 const isHasSubHeader = (column: TableColumnHeader): boolean => {
   return !!(column.subHeader && column.subHeader.length > 0);
 };
-
-// const getMaxHeaderHeight = (
-//   tableColumnHeaders: TableColumnHeader[],
-//   rowHeight: number
-// ): number => {
-//   let maxHeight = rowHeight;
-//   tableColumnHeaders.forEach((column) => {
-//     if (column.subHeader) {
-//       const subHeaderHeight = getMaxHeaderHeight(column.subHeader, rowHeight);
-//       maxHeight = Math.max(maxHeight, rowHeight + subHeaderHeight);
-//     }
-//   });
-//   return maxHeight;
-// };
 
 const drawCell = (
   doc: InstanceType<typeof PDFDocument>,
@@ -222,8 +210,6 @@ const generateTableRow = (
         return;
       }
 
-      //console.log("[column]", column);
-
       const columnXOffset = getColumnXOffset(
         tableColumnHeaders,
         tableColumnHeaders.indexOf(column)
@@ -243,10 +229,51 @@ const generateTableRow = (
       );
 
       doc.rect(columnStartX, y, column.width, rowHeight).stroke();
+      // console.log("columnY shouldbe", y + rowHeight);
+      // console.log("[x,y]", doc.x, doc.y);
     });
   };
 
   drawRow(row, tableColumnHeaders, startX, y, rowHeight);
+};
+
+const generateSumRow = (
+  doc: InstanceType<typeof PDFDocument>,
+  data: Decimal[],
+  deepestColumns: TableColumnHeader[],
+  startX: number,
+  lastY: number,
+  sumRowHeight: number = 25,
+  width: number = 200
+) => {
+  // add summary before new page
+  const currentY = doc.y;
+  console.log("[currentY before new page]", currentY);
+  doc.rect(startX, lastY, width, sumRowHeight).stroke();
+
+  let i = 0;
+  deepestColumns.forEach((column, index) => {
+    const columnXOffset = getColumnXOffset(deepestColumns, index);
+    const columnStartX = startX + columnXOffset;
+    const columnStartY = lastY;
+
+    // Draw the header text
+    //drawCell(doc, "nilai", columnStartX, columnStartY, column.width, "center");
+    if (column.isSummable) {
+      doc.rect(columnStartX, columnStartY, column.width, sumRowHeight).stroke();
+      drawCell(
+        doc,
+        data[i].toString(),
+        columnStartX,
+        columnStartY,
+        column.width,
+        column.align
+      );
+      i++;
+    }
+  });
+
+  drawCell(doc, "Jumlah", startX, lastY, width, "left", 10, 5, 0);
 };
 
 export interface DataGroup {
@@ -272,6 +299,15 @@ const generateTable = (
 
   // count total width
   const totalWidth = getTotalTableWidth(deepestColumns);
+
+  // filter deepest column that isSummable === true
+  const summableColumns = deepestColumns.filter((column) => column.isSummable);
+  let pageSums = summableColumns.map(() => new Decimal(0));
+  const pageSumsArray: Decimal[][] = []; // Explicitly define the type
+  const resetSums = () => {
+    pageSumsArray.push([...pageSums]);
+    pageSums = summableColumns.map(() => new Decimal(0));
+  };
 
   generateTableHeader(doc, tableColumnHeaders, startX, startY, headerRowHeight);
   generateNumberingHeader(
@@ -348,6 +384,23 @@ const generateTable = (
       // reset startY
       rowCounterOnPage = 0;
       dataGroupIterator = 0;
+
+      // generate sum row before new page
+      // baseStartY + dataGroupIterator * heightDivider
+      // const lastY = baseStartY + dataGroupIterator * heightDivider;
+      resetSums();
+      const lastY = dividerStartY - 3;
+      const dataSum = pageSumsArray[page - 1];
+      generateSumRow(
+        doc,
+        dataSum,
+        deepestColumns,
+        startX,
+        lastY,
+        20,
+        totalWidth
+      );
+
       doc.addPage(); // new page
       page++;
       console.log("[NEW PAGE] on new divider", page);
@@ -406,6 +459,8 @@ const generateTable = (
 
     let rowReset = false;
 
+    // Iterate and generate row for each groupMembers
+    // calculate subSumRow
     dataGroup.groupMembers.forEach((groupMembers, rowIndex) => {
       rowCounterOnPage++;
 
@@ -420,6 +475,22 @@ const generateTable = (
         rowIterator = 0;
         dataGroupIterator = 0;
         rowReset = true;
+
+        // generate sum row before new page
+        resetSums();
+        console.log("Page Sums:", pageSumsArray);
+        console.log(pageSumsArray[page - 1]); // array is zero based
+        const dataSum = pageSumsArray[page - 1];
+        generateSumRow(
+          doc,
+          dataSum,
+          deepestColumns,
+          startX,
+          startYDynamic,
+          20,
+          totalWidth
+        );
+
         doc.addPage(); // new page
         page++;
         //console.log("[NEW PAGE] on new row", page);
@@ -446,6 +517,13 @@ const generateTable = (
           headerNumberingRowHeight
         );
       } else {
+        // sum row
+        summableColumns.forEach((column, columnIndex) => {
+          const columnValue = groupMembers[column.field as string];
+          pageSums[columnIndex] = pageSums[columnIndex].plus(
+            new Decimal(columnValue)
+          );
+        });
         rowIterator++;
         rowReset = false;
       }
@@ -620,8 +698,8 @@ export async function generateTabelDinamis(
     // how to detect last start y
 
     // Detect current x and y coordinates
-    const currentX = doc.x;
-    const currentY = doc.y;
+    let currentX = doc.x;
+    let currentY = doc.y;
     console.log(`Current X: ${currentX}, Current Y: ${currentY}`);
 
     doc
@@ -635,10 +713,23 @@ export async function generateTabelDinamis(
     const doctWidth = doc.page.width;
     console.log("doc.page.width", doctWidth);
 
-    const y1 = currentY + dataRowHeight + 10;
-    const y2 = y1 + 50;
-    const x1 = startX;
-    const x2 = doctWidth - 300;
+    let y1 = currentY + dataRowHeight + 10;
+    let y2 = y1 + 50;
+    let x1 = startX;
+    let x2 = doctWidth - 300;
+
+    // check if need to add page if the last row is near the end of the page
+    const availableHeight = doc.page.height - 60;
+    const isPageNeeded = y1 + 75 > availableHeight;
+    if (isPageNeeded) {
+      doc.addPage();
+      // tambahkan total lagi disini ?
+      x1 = startX;
+      x2 = doctWidth - 300;
+      y1 = startY;
+      y2 = y1 + 50;
+    }
+
     generateReportFooter(doc, x1, x2, y1, y2, ppk, bendahara);
 
     doc.end();

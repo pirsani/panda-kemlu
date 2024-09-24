@@ -44,6 +44,7 @@
     "date-fns": "^3.6.0",
     "decimal.js": "^10.4.3",
     "docxtemplater": "^3.50.0",
+    "faker": "^6.6.6",
     "file-type": "^19.5.0",
     "html2canvas": "^1.4.1",
     "iconv-lite": "^0.6.3",

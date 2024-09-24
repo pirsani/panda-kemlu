@@ -4,6 +4,7 @@ import generateTabelDinamis, {
   TableOptions,
   TableRow,
 } from "@/utils/pdf/tabel-dinamis";
+import { faker } from "@faker-js/faker";
 import { once } from "events";
 import fs from "fs";
 import { concat, max } from "lodash";
@@ -57,6 +58,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
           header: "JP",
           headerNumberingString: "3",
           field: "jp",
+          isSummable: true,
           width: 35,
           align: "center",
         },
@@ -65,6 +67,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
           header: "BESARAN",
           headerNumberingString: "4",
           field: "besaran",
+          isSummable: true,
           width: 75,
           align: "right",
         },
@@ -73,6 +76,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
           header: "JUMLAH",
           headerNumberingString: "4",
           field: "jumlahBruto",
+          isSummable: true,
           width: 75,
           align: "right",
         },
@@ -89,6 +93,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
           header: "DPP",
           headerNumberingString: "5",
           field: "dpp",
+          isSummable: true,
           width: 75,
           align: "right",
         },
@@ -105,6 +110,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
           header: "PPH 21 YANG DIPOTONG",
           headerNumberingString: "7",
           field: "pph",
+          isSummable: true,
           width: 70,
           align: "right",
         },
@@ -115,6 +121,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
       header: "JUMLAH YANG DITERIMA",
       headerNumberingString: "7",
       field: "jumlahNetto",
+      isSummable: true,
       width: 75,
       align: "center",
     },
@@ -128,99 +135,38 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
     },
   ];
 
-  const rows1: TableRow[] = [
-    {
-      no: 1,
-      namaNipNpwp: "John Doe panjang \n 1234567890 \n 1234567890",
-      nama: "John Doe panjang",
-      jabatan: "Manager",
-      jp: 2.3,
-      besaran: "Rp. 105.000.000",
-      jumlahBruto: "$500",
-      dpp: "Rp. 15.000.000",
-      tarif: "5%",
-      pph: "Rp. 750.000",
-      jumlahNetto: "$500",
-      bankConcated: "BCA \n fulan bin fulan \n 1234567890",
-    },
-  ];
+  const generateFakeData = (count: number): TableRow[] => {
+    const rows: TableRow[] = [];
+    for (let i = 0; i < count; i++) {
+      rows.push({
+        no: i + 1,
+        namaNipNpwp: `${faker.person.fullName()} \n ${faker.string.numeric(
+          18
+        )} \n ${faker.string.numeric(16)}`,
+        nama: `${faker.person.fullName()}`,
+        jabatan: `${faker.person.jobTitle()}`,
+        jp: `${faker.number.float({ min: 1, max: 5, fractionDigits: 1 })}`,
+        besaran: faker.number.int({ min: 100, max: 1000 }),
+        jumlahBruto: faker.number.int({ min: 100, max: 1000 }),
+        dpp: faker.number.int({ min: 100, max: 1000 }),
+        tarif: faker.helpers.arrayElement(["5%", "10%", "15%"]),
+        pph: faker.number.int({ min: 100, max: 1000 }),
+        jumlahNetto: faker.number.int({ min: 100, max: 1000 }),
+        bankConcated: `${faker.helpers.arrayElement([
+          "BNI",
+          "BCA",
+          "MANDIRI",
+        ])} \n ${faker.person.fullName()} \n ${faker.string.numeric(10)}`,
+      });
+    }
+    return rows;
+  };
 
-  const rows: TableRow[] = [
-    {
-      no: 1,
-      namaNipNpwp: "John Doe panjang \n 1234567890 \n 1234567890",
-      nama: "John Doe panjang",
-      jabatan: "Manager",
-      jp: 2.3,
-      besaran: "Rp. 105.000.000",
-      jumlahBruto: "$500",
-      dpp: "Rp. 15.000.000",
-      tarif: "5%",
-      pph: "Rp. 750.000",
-      jumlahNetto: "$500",
-      bankConcated: "BCA \n fulan bin fulan \n 1234567890",
-    },
-    {
-      no: 2,
-      namaNipNpwp: "John Doe panjang",
-      nama: "John Doe panjang",
-      jabatan: "Manager",
-      jp: 2.5,
-      besaran: "$5000",
-      jumlahBruto: "$500",
-      dpp: "$200",
-      tarif: "5%",
-      pph: "Rp. 750.000",
-      jumlahNetto: "$500",
-      bankConcated: "BCA \n fulan bin fulan \n 1234567890",
-    },
-  ];
+  const rows1: TableRow[] = generateFakeData(1);
 
-  const rows3: TableRow[] = [
-    {
-      no: 1,
-      namaNipNpwp: "John Doe panjang \n 1234567890 \n 1234567890",
-      nama: "John Doe panjang",
-      jabatan: "Manager",
-      jp: 2.3,
-      besaran: "Rp. 105.000.000",
-      jumlahBruto: "$500",
-      dpp: "Rp. 15.000.000",
-      tarif: "5%",
-      pph: "Rp. 750.000",
-      jumlahNetto: "$500",
-      bankConcated: "BCA \n fulan bin fulan \n 1234567890",
-    },
-    {
-      no: 2,
-      namaNipNpwp: "fukasb sdsd sadj \n 1234567890 \n 1234567890",
-      nama: "siaa ajsdasd ",
-      jabatan: "Manager",
-      jp: 2.5,
-      besaran: "$5000",
-      jumlahBruto: "$500",
-      dpp: "$200",
-      tarif: "5%",
-      pph: "Rp. 750.000",
-      jumlahNetto: "$500",
-      bankConcated: "BCA \n fulan bin fulan \n 1234567890",
-    },
+  const rows2: TableRow[] = generateFakeData(2);
 
-    {
-      no: 3,
-      namaNipNpwp: "sansdi sadsad \n 1234567890 \n 1234567890",
-      nama: "siaa sad ",
-      jabatan: "sadsad sdss",
-      jp: 2.5,
-      besaran: "$5000",
-      jumlahBruto: "$500",
-      dpp: "$200",
-      tarif: "5%",
-      pph: "Rp. 750.000",
-      jumlahNetto: "$500",
-      bankConcated: "BNI \n sdfdsf dsfdsf \n 1234567890",
-    },
-  ];
+  const rows3: TableRow[] = generateFakeData(3);
 
   const jadwal1: DataGroup = {
     nama: "Kelas A",
@@ -229,7 +175,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
 
   const jadwal2: DataGroup = {
     nama: "Kelas B",
-    groupMembers: rows,
+    groupMembers: rows2,
   };
 
   const jadwal3: DataGroup = {
@@ -241,24 +187,16 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
     jadwal1,
     jadwal3,
     jadwal3,
-    jadwal2,
-    jadwal1,
-    jadwal2,
-    jadwal2,
-    jadwal1,
-    jadwal1,
-    jadwal1,
-    jadwal1,
-    jadwal1,
-    jadwal1,
     jadwal3,
-    jadwal2,
-    jadwal1,
-    jadwal2,
-    jadwal2,
+    jadwal3,
     jadwal1,
     jadwal3,
     jadwal3,
+    jadwal3,
+    jadwal3,
+    jadwal2,
+    jadwal1,
+    jadwal1,
   ];
 
   const options: TableOptions = {
