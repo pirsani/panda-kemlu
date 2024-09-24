@@ -237,9 +237,18 @@ const generateTableRow = (
   drawRow(row, tableColumnHeaders, startX, y, rowHeight);
 };
 
+const sumData = (data: Decimal[][]): Decimal[] => {
+  return data.reduce(
+    (acc, row) => {
+      return acc.map((value, index) => value.plus(row[index]));
+    },
+    data[0].map(() => new Decimal(0))
+  );
+};
+
 const generateSumRow = (
   doc: InstanceType<typeof PDFDocument>,
-  data: Decimal[],
+  data: Decimal[][],
   deepestColumns: TableColumnHeader[],
   startX: number,
   lastY: number,
@@ -250,6 +259,8 @@ const generateSumRow = (
   const currentY = doc.y;
   console.log("[currentY before new page]", currentY);
   doc.rect(startX, lastY, width, sumRowHeight).stroke();
+
+  const acummulatedSum = sumData(data);
 
   let i = 0;
   deepestColumns.forEach((column, index) => {
@@ -263,7 +274,7 @@ const generateSumRow = (
       doc.rect(columnStartX, columnStartY, column.width, sumRowHeight).stroke();
       drawCell(
         doc,
-        data[i].toString(),
+        acummulatedSum[i].toString(),
         columnStartX,
         columnStartY,
         column.width,
@@ -393,7 +404,7 @@ const generateTable = (
       const dataSum = pageSumsArray[page - 1];
       generateSumRow(
         doc,
-        dataSum,
+        pageSumsArray,
         deepestColumns,
         startX,
         lastY,
@@ -483,7 +494,7 @@ const generateTable = (
         const dataSum = pageSumsArray[page - 1];
         generateSumRow(
           doc,
-          dataSum,
+          pageSumsArray,
           deepestColumns,
           startX,
           startYDynamic,
@@ -535,6 +546,26 @@ const generateTable = (
         startYDynamic,
         dataRowHeight
       );
+
+      // if last row, generate sum row
+      if (
+        dataGroupIndex === tableData.length - 1 &&
+        rowIndex === dataGroup.groupMembers.length - 1
+      ) {
+        resetSums();
+        const lastY = startYDynamic + dataRowHeight;
+        const dataSum = pageSumsArray[page - 1];
+        console.log("Last Page Sums:", pageSumsArray);
+        generateSumRow(
+          doc,
+          pageSumsArray,
+          deepestColumns,
+          startX,
+          lastY,
+          20,
+          totalWidth
+        );
+      }
     });
 
     dataGroupIterator++;
