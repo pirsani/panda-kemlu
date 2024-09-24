@@ -4,6 +4,7 @@ import generatorDokumenPengadaan, {
   downloadDokumenPengadaan,
 } from "./generator-dokumen-pengadaan";
 import { downloadDokumenRampungan } from "./generator-rampungan";
+import downloadTabelDinamis from "./generator-tabel-dinamis";
 import { downloadTemplateExcel } from "./template-excel";
 
 export async function GET(
@@ -25,6 +26,8 @@ export async function GET(
       return downloadTemplateExcel(req, slug);
     case "daftar-nominatif":
       return downloadDaftarNominatif(req, slug);
+    case "tabel-dinamis":
+      return downloadTabelDinamis(req, slug);
     default:
       return new NextResponse(`Download ${params.slug.join("/")}`);
   }
