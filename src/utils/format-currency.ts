@@ -11,11 +11,18 @@ export const formatCurrency = (
     ? amount
     : new Decimal(amount);
 
-  // Format the Decimal amount as a currency string
-  return new Intl.NumberFormat(locale, {
+  // Define formatting options
+  const options: Intl.NumberFormatOptions = {
     style: "currency",
     currency: currency,
-  }).format(decimalAmount.toNumber()); // Convert back to number for formatting
+    minimumFractionDigits: currency === "IDR" ? 0 : 2, // No decimals for IDR
+    maximumFractionDigits: currency === "IDR" ? 0 : 2,
+  };
+
+  // Format the Decimal amount as a currency string
+  return new Intl.NumberFormat(locale, options).format(
+    decimalAmount.toNumber()
+  );
 };
 
 export default formatCurrency;

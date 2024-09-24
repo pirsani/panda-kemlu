@@ -6,12 +6,15 @@ import { NextResponse } from "next/server";
 import path from "path";
 import PDFDocument from "pdfkit"; // Importing PDFDocument as a value
 import { height, width } from "pdfkit/js/page";
+import formatCurrency from "../format-currency";
 
 export interface TableColumnHeader {
   header: string;
   headerNumberingString?: string;
   field?: String;
   isSummable?: boolean; // Indicates if the column values can be summed
+  format?: "number" | "currency" | "date";
+  currency?: "IDR" | "USD" | "EUR";
   level: number;
   width: number;
   align: "left" | "center" | "right";
@@ -21,6 +24,54 @@ export interface TableColumnHeader {
 export interface TableRow {
   [key: string]: string | number;
 }
+
+const justifyBetween = (
+  fullValue: string, // This should contain the currency symbol and numeric value, e.g., 'Rp 919.099'
+  width: number,
+  fontSize: number,
+  doc: InstanceType<typeof PDFDocument>
+) => {
+  // add space 10
+  const space = -10;
+  try {
+    // Set the font size before measuring the width of the space character
+    doc.fontSize(fontSize);
+
+    // Use a regular expression to split the currency symbol from the value
+    const match = fullValue.match(/^([^\d\s]+)\s*(\d.+)$/);
+
+    if (!match) {
+      throw new Error(
+        "Invalid format for value: must include a currency symbol and numeric value."
+      );
+    }
+
+    const currencySymbol = match[1]; // e.g., 'Rp'
+    const value = match[2]; // e.g., '919.099'
+
+    // Measure the width of the space character, the value, and the currency symbol
+    const spaceWidth = doc.widthOfString(" ");
+    const valueWidth = doc.widthOfString(value);
+    const currencySymbolWidth = doc.widthOfString(currencySymbol);
+
+    // Calculate the available width for inserting spaces between the currency symbol and the value
+    const availableWidth = space + width - (valueWidth + currencySymbolWidth);
+
+    // If the available width is negative or zero, return the currency symbol and value with no extra spacing
+    if (availableWidth <= 0) return `${currencySymbol} ${value}`;
+
+    // Calculate how many spaces can fit in the available width
+    const totalSpaces = Math.floor(availableWidth / spaceWidth);
+
+    // Build the final spread value by inserting the spaces between the currency symbol and the value
+    let spreadValue = `${currencySymbol}${" ".repeat(totalSpaces)}${value}`;
+
+    return spreadValue;
+  } catch (error) {
+    console.error("Error in spreadValueAcrossWidth:", error);
+    throw error;
+  }
+};
 
 const getColumnXOffset = (
   tableColumnHeaders: TableColumnHeader[],
@@ -216,17 +267,18 @@ const generateTableRow = (
       );
       const columnStartX = startX + columnXOffset;
 
-      drawCell(
-        doc,
-        String(value),
-        columnStartX,
-        y,
-        column.width,
-        column.align,
-        8,
-        5,
-        5
-      );
+      let val = String(value);
+      if (column.format === "currency") {
+        const currValue = formatCurrency(
+          value as number,
+          "id-ID",
+          column.currency
+        );
+        // Spread value across column width if needed to fit the text Rp 1.000.000,00 -> Rp   1.000.000,00
+        val = justifyBetween(String(currValue), column.width, 8, doc);
+      }
+
+      drawCell(doc, val, columnStartX, y, column.width, column.align, 8, 5, 5);
 
       doc.rect(columnStartX, y, column.width, rowHeight).stroke();
       // console.log("columnY shouldbe", y + rowHeight);
@@ -272,10 +324,21 @@ const generateSumRow = (
     // Draw the header text
     //drawCell(doc, "nilai", columnStartX, columnStartY, column.width, "center");
     if (column.isSummable) {
+      let val = String(acummulatedSum[i]);
+      if (column.format === "currency") {
+        const currValue = formatCurrency(
+          acummulatedSum[i],
+          "id-ID",
+          column.currency
+        );
+        // Spread value across column width if needed to fit the text Rp 1.000.000,00 -> Rp   1.000.000,00
+        val = justifyBetween(String(currValue), column.width, 8, doc);
+      }
+
       doc.rect(columnStartX, columnStartY, column.width, sumRowHeight).stroke();
       drawCell(
         doc,
-        acummulatedSum[i].toString(),
+        val,
         columnStartX,
         columnStartY,
         column.width,
@@ -344,6 +407,8 @@ const generateTable = (
   let rowIterator = 0;
   let page = 1;
   let rowCounterOnPage = 0;
+
+  // iterate dataGroup
   tableData.forEach((dataGroup, dataGroupIndex) => {
     console.log("\n");
     console.log("[page]", page);
@@ -368,42 +433,20 @@ const generateTable = (
       totalHeightRow +
       addedSumRowHeight;
 
-    // debug baseStartY
-    console.log(
-      "[baseStartY = startY + totalHeightHeader+headerRowHeight+totalHeightRow]",
-      `baseStartY = ${startY} + ${totalHeightHeader} + ${headerRowHeight} + ${totalHeightRow}`,
-      baseStartY
-    );
-
     // divider row dengan nama kelas
     let dividerStartY = baseStartY + 3 + dataGroupIterator * heightDivider;
 
     const isNewPageNeeded =
       dividerStartY + heightDivider + dataRowHeight > availableHeight;
-    console.log(
-      "[dividerStartY = baseStartY + 3 + dataGroupIterator * heightDivider]",
-      dividerStartY,
-      baseStartY,
-      dataGroupIterator,
-      heightDivider
-    );
-    console.log(
-      "[dividerStartY,dataRowHeight,availableHeight]",
-      dividerStartY,
-      dataRowHeight,
-      availableHeight
-    );
+
     if (isNewPageNeeded) {
       // reset startY
       rowCounterOnPage = 0;
       dataGroupIterator = 0;
 
       // generate sum row before new page
-      // baseStartY + dataGroupIterator * heightDivider
-      // const lastY = baseStartY + dataGroupIterator * heightDivider;
       resetSums();
-      const lastY = dividerStartY - 3;
-      const dataSum = pageSumsArray[page - 1];
+      const lastY = dividerStartY - 3; // plus 3 agar tulisan tidak berada tepat di garis
       generateSumRow(
         "Jumlah yang dipindahkan",
         doc,
@@ -587,10 +630,13 @@ const generateTable = (
       ) {
         resetSums();
         const lastY = startYDynamic + dataRowHeight;
-        const dataSum = pageSumsArray[page - 1];
+        // setelah row terakhir perlu footer yang berisi tanggal dan ttd
+        // maka jika tidak cukup tinggi, maka perlu new page
+        const isNewPageNeeded = lastY + 100 > availableHeight;
+
         console.log("Last Page Sums:", pageSumsArray);
         generateSumRow(
-          "Jumlah Total",
+          isNewPageNeeded ? "Jumlah yang dipindahkan" : "Jumlah Total",
           doc,
           pageSumsArray,
           deepestColumns,
@@ -599,6 +645,55 @@ const generateTable = (
           20,
           totalWidth
         );
+
+        console.log("isNewPageNeeded", isNewPageNeeded);
+        if (isNewPageNeeded) {
+          doc.addPage(); // new page
+          page++;
+          console.log("[NEW PAGE] on last row", page);
+          // reset startY
+          startYDynamic = controlBaseStartY;
+          baseStartY = controlBaseStartY;
+          startYRowgroupMembers = controlStartYRowgroupMembers;
+          generateTableHeader(
+            doc,
+            tableColumnHeaders,
+            startX,
+            startY,
+            headerRowHeight
+          );
+          generateNumberingHeader(
+            doc,
+            deepestColumns,
+            startX,
+            startY +
+              totalHeightHeader +
+              headerRowHeight -
+              headerNumberingRowHeight,
+            headerNumberingRowHeight
+          );
+          // add sum row jumlah pindahan
+          generateSumRow(
+            "Jumlah Pindahan",
+            doc,
+            pageSumsArray,
+            deepestColumns,
+            startX,
+            startYDynamic - sumRowHeight,
+            sumRowHeight,
+            totalWidth
+          );
+          generateSumRow(
+            "Jumlah Total",
+            doc,
+            pageSumsArray,
+            deepestColumns,
+            startX,
+            startYDynamic,
+            sumRowHeight,
+            totalWidth
+          );
+        }
       }
     });
 
@@ -700,6 +795,9 @@ export interface TableOptions {
   dataRowHeight: number; // tinggi untuk masing-masing row data
 }
 export async function generateTabelDinamis(
+  satker: string,
+  tableTitle: string,
+  tableSubtitle: string,
   tableData: DataGroup[],
   tableColumnHeaders: TableColumnHeader[],
   tableOptions: TableOptions
@@ -742,12 +840,7 @@ export async function generateTabelDinamis(
     //   .lineTo(lineEndX, lineY) // Draw the line to the end point
     //   .stroke(); // Apply the stroke to draw the line
 
-    generateReportHeader(
-      doc,
-      "Pusat Pendidikan dan Pelatihan",
-      "DAFTAR NOMINATIF HONORARIUM NARASUMBER/PEMBAHAS PAKAR/ PRAKTISI/ PROFESIONAL",
-      "KEGIATAN PELATIHAN DAN PENGEMBANGAN KOMPETENSI PEGAWAI"
-    );
+    generateReportHeader(doc, satker, tableTitle, tableSubtitle);
 
     generateTable(
       doc,
@@ -767,10 +860,10 @@ export async function generateTabelDinamis(
     let currentY = doc.y;
     console.log(`Current X: ${currentX}, Current Y: ${currentY}`);
 
-    doc
-      .moveTo(startX, currentY + dataRowHeight) // Move to the start of the line
-      .lineTo(currentX + 10, currentY + dataRowHeight) // Draw the line to the end point
-      .stroke(); // Apply the stroke to draw the line
+    // doc
+    //   .moveTo(startX, currentY + dataRowHeight) // Move to the start of the line
+    //   .lineTo(currentX + 10, currentY + dataRowHeight) // Draw the line to the end point
+    //   .stroke(); // Apply the stroke to draw the line
 
     // mulai dari sini generate footer
     const ppk = { nama: "Fulan bin Fulan", NIP: "1234567890" };
@@ -778,7 +871,7 @@ export async function generateTabelDinamis(
     const doctWidth = doc.page.width;
     console.log("doc.page.width", doctWidth);
 
-    let y1 = currentY + dataRowHeight + 10;
+    let y1 = currentY + 20;
     let y2 = y1 + 50;
     let x1 = startX;
     let x2 = doctWidth - 300;

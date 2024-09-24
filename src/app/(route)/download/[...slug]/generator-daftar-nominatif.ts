@@ -68,6 +68,8 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
           headerNumberingString: "4",
           field: "besaran",
           isSummable: true,
+          format: "currency",
+          currency: "USD",
           width: 75,
           align: "right",
         },
@@ -76,6 +78,8 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
           header: "JUMLAH",
           headerNumberingString: "4",
           field: "jumlahBruto",
+          format: "currency",
+          currency: "IDR",
           isSummable: true,
           width: 75,
           align: "right",
@@ -147,7 +151,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
         jabatan: `${faker.person.jobTitle()}`,
         jp: `${faker.number.float({ min: 1, max: 5, fractionDigits: 1 })}`,
         besaran: faker.number.int({ min: 100, max: 1000 }),
-        jumlahBruto: faker.number.int({ min: 100, max: 1000 }),
+        jumlahBruto: faker.number.int({ min: 50000, max: 100000000 }),
         dpp: faker.number.int({ min: 100, max: 1000 }),
         tarif: faker.helpers.arrayElement(["5%", "10%", "15%"]),
         pph: faker.number.int({ min: 100, max: 1000 }),
@@ -196,7 +200,8 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
     jadwal3,
     jadwal2,
     jadwal1,
-    jadwal1,
+    //jadwal1,
+    jadwal2,
   ];
 
   const options: TableOptions = {
@@ -207,7 +212,17 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
     dataRowHeight: 60,
   };
   try {
-    const pdfBuffer = await generateTabelDinamis(jadwals, columns, options);
+    const satker = "Pusat Pendidikan dan Pelatihan ";
+    const titleText = `DAFTAR NOMINATIF HONORARIUM NARASUMBER/PEMBAHAS PAKAR/ PRAKTISI/ PROFESIONAL`;
+    const subtitleText = `KEGIATAN PELATIHAN DAN PENGEMBANGAN KOMPETENSI PEGAWAI NEGERI SIPIL`;
+    const pdfBuffer = await generateTabelDinamis(
+      satker,
+      titleText,
+      subtitleText,
+      jadwals,
+      columns,
+      options
+    );
     return new NextResponse(pdfBuffer, {
       status: 200,
       headers: {
@@ -216,6 +231,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
       },
     });
   } catch (error) {
+    console.error(error);
     throw new Error("Failed to generate PDF");
   }
 }
