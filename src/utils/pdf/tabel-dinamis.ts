@@ -247,6 +247,7 @@ const sumData = (data: Decimal[][]): Decimal[] => {
 };
 
 const generateSumRow = (
+  textNarasiJumlah: string,
   doc: InstanceType<typeof PDFDocument>,
   data: Decimal[][],
   deepestColumns: TableColumnHeader[],
@@ -284,7 +285,7 @@ const generateSumRow = (
     }
   });
 
-  drawCell(doc, "Jumlah", startX, lastY, width, "left", 10, 5, 0);
+  drawCell(doc, textNarasiJumlah, startX, lastY, width, "left", 10, 5, 0);
 };
 
 export interface DataGroup {
@@ -329,17 +330,19 @@ const generateTable = (
     headerNumberingRowHeight
   );
 
+  let sumRowHeight = 20;
   const heightDivider = 15;
   // generate table row
   let controlBaseStartY =
-    startY + totalHeightHeader + headerRowHeight + headerNumberingRowHeight;
-  let isReset = false;
+    startY +
+    totalHeightHeader +
+    headerRowHeight +
+    headerNumberingRowHeight +
+    sumRowHeight; // 20 is sumRowHeight
   let controlStartYRowgroupMembers = controlBaseStartY + heightDivider;
-  let controlStartYDynamic = 0;
   let dataGroupIterator = 0;
   let rowIterator = 0;
   let page = 1;
-  let rowCounter = 0;
   let rowCounterOnPage = 0;
   tableData.forEach((dataGroup, dataGroupIndex) => {
     console.log("\n");
@@ -355,16 +358,15 @@ const generateTable = (
     }
     const totalHeightDivider = dataGroupIterator * heightDivider;
     const totalHeightRow = rowCounterOnPage * dataRowHeight;
-    //const yBaseOnIndex = dataGroupIterator * length * dataRowHeight;
-    //console.log("[yBaseOnIndex]", yBaseOnIndex);
 
+    // hanya tambahkan sumRowHeight jika page > 1 karena di page 1 tidak ada pindahan jumlah
+    const addedSumRowHeight = page == 1 ? 0 : sumRowHeight;
     let baseStartY =
       startY +
       totalHeightHeader +
       headerRowHeight +
-      //headerNumberingRowHeight +
-      //totalHeightDivider +
-      totalHeightRow;
+      totalHeightRow +
+      addedSumRowHeight;
 
     // debug baseStartY
     console.log(
@@ -403,6 +405,7 @@ const generateTable = (
       const lastY = dividerStartY - 3;
       const dataSum = pageSumsArray[page - 1];
       generateSumRow(
+        "Jumlah yang dipindahkan",
         doc,
         pageSumsArray,
         deepestColumns,
@@ -430,6 +433,16 @@ const generateTable = (
         startX,
         startY + totalHeightHeader + headerRowHeight - headerNumberingRowHeight,
         headerNumberingRowHeight
+      );
+      generateSumRow(
+        "Jumlah Pindahan",
+        doc,
+        pageSumsArray,
+        deepestColumns,
+        startX,
+        startY + totalHeightHeader + headerRowHeight + headerNumberingRowHeight,
+        sumRowHeight,
+        totalWidth
       );
     } else {
       //console.log("[CONTINUE]", dataGroupIndex);
@@ -493,6 +506,7 @@ const generateTable = (
         console.log(pageSumsArray[page - 1]); // array is zero based
         const dataSum = pageSumsArray[page - 1];
         generateSumRow(
+          "Jumlah yang dipindahkan",
           doc,
           pageSumsArray,
           deepestColumns,
@@ -527,7 +541,27 @@ const generateTable = (
             headerNumberingRowHeight,
           headerNumberingRowHeight
         );
+        // add sum row jumlah pindahan
+        generateSumRow(
+          "Jumlah Pindahan",
+          doc,
+          pageSumsArray,
+          deepestColumns,
+          startX,
+          startYDynamic - sumRowHeight,
+          sumRowHeight,
+          totalWidth
+        );
+        summableColumns.forEach((column, columnIndex) => {
+          const columnValue = groupMembers[column.field as string];
+          pageSums[columnIndex] = pageSums[columnIndex].plus(
+            new Decimal(columnValue)
+          );
+        });
       } else {
+        rowIterator++;
+        rowReset = false;
+
         // sum row
         summableColumns.forEach((column, columnIndex) => {
           const columnValue = groupMembers[column.field as string];
@@ -535,9 +569,8 @@ const generateTable = (
             new Decimal(columnValue)
           );
         });
-        rowIterator++;
-        rowReset = false;
       }
+
       generateTableRow(
         doc,
         groupMembers,
@@ -557,6 +590,7 @@ const generateTable = (
         const dataSum = pageSumsArray[page - 1];
         console.log("Last Page Sums:", pageSumsArray);
         generateSumRow(
+          "Jumlah Total",
           doc,
           pageSumsArray,
           deepestColumns,
