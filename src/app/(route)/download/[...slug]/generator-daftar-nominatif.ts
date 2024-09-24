@@ -1,6 +1,7 @@
 import generateTabelDinamis, {
   DataGroup,
   TableColumnHeader,
+  TableFooterOptions,
   TableOptions,
   TableRow,
 } from "@/utils/pdf/tabel-dinamis";
@@ -215,13 +216,19 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
     const satker = "Pusat Pendidikan dan Pelatihan ";
     const titleText = `DAFTAR NOMINATIF HONORARIUM NARASUMBER/PEMBAHAS PAKAR/ PRAKTISI/ PROFESIONAL`;
     const subtitleText = `KEGIATAN PELATIHAN DAN PENGEMBANGAN KOMPETENSI PEGAWAI NEGERI SIPIL`;
+
+    const footerOptions: TableFooterOptions = {
+      kiri: { text: "test", nama: "fulan", NIP: "6537327432" },
+      kanan: { text: "test", nama: "fulan", NIP: "6537327432" },
+    };
     const pdfBuffer = await generateTabelDinamis(
       satker,
       titleText,
       subtitleText,
       jadwals,
       columns,
-      options
+      options,
+      footerOptions
     );
     return new NextResponse(pdfBuffer, {
       status: 200,

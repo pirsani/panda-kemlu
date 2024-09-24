@@ -4,7 +4,7 @@ import fs from "fs";
 import { concat, max } from "lodash";
 import { NextResponse } from "next/server";
 import path from "path";
-import PDFDocument from "pdfkit"; // Importing PDFDocument as a value
+import PDFDocument, { text, underline } from "pdfkit"; // Importing PDFDocument as a value
 import { height, width } from "pdfkit/js/page";
 import formatCurrency from "../format-currency";
 
@@ -24,6 +24,47 @@ export interface TableColumnHeader {
 export interface TableRow {
   [key: string]: string | number;
 }
+
+// Function to add underlined text with correct alignment
+const addUnderline = (
+  doc: InstanceType<typeof PDFDocument>,
+  text: string,
+  x: number,
+  y: number,
+  options: {
+    fontSize?: number;
+    underlineColor?: string;
+    width?: number;
+    align?: "left" | "center" | "right";
+  } = {}
+) => {
+  const {
+    fontSize = 12,
+    underlineColor = "black",
+    width = 100, // Default width in case width is not provided
+    align = "left",
+  } = options;
+
+  // Measure text width
+  const textWidth = doc.widthOfString(text);
+
+  // Adjust x position based on alignment
+  let adjustedX = x;
+  if (align === "center") {
+    adjustedX = x + (width - textWidth) / 2; // Center align
+  } else if (align === "right") {
+    adjustedX = x + (width - textWidth); // Right align
+  }
+
+  // Calculate underline position
+  const underlineY = y + fontSize - 1; // Position underline slightly below text
+
+  // Draw underline
+  doc
+    .moveTo(adjustedX, underlineY)
+    .lineTo(adjustedX + textWidth, underlineY)
+    .stroke(underlineColor);
+};
 
 const justifyBetween = (
   fullValue: string, // This should contain the currency symbol and numeric value, e.g., 'Rp 919.099'
@@ -128,6 +169,7 @@ const isHasSubHeader = (column: TableColumnHeader): boolean => {
   return !!(column.subHeader && column.subHeader.length > 0);
 };
 
+// Updated drawCell function
 const drawCell = (
   doc: InstanceType<typeof PDFDocument>,
   text: string,
@@ -137,12 +179,10 @@ const drawCell = (
   align: "left" | "center" | "right",
   fontSize: number = 8, // Default font size value
   padding: number = 5, // Default padding value
-  lineSpacing: number = 5 // Default line spacing value
+  lineSpacing: number = 5, // Default line spacing value
+  underline: boolean = false // New parameter to decide whether to underline text
 ) => {
-  //const adjustedX = align === "right" ? x : x + padding;
   const adjustedX = x + padding; // Add horizontal padding if needed
-
-  //const adjustedX = x; //+ padding; // Add horizontal padding if needed
   const adjustedWidth = width - 2 * padding;
   const adjustedY = y + padding; // Add vertical padding if needed
 
@@ -150,10 +190,23 @@ const drawCell = (
   let currentY = adjustedY;
 
   lines.forEach((line) => {
+    // Draw regular text
     doc.fontSize(fontSize).text(line, adjustedX, currentY, {
       width: adjustedWidth,
       align: align,
     });
+
+    // Add underline if required
+    if (underline) {
+      addUnderline(doc, line, adjustedX, currentY, {
+        fontSize,
+        underlineColor: "black", // Set underline color or pass as a parameter
+        width: adjustedWidth, // Use the cell width
+        align, // Use the same alignment as the text
+      });
+    }
+
+    // Update currentY to account for line spacing
     currentY +=
       doc.heightOfString(line, { width: adjustedWidth }) + lineSpacing;
   });
@@ -735,55 +788,39 @@ const generateReportFooter = (
   x2: number,
   y1: number,
   y2: number,
-  ppk: { nama: string; NIP: string },
-  bendahara: { nama: string; NIP: string }
+  kiri: { text: string; nama: string; NIP: string },
+  kanan: { text: string; nama: string; NIP: string }
 ) => {
+  drawCell(doc, kiri.text, x1, y1, 250, "center", 11, 0, 0);
+
+  drawCell(doc, `${kiri.nama}`, x1, y2, 250, "center", 11, 0, 0, true);
   drawCell(
     doc,
-    `Mengetahui, \n Pejabat Pembuat Komitmen`,
+    `NIP. ${kiri.NIP}`,
     x1,
-    y1,
+    y2 + 12,
     250,
     "center",
-    12,
+    11,
     0,
-    0
+    0,
+    false
   );
+
+  drawCell(doc, kanan.text, x2, y1, 250, "center", 11, 0, 0);
+  drawCell(doc, `${kanan.nama}`, x2, y2, 250, "center", 11, 0, 0, true);
 
   drawCell(
     doc,
-    `${ppk.nama} \n NIP. ${ppk.NIP}`,
-    x1,
-    y2,
-    250,
-    "center",
-    12,
-    0,
-    0
-  );
-
-  drawCell(
-    doc,
-    `Mengetahui, \n Pejabat Pembuat Komitmen`,
+    `NIP. ${kanan.NIP}`,
     x2,
-    y1,
+    y2 + 12,
     250,
     "center",
-    12,
+    11,
     0,
-    0
-  );
-
-  drawCell(
-    doc,
-    `${ppk.nama} \n NIP. ${ppk.NIP}`,
-    x2,
-    y2,
-    250,
-    "center",
-    12,
     0,
-    0
+    false
   );
 };
 
@@ -794,13 +831,18 @@ export interface TableOptions {
   headerNumberingRowHeight: number; // tinggi untuk baris header nomor dibawah header
   dataRowHeight: number; // tinggi untuk masing-masing row data
 }
+export interface TableFooterOptions {
+  kiri: { text: string; nama: string; NIP: string };
+  kanan: { text: string; nama: string; NIP: string };
+}
 export async function generateTabelDinamis(
   satker: string,
   tableTitle: string,
   tableSubtitle: string,
   tableData: DataGroup[],
   tableColumnHeaders: TableColumnHeader[],
-  tableOptions: TableOptions
+  tableOptions: TableOptions,
+  tableFooterOptions: TableFooterOptions
 ) {
   const {
     startX,
@@ -866,8 +908,17 @@ export async function generateTabelDinamis(
     //   .stroke(); // Apply the stroke to draw the line
 
     // mulai dari sini generate footer
-    const ppk = { nama: "Fulan bin Fulan", NIP: "1234567890" };
-    const bendahara = { nama: "Fulan bin Fulan", NIP: "1234567890" };
+    const { kiri, kanan } = tableFooterOptions;
+    // const ppk = {
+    //   text: "Mengetahui,\nPejabat Pembuat Komitmen",
+    //   nama: "Fulan bin Fulan",
+    //   NIP: "1234567890",
+    // };
+    // const bendahara = {
+    //   text: "Bendahara",
+    //   nama: "Fulan bin Fulan",
+    //   NIP: "1234567890",
+    // };
     const doctWidth = doc.page.width;
     console.log("doc.page.width", doctWidth);
 
@@ -888,7 +939,7 @@ export async function generateTabelDinamis(
       y2 = y1 + 50;
     }
 
-    generateReportFooter(doc, x1, x2, y1, y2, ppk, bendahara);
+    generateReportFooter(doc, x1, x2, y1, y2, kiri, kanan);
 
     doc.end();
     // Wait for 'end' event to ensure the document generation is complete
