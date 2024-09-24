@@ -250,6 +250,7 @@ const generateTable = (
   const deepestColumns = getDeepestColumns(columns);
   const maxLevel = findMaxLevel(columns);
   const totalHeightHeader = maxLevel * headerRowHeight;
+  const availableHeight = doc.page.height - 60;
 
   // count total width
   const totalWidth = getTotalTableWidth(deepestColumns);
@@ -272,38 +273,62 @@ const generateTable = (
   let controlStartYDynamic = 0;
   let jadwalIterator = 0;
   let rowIterator = 0;
+  let page = 1;
+  let rowCounter = 0;
+  let rowCounterOnPage = 0;
   rows.forEach((jadwal, jadwalIndex) => {
     console.log("\n");
-    console.log("[jadwalIndex, jadwalIterator]", jadwalIndex, jadwalIterator);
+    console.log("[page]", page);
+    console.log("[jadwalIterator,jadwalIndex ]", jadwalIterator, jadwalIndex);
     let length = 0;
     if (jadwalIndex !== 0) {
       length = rows[jadwalIndex - 1].jadwalNarasumber.length;
     }
     const totalHeightDivider = jadwalIterator * heightDivider;
-    const totalHeightRow = rowIterator * rowHeight;
-    const yBaseOnIndex = jadwalIterator * length * rowHeight;
-    console.log("[yBaseOnIndex]", yBaseOnIndex);
+    const totalHeightRow = rowCounterOnPage * rowHeight;
+    //const yBaseOnIndex = jadwalIterator * length * rowHeight;
+    //console.log("[yBaseOnIndex]", yBaseOnIndex);
 
     let baseStartY =
       startY +
       totalHeightHeader +
       headerRowHeight +
-      headerNumberingRowHeight +
+      //headerNumberingRowHeight +
       //totalHeightDivider +
       totalHeightRow;
+
+    // debug baseStartY
+    console.log(
+      "[baseStartY = startY + totalHeightHeader+headerRowHeight+totalHeightRow]",
+      `baseStartY = ${startY} + ${totalHeightHeader} + ${headerRowHeight} + ${totalHeightRow}`,
+      baseStartY
+    );
 
     // divider row dengan nama kelas
     let dividerStartY = baseStartY + 2 + jadwalIterator * heightDivider;
 
-    const isNewPageNeeded = dividerStartY + rowHeight > doc.page.height - 25;
+    const isNewPageNeeded =
+      dividerStartY + heightDivider + rowHeight > availableHeight;
+    console.log(
+      "[dividerStartY = baseStartY + 2 + jadwalIterator * heightDivider]",
+      dividerStartY,
+      baseStartY,
+      jadwalIterator,
+      heightDivider
+    );
+    console.log(
+      "[dividerStartY,rowHeight,availableHeight]",
+      dividerStartY,
+      rowHeight,
+      availableHeight
+    );
     if (isNewPageNeeded) {
       // reset startY
-      console.log("[max height]", doc.page.height - 25);
+      rowCounterOnPage = 0;
       jadwalIterator = 0;
-      console.log("[isNewPageNeeded On Divider]", isNewPageNeeded, jadwalIndex);
-      //doc.addPage();
       doc.addPage(); // new page
-      console.log("reset");
+      page++;
+      console.log("[NEW PAGE] on new divider", page);
       baseStartY = controlBaseStartY;
       dividerStartY = baseStartY + 2;
       generateTableHeader(doc, columns, startX, startY, headerRowHeight);
@@ -314,13 +339,12 @@ const generateTable = (
         startY + totalHeightHeader + headerRowHeight - headerNumberingRowHeight,
         headerNumberingRowHeight
       );
-      console.log("Draw divider in new page", dividerStartY, "\n");
     } else {
-      console.log("[CONTINUE]", jadwalIndex);
+      //console.log("[CONTINUE]", jadwalIndex);
     }
 
     // Set the fill color for the rectangle
-    console.log("Draw divider", dividerStartY, "\n");
+    //console.log("Draw divider", dividerStartY, "\n");
     doc
       .fillColor("#e9ecef") // Set the desired background color
       .rect(
@@ -335,7 +359,7 @@ const generateTable = (
 
     drawCell(
       doc,
-      `${jadwal.nama} ${jadwal.tanggal} ${jadwal.jam} iterator ${jadwalIterator} jadwalIndex ${jadwalIndex}`,
+      `${jadwal.nama} ${jadwal.tanggal} ${jadwal.jam} jadwalIterator ${jadwalIterator} jadwalIndex ${jadwalIndex}`,
       startX,
       dividerStartY,
       totalWidth,
@@ -350,36 +374,48 @@ const generateTable = (
     if (isNewPageNeeded) {
       startYRowjadwalNarasumber = controlStartYRowjadwalNarasumber;
     }
+    if ((jadwalIterator = 0)) {
+      startYRowjadwalNarasumber = controlStartYRowjadwalNarasumber;
+    }
 
     //let startYDynamic = startYRowjadwalNarasumber;
     let rowReset = false;
-    jadwal.jadwalNarasumber.forEach((jadwalNarasumber, rowIndex) => {
-      let startYDynamic = startYRowjadwalNarasumber + rowHeight * rowIndex;
+    //var startYDynamic = startYRowjadwalNarasumber;
 
-      //startYDynamic = startYRowjadwalNarasumber + rowHeight * rowIndex;
-      console.log(
-        "[startY, baseStartY,startYRowjadwalNarasumber]",
-        startY,
-        baseStartY,
-        startYRowjadwalNarasumber
-      );
-      console.log(
-        "[startYDynamic, expectedHeight]",
-        startYDynamic,
-        startYDynamic + rowHeight
-      );
-      const isNewPageNeeded = startYDynamic + rowHeight > doc.page.height - 25;
+    jadwal.jadwalNarasumber.forEach((jadwalNarasumber, rowIndex) => {
+      //console.log("[Row iterator, isReset]", rowIterator, isReset);
+      rowCounterOnPage++;
+
+      let startYDynamic = startYRowjadwalNarasumber + rowHeight * rowIndex;
+      if (rowReset) {
+        startYDynamic = controlStartYRowjadwalNarasumber + rowHeight - 15;
+      }
+
+      // console.log(
+      //   "[rowIndex, startYRowjadwalNarasumber, startYDynamic, expectedHeight]",
+      //   rowIndex,
+      //   startYDynamic,
+      //   startYRowjadwalNarasumber,
+      //   startYDynamic + rowHeight
+      // );
+      const isNewPageNeeded = startYDynamic + rowHeight > availableHeight;
       if (isNewPageNeeded) {
+        rowCounterOnPage = 1;
         rowIterator = 0;
+        jadwalIterator = 0;
         rowReset = true;
-        console.log(
-          "[isNewPageNeeded on Row]",
-          isNewPageNeeded,
-          jadwalIndex,
-          rowIndex
-        );
-        console.log("[max height]", doc.page.height - 25);
+        // console.log(
+        //   "[isNewPageNeeded on Row]",
+        //   isNewPageNeeded,
+        //   jadwalIndex,
+        //   rowIndex
+        // );
+        // console.log("[max height]", availableHeight);
         doc.addPage(); // new page
+        page++;
+        console.log("[NEW PAGE] on new row", page);
+        //console.log("[NEW PAGE] on new row", jadwalIndex, rowIndex);
+
         // reset startY
         startYDynamic = controlBaseStartY;
         baseStartY = controlBaseStartY;
@@ -399,6 +435,13 @@ const generateTable = (
         rowIterator++;
         rowReset = false;
       }
+      // console.log(
+      //   "[startY, baseStartY,startYDynamic,startYRowjadwalNarasumber]",
+      //   startY,
+      //   baseStartY,
+      //   startYDynamic,
+      //   startYRowjadwalNarasumber
+      // );
       generateTableRow(
         doc,
         jadwalNarasumber,
@@ -612,8 +655,8 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
   const rows1: TableRow[] = [
     {
       no: 1,
-      namaNipNpwp: "satu orang \n 97638383 \n 4847474",
-      nama: "satu orang",
+      namaNipNpwp: "John Doe panjang \n 1234567890 \n 1234567890",
+      nama: "John Doe panjang",
       jabatan: "Manager",
       jp: 2.3,
       besaran: "Rp. 105.000.000",
@@ -710,31 +753,42 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
     jadwalNarasumber: rows1,
   };
 
-  const jadwal: Jadwal = {
-    nama: "Kelas A",
+  const jadwal2: Jadwal = {
+    nama: "Kelas B",
     tanggal: "2021-10-10",
     jam: "09:00 - 16:00",
     jadwalNarasumber: rows,
   };
 
   const jadwal3: Jadwal = {
-    nama: "Kelas X",
+    nama: "Kelas C",
     tanggal: "2021-10-10",
     jam: "09:00 - 16:00",
     jadwalNarasumber: rows3,
   };
 
   const jadwals = [
-    jadwal3,
-    jadwal,
-    jadwal3,
-    jadwal3,
-    jadwal,
-    jadwal3,
+    jadwal1,
+    jadwal2,
+    jadwal2,
     jadwal1,
     jadwal3,
-    jadwal,
-    jadwal,
+    jadwal3,
+    jadwal2,
+    jadwal2,
+    jadwal1,
+    jadwal2,
+    jadwal2,
+    jadwal1,
+    jadwal2,
+    jadwal2,
+    jadwal1,
+    jadwal3,
+    jadwal3,
+    jadwal2,
+    jadwal2,
+    jadwal1,
+    jadwal3,
   ];
 
   const customFontPath = path.resolve(
@@ -762,7 +816,7 @@ export async function generateDaftarNominatif(req: Request, slug: string[]) {
   const startY = 75; // y-coordinate for the start of the table
   const headerRowHeight = 25; // tinggi untuk masing-masing baris header
   const headerNumberingRowHeight = 15; // tinggi untuk masing-masing baris header nomor
-  const rowHeight = 50; // tinggi untuk masing-masing row data
+  const rowHeight = 60; // tinggi untuk masing-masing row data
 
   try {
     //doc.rect(10, 10, 820, 560).stroke(); // reference
