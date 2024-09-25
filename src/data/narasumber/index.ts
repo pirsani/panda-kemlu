@@ -29,7 +29,7 @@ const getNarasumber = async () => {
       TO_CHAR(created_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS "createdAt",
       TO_CHAR(updated_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS "updatedAt"
     FROM 
-      narasumber;
+      narasumber order by nama;
   `;
   const narasumber = await dbHonorarium.$queryRaw<NarasumberWithStringDate[]>(
     rawQuery

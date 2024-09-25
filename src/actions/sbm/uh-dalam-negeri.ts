@@ -25,7 +25,7 @@ export const simpanDataSbmUhDalamNegeri = async (
         createdBy: "admin",
       },
     });
-    revalidatePath("/data-referensi/sbm/uang-representasi");
+    revalidatePath("/data-referensi/sbm/uh-dalam-negeri");
     return {
       success: true,
       data: sbmUhDalamNegeriBaru,
@@ -63,7 +63,7 @@ export const updateDataSbmUhDalamNegeri = async (
         sbmUhDalamNegeriBaru
       );
     //console.log("[PLAIN OBJECT]", plainObject);
-    revalidatePath("/data-referensi/sbm/honorarium");
+    revalidatePath("/data-referensi/sbm/uh-dalam-negeri");
     return {
       success: true,
       data: plainObject,
@@ -86,7 +86,7 @@ export const deleteDataSbmUhDalamNegeri = async (
         id,
       },
     });
-    revalidatePath("/data-referensi/sbm/honorarium");
+    revalidatePath("/data-referensi/sbm/uh-dalam-negeri");
     const plainObject =
       convertSpecialTypesToPlain<SbmUhDalamNegeriPlainObject>(deleted);
     return {

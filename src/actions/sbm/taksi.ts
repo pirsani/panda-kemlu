@@ -25,7 +25,7 @@ export const simpanDataSbmTaksi = async (
         createdBy: "admin",
       },
     });
-    revalidatePath("/data-referensi/sbm/uang-representasi");
+    revalidatePath("/data-referensi/sbm/taksi");
     return {
       success: true,
       data: sbmTaksiBaru,

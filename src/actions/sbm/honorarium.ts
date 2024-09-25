@@ -25,7 +25,7 @@ export const simpanDataSbmHonorarium = async (
         createdBy: "admin",
       },
     });
-    revalidatePath("/data-referensi/sbm/uang-representasi");
+    revalidatePath("/data-referensi/sbm/honorarium");
     return {
       success: true,
       data: sbmHonorariumBaru,

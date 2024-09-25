@@ -81,6 +81,7 @@ const seedProvinsi = async (): Promise<void> => {
       .on("data", (data) => results.push(data))
       .on("end", async () => {
         try {
+          let urutan = 1;
           for (const row of results) {
             //console.log(row);
             await dbHonorarium.provinsi.create({
@@ -91,6 +92,7 @@ const seedProvinsi = async (): Promise<void> => {
                 nama: row.nama,
                 singkatan: row.nama_singkatan || null,
                 aktif: true,
+                urutan: urutan++,
                 createdBy: "init",
                 createdAt: new Date(),
                 //updatedBy: null,
