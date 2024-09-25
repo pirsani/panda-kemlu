@@ -159,7 +159,7 @@ async function saveDataSbmUhLuarNegeriToDatabase(
       golonganD: item.golonganD.toNumber(),
     }));
 
-    revalidatePath("/data-referensi/sbm/uh-luar-negeri", "page");
+    revalidatePath("/data-referensi/sbm/uh-luar-negeri");
 
     return convertedData as SbmUhLuarNegeriPlainObject[];
   } catch (error) {
@@ -191,7 +191,7 @@ export const deleteDataSbmUhLuarNegeri = async (
       golonganC: deleted.golonganC.toNumber(),
       golonganD: deleted.golonganD.toNumber(),
     };
-    revalidatePath("/data-referensi/sbm/uh-luar-negeri", "page");
+    revalidatePath("/data-referensi/sbm/uh-luar-negeri");
     console.log("[deleted]", convertedData);
 
     return {

@@ -63,7 +63,7 @@ export const updateDataSbmUhLuarNegeri = async (
         sbmUhLuarNegeriBaru
       );
     //console.log("[PLAIN OBJECT]", plainObject);
-    revalidatePath("/data-referensi/sbm/honorarium");
+    revalidatePath("/data-referensi/sbm/uh-luar-negeri");
     return {
       success: true,
       data: plainObject,
@@ -86,7 +86,7 @@ export const deleteDataSbmUhLuarNegeri = async (
         id,
       },
     });
-    revalidatePath("/data-referensi/sbm/honorarium");
+    revalidatePath("/data-referensi/sbm/uh-luar-negeri");
     const plainObject =
       convertSpecialTypesToPlain<SbmUhLuarNegeriPlainObject>(deleted);
     return {

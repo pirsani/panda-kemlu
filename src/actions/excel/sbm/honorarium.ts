@@ -45,7 +45,7 @@ export const importExcelSbmHonorarium = async (
           message: "No result Error saving data to database",
         };
       } else {
-        revalidatePath("/data-referensi/sbm/honorarium", "page");
+        revalidatePath("/data-referensi/sbm/honorarium");
         return {
           success: true,
           data: result,
@@ -170,7 +170,7 @@ export const deleteDataSbmHonorarium = async (
       ...deleted,
       besaran: deleted.besaran.toNumber(), // Convert Decimal to number
     };
-    revalidatePath("/data-referensi/sbm/honorarium", "page");
+    revalidatePath("/data-referensi/sbm/honorarium");
     console.log("[deleted]", convertedData);
 
     return {

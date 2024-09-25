@@ -28,7 +28,6 @@ const EditNarasumber = ({
   isEditing,
   closeDialog = () => {},
 }: EditNarasumberProps) => {
-  //const [open, setOpen] = useState(isEditing);
   const onCancel = () => {
     closeDialog();
   };
@@ -89,7 +88,7 @@ const EditNarasumber = ({
       } else {
         toast.success("Berhasil menyimpan narasumber");
         console.log("Berhasil menyimpan narasumber:", data);
-        //setOpen(false);
+        closeDialog();
       }
     } catch (error) {
       // Generic error handling

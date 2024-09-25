@@ -163,7 +163,7 @@ async function saveDataSbmUhDalamNegeriToDatabase(
       ...convertSpecialTypesToPlain<SbmUhDalamNegeriPlainObject>(item),
     }));
 
-    revalidatePath("/data-referensi/sbm/uh-dalam-negeri", "page");
+    revalidatePath("/data-referensi/sbm/uh-dalam-negeri");
 
     return convertedData;
   } catch (error) {

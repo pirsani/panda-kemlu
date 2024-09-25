@@ -158,7 +158,7 @@ async function saveDataSbmTaksiToDatabase(
       ...convertSpecialTypesToPlain<SbmTaksiPlainObject>(item),
     }));
 
-    revalidatePath("/data-referensi/sbm/uh-dalam-negeri", "page");
+    revalidatePath("/data-referensi/sbm/taksi");
 
     return convertedData;
   } catch (error) {
