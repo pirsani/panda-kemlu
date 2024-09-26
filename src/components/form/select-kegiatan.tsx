@@ -59,9 +59,10 @@ const SelectKegiatan = ({
       onChange={handleChange}
       options={options}
       isClearable
-      menuPortalTarget={document.body} // Use state which is set after component mounts
+      //menuPortalTarget={document.body} // Use state which is set after component mounts
       styles={{
         menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+        // control: (base) => ({ ...base, zIndex: 1000 }), // Ensure control has high z-index
       }}
       className={cn("w-full", className)}
     />

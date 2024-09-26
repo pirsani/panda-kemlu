@@ -47,6 +47,7 @@ export const importExcelSbmUhDalamNegeri = async (
           message: "No result Error saving data to database",
         };
       } else {
+        revalidatePath("/data-referensi/sbm/uh-dalam-negeri");
         return {
           success: true,
           data: result,
@@ -162,9 +163,6 @@ async function saveDataSbmUhDalamNegeriToDatabase(
     const convertedData = createdSbmUhDalamNegeri.map((item) => ({
       ...convertSpecialTypesToPlain<SbmUhDalamNegeriPlainObject>(item),
     }));
-
-    revalidatePath("/data-referensi/sbm/uh-dalam-negeri");
-
     return convertedData;
   } catch (error) {
     console.error("Error saving data to database:", error);

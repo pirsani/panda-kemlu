@@ -19,13 +19,13 @@ const ReferensiSbmUhLuarNegeriPage = async () => {
   // ];
 
   return (
-    <div className="p-4 pb-24 h-auto min-h-full flex flex-col">
+    <div className="p-4 pb-24 h-auto min-h-full flex flex-col gap-2">
       <h1 className="m-2">Tabel Referensi &gt; SBM UH Luar Negeri </h1>
+      <FormUploadExcelSbmUhLuarNegeri />
       <TabelSbmUhLuarNegeri
         data={convertedData}
         optionsNegara={optionsNegara}
       />
-      <FormUploadExcelSbmUhLuarNegeri />
     </div>
   );
 };

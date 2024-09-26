@@ -7,7 +7,11 @@ import { Materi } from "@prisma-honorarium/client";
 import { revalidatePath } from "next/cache";
 
 export const getMateri = async (materi?: string) => {
-  const dataMateri = await dbHonorarium.materi.findMany({});
+  const dataMateri = await dbHonorarium.materi.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
   return dataMateri;
 };
 

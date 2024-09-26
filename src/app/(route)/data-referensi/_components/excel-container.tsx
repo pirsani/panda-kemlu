@@ -30,6 +30,7 @@ interface ExcelContainerProps {
   columnsWithEmptyValueAllowed?: string[];
   onChange?: (file: File | null) => void;
   onParse?: (data: ParseResult | null) => void;
+  placeholder?: string;
 }
 
 const ExcelContainer = ({
@@ -40,6 +41,7 @@ const ExcelContainer = ({
   columnsWithEmptyValueAllowed = [],
   onChange: parentOnChange = () => {},
   onParse = () => {},
+  placeholder,
 }: ExcelContainerProps) => {
   const [data, setData] = useState<Record<string, any>[]>([]);
   const [emptyValues, setEmptyValues] = useState<Record<number, string[]>>([]);
@@ -105,19 +107,24 @@ const ExcelContainer = ({
   }, [value]);
 
   return (
-    <div className="mt-4">
-      <div className="flex flex-row items-center gap-2 mb-2">
-        <Button variant="outline">
-          <Link href={templateXlsx}>Unduh template xlsx</Link>
-        </Button>
-        <span>atau</span>
+    <div className="w-full mt-4">
+      <div className="flex flex-col lg:flex-row gap-4">
+        <div className="flex flex-row items-center gap-4 mb-2">
+          <Button>
+            <Link href={templateXlsx}>Unduh template xlsx</Link>
+          </Button>
+          <span>atau</span>
+        </div>
+        <div className="w-full xl:w-1/2">
+          <InputFileXlsx
+            onChange={handleOnChange}
+            maxColumns={9}
+            name={name}
+            extractFromColumns={extractFromColumns}
+            placeholder={placeholder}
+          />
+        </div>
       </div>
-      <InputFileXlsx
-        onChange={handleOnChange}
-        maxColumns={9}
-        name={name}
-        extractFromColumns={extractFromColumns}
-      />
 
       {(Object.keys(emptyValues).length > 0 || missingColumns.length > 0) && (
         <WarningOnEmpty

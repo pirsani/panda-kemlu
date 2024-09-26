@@ -144,45 +144,9 @@ async function saveDataSbmHonorariumToDatabase(
       besaran: item.besaran.toNumber(), // Convert Decimal to number
     }));
 
-    revalidatePath("/data-referensi/sbm/honorarium");
-
     return convertedData;
   } catch (error) {
     console.error("Error saving data to database:", error);
     throw new Error("Error saving data to database");
   }
 }
-
-export const deleteDataSbmHonorarium = async (
-  id: number
-): Promise<ActionResponse<SbmHonorariumWithNumber>> => {
-  // check user permission
-  // if (!userCanDeleteData) {}
-
-  try {
-    const deleted = await dbHonorarium.sbmHonorarium.delete({
-      where: {
-        id,
-      },
-    });
-
-    const convertedData = {
-      ...deleted,
-      besaran: deleted.besaran.toNumber(), // Convert Decimal to number
-    };
-    revalidatePath("/data-referensi/sbm/honorarium");
-    console.log("[deleted]", convertedData);
-
-    return {
-      success: true,
-      data: convertedData,
-      message: "Data sbmHonorarium berhasil dihapus",
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: "Error deleting data from database",
-      message: "Error deleting data from database",
-    };
-  }
-};

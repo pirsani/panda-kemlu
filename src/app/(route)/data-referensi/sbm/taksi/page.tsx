@@ -17,10 +17,10 @@ const ReferensiSbmTaksiPage = async () => {
   // ];
 
   return (
-    <div className="p-4 pb-24 h-auto min-h-full flex flex-col">
+    <div className="p-4 pb-24 h-auto min-h-full flex flex-col p-2">
       <h1 className="m-2">Tabel Referensi &gt; SBM Taksi</h1>
-      <TabelSbmTaksi data={convertedData} optionsProvinsi={optionsProvinsi} />
       <FormUploadExcelSbmTaksi />
+      <TabelSbmTaksi data={convertedData} optionsProvinsi={optionsProvinsi} />
     </div>
   );
 };

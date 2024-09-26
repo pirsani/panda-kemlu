@@ -1,8 +1,6 @@
 "use client";
 import { simpanDataMateri } from "@/actions/materi";
-//import SelectKegiatan from "@/components/form/select-kegiatan";
 import { Button } from "@/components/ui/button";
-import dynamic from "next/dynamic";
 
 import {
   Form,
@@ -19,7 +17,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-const FormMateri = () => {
+interface FormMateriProps {
+  onCancel?: () => void;
+  handleFormSubmitComplete?: (isSuccess: Boolean) => void;
+  className?: string;
+  materi?: Partial<Materi>;
+}
+const FormMateri = ({
+  onCancel,
+  handleFormSubmitComplete,
+  className,
+  materi,
+}: FormMateriProps) => {
   const form = useForm<Materi>({
     resolver: zodResolver(materiSchema),
     defaultValues: {
@@ -38,6 +47,8 @@ const FormMateri = () => {
         );
         form.reset();
       }
+
+      handleFormSubmitComplete?.(materi.success);
     } catch (error) {
       toast.error("Gagal menyimpan data materi");
     }
@@ -47,12 +58,12 @@ const FormMateri = () => {
     <div>
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col gap-2">
             <FormField
               control={form.control}
               name="kode"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="w-full">
                   <FormLabel>Kode</FormLabel>
                   <FormControl>
                     <Input placeholder="[PDK-BXYZN]" {...field} />
@@ -65,7 +76,7 @@ const FormMateri = () => {
               control={form.control}
               name="nama"
               render={({ field }) => (
-                <FormItem className="w-full sm:w-1/3">
+                <FormItem className="w-full">
                   <FormLabel>Nama</FormLabel>
                   <FormControl>
                     <Input placeholder="Materi [A-Z]" {...field} />
@@ -75,8 +86,15 @@ const FormMateri = () => {
               )}
             />
 
-            <div className=" flex flex-auto items-end">
+            <div
+              className={cn(
+                "flex flex-col sm:flex-row  sm:justify-end gap-2 mt-6"
+              )}
+            >
               <Button type="submit">Tambah</Button>
+              <Button type="button" variant={"outline"} onClick={onCancel}>
+                Batal
+              </Button>
             </div>
           </div>
         </form>

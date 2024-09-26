@@ -59,7 +59,7 @@ const SelectPejabatEselon2keAtas = ({
       onChange={handleChange}
       options={options}
       isClearable
-      menuPortalTarget={document.body} // Use state which is set after component mounts
+      // menuPortalTarget={document.body} // Use state which is set after component mounts
       styles={{
         menuPortal: (base) => ({ ...base, zIndex: 9999 }),
       }}

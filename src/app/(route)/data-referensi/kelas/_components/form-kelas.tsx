@@ -24,7 +24,18 @@ const SelectKegiatan = dynamic(
   { ssr: false, loading: () => <p>Loading daftar kegiatan...</p> }
 );
 
-const FormKelas = () => {
+interface FormKelasProps {
+  onCancel?: () => void;
+  handleFormSubmitComplete?: (isSuccess: Boolean) => void;
+  className?: string;
+  kelas?: Partial<Kelas>;
+}
+const FormKelas = ({
+  onCancel,
+  handleFormSubmitComplete,
+  className,
+  kelas,
+}: FormKelasProps) => {
   const form = useForm<Kelas>({
     resolver: zodResolver(kelasSchema),
     defaultValues: {
@@ -37,6 +48,13 @@ const FormKelas = () => {
   const onSubmit = async (data: Kelas) => {
     try {
       const kelas = await simpanDataKelas(data);
+      if (kelas.success) {
+        toast.success(
+          `Berhasil menyimpan data kelas ${kelas.data?.kode} ${kelas.data?.nama}`
+        );
+        form.reset();
+      }
+      handleFormSubmitComplete?.(kelas.success);
     } catch (error) {
       toast.error("Gagal menyimpan data kelas");
     }
@@ -46,7 +64,7 @@ const FormKelas = () => {
     <div>
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col gap-2">
             <FormField
               control={form.control}
               name="kode"
@@ -78,7 +96,7 @@ const FormKelas = () => {
               name="kegiatanId"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Nama</FormLabel>
+                  <FormLabel>Nama Kegiatan</FormLabel>
                   <FormControl>
                     <SelectKegiatan
                       onChange={field.onChange}
@@ -89,8 +107,15 @@ const FormKelas = () => {
                 </FormItem>
               )}
             />
-            <div className=" flex flex-auto items-end">
+            <div
+              className={cn(
+                "flex flex-col sm:flex-row  sm:justify-end gap-2 mt-6"
+              )}
+            >
               <Button type="submit">Tambah</Button>
+              <Button type="button" variant={"outline"} onClick={onCancel}>
+                Batal
+              </Button>
             </div>
           </div>
         </form>

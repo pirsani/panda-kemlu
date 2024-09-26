@@ -148,9 +148,7 @@ const FormJadwal = ({ onCancel, onSubmit = () => {} }: FormJadwalProps) => {
           )}
         />
         <div
-          className={cn(
-            "flex flex-col sm:flex-row sm:flex-row sm:justify-end sm:space-x-2 gap-2 mt-6"
-          )}
+          className={cn("flex flex-col sm:flex-row  sm:justify-end gap-2 mt-6")}
         >
           <Button type="submit">Simpan</Button>
           <Button variant="outline" onClick={onCancel}>

@@ -45,6 +45,7 @@ export const importExcelSbmTaksi = async (
           message: "No result Error saving data to database",
         };
       } else {
+        revalidatePath("/data-referensi/sbm/taksi");
         return {
           success: true,
           data: result,
@@ -157,9 +158,6 @@ async function saveDataSbmTaksiToDatabase(
     const convertedData = createdSbmTaksi.map((item) => ({
       ...convertSpecialTypesToPlain<SbmTaksiPlainObject>(item),
     }));
-
-    revalidatePath("/data-referensi/sbm/taksi");
-
     return convertedData;
   } catch (error) {
     console.error("Error saving data to database:", error);

@@ -36,7 +36,7 @@ const FormNarasumberContainer = ({
   };
 
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       <TambahNarasumber />
       <EditNarasumber
         isEditing={isEditing}

@@ -27,7 +27,18 @@ const SelectPejabatEselon2keAtas = dynamic(
   { ssr: false, loading: () => <p>Loading pejabat...</p> }
 );
 
-const FormSbmUangRepresentasi = () => {
+interface FormSbmUangRepresentasiProps {
+  onCancel?: () => void;
+  handleFormSubmitComplete?: (isSuccess: Boolean) => void;
+  className?: string;
+  sbmUangRepresentasi?: Partial<SbmUangRepresentasi>;
+}
+const FormSbmUangRepresentasi = ({
+  onCancel,
+  handleFormSubmitComplete,
+  className,
+  sbmUangRepresentasi,
+}: FormSbmUangRepresentasiProps) => {
   const form = useForm<SbmUangRepresentasi>({
     resolver: zodResolver(sbmUangRepresentasiSchema),
     defaultValues: {
@@ -50,16 +61,13 @@ const FormSbmUangRepresentasi = () => {
   return (
     <div>
       <Form {...form}>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-4 border rounded-sm p-4"
-        >
-          <div className="flex flex-col sm:flex-row gap-2">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
             <FormField
               control={form.control}
               name="pejabatId"
               render={({ field }) => (
-                <FormItem className="w-full sm:w-1/4">
+                <FormItem className="w-full">
                   <FormLabel>Pejabat</FormLabel>
                   <FormControl>
                     <SelectPejabatEselon2keAtas
@@ -75,7 +83,7 @@ const FormSbmUangRepresentasi = () => {
               control={form.control}
               name="satuan"
               render={({ field }) => (
-                <FormItem className="w-full sm:w-1/6 ">
+                <FormItem className="w-full">
                   <FormLabel>Satuan</FormLabel>
                   <FormControl>
                     <Input placeholder="OH" {...field} />
@@ -125,8 +133,15 @@ const FormSbmUangRepresentasi = () => {
               )}
             />
 
-            <div className=" flex flex-auto items-end">
+            <div
+              className={cn(
+                "flex flex-col sm:flex-row  sm:justify-end gap-2 mt-6"
+              )}
+            >
               <Button type="submit">Tambah</Button>
+              <Button type="button" variant={"outline"} onClick={onCancel}>
+                Batal
+              </Button>
             </div>
           </div>
         </form>

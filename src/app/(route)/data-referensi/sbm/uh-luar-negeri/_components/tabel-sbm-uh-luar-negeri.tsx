@@ -1,6 +1,8 @@
 "use client";
-import { deleteDataSbmUhLuarNegeri } from "@/actions/excel/sbm/uh-luar-negeri";
-import { updateDataSbmUhLuarNegeri } from "@/actions/sbm/uh-luar-negeri";
+import {
+  deleteDataSbmUhLuarNegeri,
+  updateDataSbmUhLuarNegeri,
+} from "@/actions/sbm/uh-luar-negeri";
 import ZodErrorList from "@/approute/data-referensi/_components/zod-error-list";
 import ConfirmDialog from "@/components/confirm-dialog";
 import {

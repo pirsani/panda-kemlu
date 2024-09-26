@@ -100,22 +100,20 @@ export const FormUploadExcelSbmUhDalamNegeri = () => {
                   extractFromColumns={extractFromColumns}
                   columnsWithEmptyValueAllowed={columnsWithEmptyValueAllowed}
                   onParse={onParse}
+                  placeholder="Pilih dan unggah file excel untuk import data"
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <div className="flex my-8 w-full justify-center">
-          {isReadyToSubmit && (
-            <Button
-              type="submit"
-              className="w-full w-1/3 bg-blue-600 hover:bg-blue-700"
-            >
+        {isReadyToSubmit && (
+          <div className="flex my-6 w-full justify-center">
+            <Button type="submit" className="w-full w-1/3">
               Import {data?.rows.length} data
             </Button>
-          )}
-        </div>
+          </div>
+        )}
       </form>
     </Form>
   );

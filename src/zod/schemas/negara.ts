@@ -5,9 +5,14 @@ const emptyStringToNull = z
   .transform((val) => (val === "" || val === "-" ? null : val.toUpperCase()));
 
 const stringToNumberOrNull = z
-  .string()
-  .transform((val) => (val === "" || val === "-" ? null : Number(val)))
-  .nullable();
+  .union([z.string(), z.number()])
+  .transform((val) => {
+    if (typeof val === "string") {
+      const parsed = parseInt(val, 10);
+      return isNaN(parsed) ? null : parsed;
+    }
+    return val;
+  });
 
 export const negaraSchema = z.object({
   kodeAlpha2: z.string().min(2).max(2),

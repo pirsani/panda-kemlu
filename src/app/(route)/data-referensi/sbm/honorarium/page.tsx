@@ -9,10 +9,10 @@ const ReferensiSbmHonorariumPage = async () => {
     ...convertSpecialTypesToPlain(item),
   }));
   return (
-    <div className="p-4 pb-24 h-auto min-h-full flex flex-col">
+    <div className="p-4 pb-24 h-auto min-h-full flex flex-col gap-2">
       <h1 className="m-2">Tabel Referensi &gt; SBM Honorarium </h1>
-      <TabelSbmHonorarium data={convertedData} />
       <FormUploadExcelSbmHonorarium />
+      <TabelSbmHonorarium data={convertedData} />
     </div>
   );
 };

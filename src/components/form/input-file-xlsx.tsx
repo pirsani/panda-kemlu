@@ -8,11 +8,13 @@ interface InputFileXlsxProps {
   onChange: (parseExcelResult: ParseExcelResult) => void;
   maxColumns?: number; // Add maxColumns prop
   extractFromColumns: string[];
+  placeholder?: string;
 }
 const InputFileXlsx = ({
   name,
   onChange,
   extractFromColumns,
+  placeholder,
 }: InputFileXlsxProps) => {
   // const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {
   const handleOnChange = async (file: File | null) => {
@@ -53,6 +55,7 @@ const InputFileXlsx = ({
       ]}
       onFileChange={handleOnChange}
       className="bg-white"
+      placeholder={placeholder}
     />
   );
 };

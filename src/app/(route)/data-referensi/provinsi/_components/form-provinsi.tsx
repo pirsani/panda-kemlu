@@ -19,7 +19,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-const FormProvinsi = () => {
+interface FormProvinsiProps {
+  onCancel?: () => void;
+  handleFormSubmitComplete?: (isSuccess: Boolean) => void;
+  className?: string;
+  provinsi?: Partial<Provinsi>;
+}
+const FormProvinsi = ({
+  onCancel,
+  handleFormSubmitComplete,
+  className,
+  provinsi,
+}: FormProvinsiProps) => {
   const form = useForm<Provinsi>({
     resolver: zodResolver(provinsiSchema),
     defaultValues: {
@@ -39,6 +50,11 @@ const FormProvinsi = () => {
           `Berhasil menyimpan data provinsi ${provinsi.data?.kode} ${provinsi.data?.nama}`
         );
         form.reset();
+        handleFormSubmitComplete?.(provinsi.success);
+      } else {
+        toast.error(
+          `Gagal menyimpan data provinsi ${data.nama} ${data.kode}, ${provinsi.message}`
+        );
       }
     } catch (error) {
       toast.error("Gagal menyimpan data provinsi");
@@ -48,16 +64,13 @@ const FormProvinsi = () => {
   return (
     <div>
       <Form {...form}>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-4 border rounded-sm p-4"
-        >
-          <div className="flex flex-col sm:flex-row gap-2">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
             <FormField
               control={form.control}
               name="kode"
               render={({ field }) => (
-                <FormItem className="w-full sm:w-1/12">
+                <FormItem className="w-full ">
                   <FormLabel>Kode</FormLabel>
                   <FormControl>
                     <Input placeholder="99" {...field} />
@@ -70,7 +83,7 @@ const FormProvinsi = () => {
               control={form.control}
               name="nama"
               render={({ field }) => (
-                <FormItem className="w-full sm:w-1/3">
+                <FormItem className="w-full ">
                   <FormLabel>Nama</FormLabel>
                   <FormControl>
                     <Input placeholder="nama" {...field} />
@@ -83,7 +96,7 @@ const FormProvinsi = () => {
               control={form.control}
               name="singkatan"
               render={({ field }) => (
-                <FormItem className="w-full sm:w-1/3">
+                <FormItem className="w-full ">
                   <FormLabel>Singkatan</FormLabel>
                   <FormControl>
                     <Input
@@ -100,7 +113,7 @@ const FormProvinsi = () => {
               control={form.control}
               name="urutan"
               render={({ field }) => (
-                <FormItem className="w-full sm:w-1/12">
+                <FormItem className="w-full sm:w-1/3">
                   <FormLabel>Urutan</FormLabel>
                   <FormControl>
                     <Input
@@ -114,8 +127,15 @@ const FormProvinsi = () => {
               )}
             />
 
-            <div className=" flex flex-auto items-end">
+            <div
+              className={cn(
+                "flex flex-col sm:flex-row  sm:justify-end gap-2 mt-6"
+              )}
+            >
               <Button type="submit">Tambah</Button>
+              <Button type="button" variant={"outline"} onClick={onCancel}>
+                Batal
+              </Button>
             </div>
           </div>
         </form>

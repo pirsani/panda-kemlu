@@ -29,10 +29,18 @@ export const simpanDataProvinsi = async (
       data: provinsiBaru,
     };
   } catch (error) {
+    const customError = error as CustomPrismaClientError;
+    if (customError.code === "P2002") {
+      return {
+        success: false,
+        error: customError.code,
+        message: "data provinsi sudah ada",
+      };
+    }
     return {
       success: false,
-      error: "Not implemented",
-      message: "Not implemented",
+      error: "EP-0001",
+      message: "Unknown error",
     };
   }
 };

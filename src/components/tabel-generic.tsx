@@ -152,11 +152,21 @@ export const TabelGeneric = <T,>({
       colRefs.current &&
       colRefs.current.length >= frozenColumnCount
     ) {
-      const colWidths = colRefs.current.map(
-        (col) => col.getBoundingClientRect().width
-      );
+      const colWidths = colRefs.current.map((col) => {
+        const width = col.getBoundingClientRect().width;
+        if (isNaN(width)) {
+          console.error("Invalid width detected:", col);
+        }
+        return width;
+      });
       const cumulativeWidths = colWidths.reduce(
-        (acc, width) => [...acc, acc[acc.length - 1] + width],
+        (acc, width) => {
+          if (isNaN(width)) {
+            console.error("Invalid width in cumulative calculation:", width);
+            return acc;
+          }
+          return [...acc, acc[acc.length - 1] + width];
+        },
         [0]
       );
       setCumulativeWidths(cumulativeWidths);
@@ -297,9 +307,22 @@ export const TabelGeneric = <T,>({
                         index < frozenColumnCount
                           ? {
                               //left: `${cumulativeWidths[index] || 0}px`,
-                              width:
-                                cumulativeWidths[index + 1] -
-                                (cumulativeWidths[index] || 0),
+                              width: (() => {
+                                const nextWidth = cumulativeWidths[index + 1];
+                                const currentWidth =
+                                  cumulativeWidths[index] || 0;
+                                if (
+                                  index + 1 >= cumulativeWidths.length ||
+                                  isNaN(nextWidth) ||
+                                  isNaN(currentWidth)
+                                ) {
+                                  console.error(
+                                    `Invalid width calculation: nextWidth=${nextWidth}, currentWidth=${currentWidth}`
+                                  );
+                                  return 0; // Provide a default value to avoid NaN
+                                }
+                                return nextWidth - currentWidth;
+                              })(),
                             }
                           : undefined
                       }
@@ -374,9 +397,22 @@ export const TabelGeneric = <T,>({
                                 // autoFocus
                                 className="p-2 flex w-full"
                                 style={{
-                                  width:
-                                    cumulativeWidths[index + 1] -
-                                    (cumulativeWidths[index] || 0),
+                                  width: (() => {
+                                    const nextWidth =
+                                      cumulativeWidths[index + 1];
+                                    const currentWidth =
+                                      cumulativeWidths[index] || 0;
+                                    if (
+                                      isNaN(nextWidth) ||
+                                      isNaN(currentWidth)
+                                    ) {
+                                      console.error(
+                                        `Invalid width calculation on select: nextWidth=${nextWidth}, currentWidth=${currentWidth}`
+                                      );
+                                      return 0; // Provide a default value to avoid NaN
+                                    }
+                                    return nextWidth - currentWidth;
+                                  })(),
                                 }} // Set the width to match the column width
                               >
                                 {cell.column.columnDef.meta?.options?.map(

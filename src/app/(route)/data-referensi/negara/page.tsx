@@ -1,6 +1,7 @@
 import { getKegiatan, getOptionsKegiatan } from "@/actions/kegiatan";
 import { getNegara } from "@/actions/negara";
 import { get } from "lodash";
+import { DialogTambahNegara } from "./_components/dialog-tambah-negara";
 import FormNegara from "./_components/form-negara";
 import { TabelNegara } from "./_components/tabel-negara";
 
@@ -9,7 +10,7 @@ const NegaraPage = async () => {
   return (
     <div className="p-4 pb-24 h-auto min-h-full flex flex-col gap-2">
       <h1 className="m-2">Tabel Referensi &gt; Negara </h1>
-      <FormNegara />
+      <DialogTambahNegara />
       <TabelNegara data={data} />
     </div>
   );

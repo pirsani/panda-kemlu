@@ -57,7 +57,7 @@ const TambahJadwalContainer = () => {
           <Calendar size={24} />
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-full sm:min-w-[750px] max-h-[90vh] overflow-auto">
+      <DialogContent className="w-full sm:min-w-[750px] max-h-[calc(100vh-100px)] ">
         <DialogHeader>
           <DialogTitle>Jadwal Kelas Pengajar</DialogTitle>
           <DialogDescription>

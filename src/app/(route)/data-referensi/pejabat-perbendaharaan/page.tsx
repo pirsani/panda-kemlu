@@ -3,11 +3,12 @@ import {
   getOptionsSatkerAnggaran,
 } from "@/actions/organisasi";
 import { getOptionsJenisJabatanPerbendaharaan } from "@/actions/pejabat-perbendaharaan";
-import FormPejabatPerbendaharaanContainer from "@/approute/data-referensi/pejabat-perbendaharaan/_components/form-pejabat-perbendaharaan-container";
+
 import {
   convertPejabatPerbendaharaanToStringDate,
   getPejabatPerbenaharaanBySatkerId,
 } from "@/data/pejabat-perbendaharaan";
+import DialogTambahPejabatPerbendaharaan from "./_components/dialog-tambah-pejabat-perbendaharaan";
 import { TabelPejabatPerbendaharaan } from "./_components/tabel-pejabat-perbendaharaan";
 
 const ReferensiPejabataPerbendaharaanPage = async () => {
@@ -16,9 +17,9 @@ const ReferensiPejabataPerbendaharaanPage = async () => {
   const optionsJenisJabatan = await getOptionsJenisJabatanPerbendaharaan();
   const optionsSatker = await getOptionsSatkerAnggaran();
   return (
-    <div className="p-4 pb-24 h-auto min-h-full flex flex-col">
+    <div className="p-4 pb-24 h-auto min-h-full flex flex-col gap-2">
       <h1 className="m-2">Tabel Referensi &gt; Pejabat Perbendaharaan</h1>
-      <FormPejabatPerbendaharaanContainer />
+      <DialogTambahPejabatPerbendaharaan />
       <TabelPejabatPerbendaharaan
         data={convertedData}
         optionsJenisJabatan={optionsJenisJabatan}

@@ -95,20 +95,20 @@ export const deleteDataSbmTaksi = async (
     const customError = error as CustomPrismaClientError;
     switch (customError.code) {
       case "P2025":
-        console.error("Sbm UHDalam Negeri not found");
+        console.error("Sbm Taksi not found");
         return {
           success: false,
-          error: "Sbm UHDalam Negeri not found",
-          message: "Sbm UHDalam Negeri not found",
+          error: "Sbm Taksi not found",
+          message: "Sbm Taksi not found",
         };
         break;
 
       case "P2003":
-        console.error("Sbm UHDalam Negeri is being referenced by other data");
+        console.error("Sbm Taksi is being referenced by other data");
         return {
           success: false,
-          error: "Sbm UHDalam Negeri is being referenced by other data",
-          message: "Sbm UHDalam Negeri is being referenced by other data",
+          error: "Sbm Taksi is being referenced by other data",
+          message: "Sbm Taksi is being referenced by other data",
         };
         break;
 

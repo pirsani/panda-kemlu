@@ -46,6 +46,7 @@ export const importExcelSbmUhLuarNegeri = async (
           message: "No result Error saving data to database",
         };
       } else {
+        revalidatePath("/data-referensi/sbm/uh-luar-negeri");
         return {
           success: true,
           data: result,
@@ -159,51 +160,9 @@ async function saveDataSbmUhLuarNegeriToDatabase(
       golonganD: item.golonganD.toNumber(),
     }));
 
-    revalidatePath("/data-referensi/sbm/uh-luar-negeri");
-
     return convertedData as SbmUhLuarNegeriPlainObject[];
   } catch (error) {
     console.error("Error saving data to database:", error);
     throw new Error("Error saving data to database");
   }
 }
-
-export const deleteDataSbmUhLuarNegeri = async (
-  id: string
-): Promise<ActionResponse<SbmUhLuarNegeriPlainObject>> => {
-  // check user permission
-  // if (!userCanDeleteData) {}
-
-  try {
-    const deleted = await dbHonorarium.sbmUhLuarNegeri.delete({
-      where: {
-        id,
-      },
-      include: {
-        negara: true,
-      },
-    });
-
-    const convertedData = {
-      ...deleted,
-      golonganA: deleted.golonganA.toNumber(),
-      golonganB: deleted.golonganB.toNumber(),
-      golonganC: deleted.golonganC.toNumber(),
-      golonganD: deleted.golonganD.toNumber(),
-    };
-    revalidatePath("/data-referensi/sbm/uh-luar-negeri");
-    console.log("[deleted]", convertedData);
-
-    return {
-      success: true,
-      data: convertedData as SbmUhLuarNegeriPlainObject,
-      message: "Data sbmUhLuarNegeri berhasil dihapus",
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: "Error deleting data from database",
-      message: "Error deleting data from database",
-    };
-  }
-};

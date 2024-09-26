@@ -1,3 +1,5 @@
+import { simpanPejabatPerbendaharaan } from "@/actions/pejabat-perbendaharaan";
+import BasicDatePicker from "@/components/form/date-picker/basic-date-picker";
 import SelectJenisJabatanPerbendaharaan from "@/components/form/select-jenis-jabatan-perbendaharaan";
 import SelectSatkerAnggaran from "@/components/form/select-satker-anggaran";
 import { Button } from "@/components/ui/button";
@@ -14,29 +16,51 @@ import { cn } from "@/lib/utils";
 import {
   PejabatPerbendaharaan,
   pejabatPerbendaharaanSchema,
+  PejabatPerbendaharaan as ZPejabatPerbendaharaan,
 } from "@/zod/schemas/pejabat-perbendaharaan";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import BasicDatePicker from "./date-picker/basic-date-picker";
+import { toast } from "sonner";
 
 interface FormPejabatPerbendaharaanProps {
   onCancel?: () => void;
-  onSubmit?: (data: PejabatPerbendaharaan) => void;
+  handleFormSubmitComplete?: (isSuccess: Boolean) => void;
   className?: string;
 }
 const FormPejabatPerbendaharaan = ({
   className,
   onCancel,
-  onSubmit = () => {}, // Provide a default no-op function
+  handleFormSubmitComplete = () => {}, // Provide a default no-op function
 }: FormPejabatPerbendaharaanProps) => {
   const form = useForm<PejabatPerbendaharaan>({
     resolver: zodResolver(pejabatPerbendaharaanSchema),
+    defaultValues: {
+      nama: "",
+      NIK: "",
+      NIP: "",
+      pangkatGolonganId: "",
+      satkerId: "",
+      jabatanId: "",
+    },
   });
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = form;
+
+  const onSubmit = async (data: ZPejabatPerbendaharaan) => {
+    // tidak ada file makan tidak perlu diubah menjadi form data
+    const simpan = await simpanPejabatPerbendaharaan(data);
+    if (!simpan.success) {
+      console.error("Gagal menyimpan pejabatPerbendaharaan:", simpan.error);
+      alert(`Gagal menyimpan pejabatPerbendaharaan ${simpan.message}`);
+      return;
+    } else {
+      toast.success("Berhasil menyimpan pejabatPerbendaharaan");
+      handleFormSubmitComplete?.(simpan.success);
+    }
+  };
 
   return (
     <Form {...form}>

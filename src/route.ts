@@ -137,14 +137,15 @@ export const dataReferensiRoutes: RouteItem[] = [
     order: 4,
     displayAsMenu: true,
   },
-  {
-    name: "referensi-sbm-taksi",
-    title: "SBM Taksi",
-    href: "/data-referensi/sbm/taksi",
-    icon: "banknote",
-    order: 5,
-    displayAsMenu: true,
-  },
+  // atas permintaan user, referensi sbm taksi dihapus
+  // {
+  //   name: "referensi-sbm-taksi",
+  //   title: "SBM Taksi",
+  //   href: "/data-referensi/sbm/taksi",
+  //   icon: "banknote",
+  //   order: 5,
+  //   displayAsMenu: true,
+  // },
   {
     name: "referensi-pph",
     title: "PPH",
@@ -155,7 +156,7 @@ export const dataReferensiRoutes: RouteItem[] = [
   },
   {
     name: "referensi-pejabat-perbendaharaan",
-    title: "Pejabat Perbendaharaan",
+    title: "Pengelola Keuangan",
     href: "/data-referensi/pejabat-perbendaharaan",
     icon: "signature",
     order: 6,

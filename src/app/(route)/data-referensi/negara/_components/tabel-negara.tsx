@@ -48,7 +48,10 @@ export const TabelNegara = ({ data: initialData }: TabelNegaraProps) => {
     return searchWords.every(
       (word) =>
         row.nama?.toLowerCase().includes(word) ||
-        row.namaInggris.toString().toLowerCase().includes(word)
+        row.namaInggris.toString().toLowerCase().includes(word) ||
+        row.kodeAlpha2.toString().toLowerCase().includes(word) ||
+        row.kodeAlpha3.toString().toLowerCase().includes(word) ||
+        row.kodeNumeric.toString().toLowerCase().includes(word)
     );
   });
 

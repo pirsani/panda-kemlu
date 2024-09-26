@@ -17,6 +17,7 @@ interface FormFileUploadProps {
   ) => void;
   className?: string;
   allowedTypes?: string[];
+  placeholder?: string;
 
   //ref?: React.RefObject<HTMLInputElement>;
 }
@@ -26,6 +27,7 @@ export const FormFileUpload = ({
   onFileChange,
   className,
   allowedTypes = ["application/pdf"],
+  placeholder = "No file selected, please choose a file",
 }: //ref,
 FormFileUploadProps) => {
   const { control, watch } = useFormContext();
@@ -47,7 +49,7 @@ FormFileUploadProps) => {
                 type="text"
                 readOnly
                 value={currentFile?.name ?? ""}
-                placeholder="No file selected, please choose a file"
+                placeholder={placeholder}
                 onClick={() =>
                   !currentFile ? inputRef.current?.click() : null
                 }
@@ -57,7 +59,7 @@ FormFileUploadProps) => {
                 type="button"
                 onClick={() => inputRef.current?.click()}
               >
-                {currentFile ? "Change" : "Choose File"}
+                {currentFile ? "Change" : "Browse File"}
               </Button>
               <Button
                 variant={"outline"}

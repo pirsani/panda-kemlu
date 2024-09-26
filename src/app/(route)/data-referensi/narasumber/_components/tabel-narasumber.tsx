@@ -207,7 +207,7 @@ export const TabelNarasumber = ({
   }, [initialData]);
 
   return (
-    <>
+    <div>
       <TabelGenericWithoutInlineEdit
         data={filteredData}
         columns={columns}
@@ -221,6 +221,6 @@ export const TabelNarasumber = ({
         onConfirm={handleConfirm}
         onCancel={handleCancel}
       />
-    </>
+    </div>
   );
 };

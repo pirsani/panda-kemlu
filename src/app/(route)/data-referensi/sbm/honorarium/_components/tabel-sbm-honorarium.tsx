@@ -1,6 +1,8 @@
 "use client";
-import { deleteDataSbmHonorarium } from "@/actions/excel/sbm/honorarium";
-import { updateDataSbmHonorarium } from "@/actions/sbm/honorarium";
+import {
+  deleteDataSbmHonorarium,
+  updateDataSbmHonorarium,
+} from "@/actions/sbm/honorarium";
 import ZodErrorList from "@/approute/data-referensi/_components/zod-error-list";
 import ConfirmDialog from "@/components/confirm-dialog";
 import {

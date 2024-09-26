@@ -722,9 +722,9 @@ model Negara {
   urutan      Int?   @default(autoincrement()) // menurut SBM
   nama        String @map("nama")
   namaInggris String @map("nama_inggris")
-  kodeAlpha2  String @map("kode_alpha_2") // ISO 3166-1 alpha-2 code
-  kodeAlpha3  String @map("kode_alpha_3") // ISO 3166-1 alpha-3 code
-  kodeNumeric String @map("kode_numeric") // ISO 3166-1 numeric code
+  kodeAlpha2  String @unique @map("kode_alpha_2") // ISO 3166-1 alpha-2 code
+  kodeAlpha3  String @unique @map("kode_alpha_3") // ISO 3166-1 alpha-3 code
+  kodeNumeric String @unique @map("kode_numeric") // ISO 3166-1 numeric code
 
   createdBy                 String                      @default("init") @map("created_by")
   createdAt                 DateTime                    @default(now()) @map("created_at")
