@@ -7,6 +7,60 @@ import { tr } from "date-fns/locale";
 import fs from "fs";
 import path, { resolve } from "path";
 
+interface unitKerja {
+  nama: string;
+  singkatan: string;
+  isSatkerAnggaran: boolean;
+  eselon: number;
+  indukOrganisasiId: string;
+}
+
+const seedUnitKerja = async (): Promise<void> => {
+  console.log("set Kemlu");
+
+  await dbHonorarium.organisasi.create({
+    data: {
+      id: "kemlu",
+      nama: "Kementerian Luar Negeri",
+      singkatan: "Kemlu",
+      createdBy: "init",
+    },
+  });
+
+  console.log("Seeding unit kerja data");
+  const results: unitKerja[] = [];
+  const csvPath = "docs/data-referensi/unit-kerja.csv";
+  const unitKerjaDataPath = path.resolve(process.cwd(), csvPath);
+  return new Promise((resolve, reject) => {
+    fs.createReadStream(unitKerjaDataPath)
+      .pipe(csv({ separator: ";" }))
+      .on("data", (data) => results.push(data))
+      .on("end", async () => {
+        try {
+          for (const row of results) {
+            //console.log(row);
+            await dbHonorarium.organisasi.create({
+              data: {
+                nama: row.nama,
+                singkatan: row.singkatan,
+                isSatkerAnggaran: row.isSatkerAnggaran ? true : false,
+                eselon: Number(row.eselon),
+                createdBy: "init",
+                indukOrganisasiId: row.indukOrganisasiId,
+                createdAt: new Date(),
+              },
+            });
+          }
+          console.log("Data seeded successfully");
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      })
+      .on("error", (error) => reject(error));
+  });
+};
+
 interface NegaraRow {
   id: string;
   urutan: string;
@@ -197,6 +251,7 @@ const deleteExisting = async (): Promise<void> => {
 
 async function main() {
   await deleteExisting();
+  await seedUnitKerja();
   await seedNegara();
   await seedProvinsi();
   await seedKota();
@@ -280,77 +335,77 @@ async function main() {
 
   // INITIATE ORGANISASI
   // UPT sekdilu dasar hukumnya apa ?
-  const organisasi = await dbHonorarium.organisasi.createMany({
-    data: [
-      {
-        nama: "Kementerian Luar Negeri",
-        singkatan: "Kemlu",
-        createdBy: "init",
-      },
-      {
-        nama: "Sekretariat Jenderal",
-        singkatan: "Setjen",
-        isSatkerAnggaran: true,
-        eselon: 1,
-        createdBy: "init",
-      },
-      {
-        nama: "Pusat Pendidikan dan Pelatihan",
-        singkatan: "Pusdiklat",
-        isSatkerAnggaran: true,
-        createdBy: "init",
-        eselon: 2,
-      },
-      {
-        nama: "Bidang Perencanaan, Pengembangan, dan Evaluasi",
-        singkatan: "PPE",
-        createdBy: "init",
-      },
-      {
-        nama: "Bidang Pendidikan dan Pelatihan Nondiplomatik",
-        singkatan: "PPN",
-        createdBy: "init",
-      },
-      {
-        nama: "Bidang Pendidikan dan Pelatihan Teknis",
-        singkatan: "PPT",
-        createdBy: "init",
-      },
-      {
-        nama: "Bidang Kerja Sama Pendidikan dan Pelatihan",
-        singkatan: "KSPP",
-        createdBy: "init",
-      },
-      {
-        nama: "Tata Usaha",
-        singkatan: "TU",
-        createdBy: "init",
-        eselon: 3,
-      },
-      {
-        nama: "UPT Sekdilu",
-        singkatan: "UPT Sekdilu",
-        createdBy: "init",
-      },
-      {
-        nama: "UPT Sesdilu",
-        singkatan: "UPT Sesdilu ",
-        createdBy: "init",
-      },
-      {
-        nama: "UPT Sesparlu",
-        singkatan: "UPT Sesparlu",
-        createdBy: "init",
-      },
-      {
-        nama: "Pusat TIK KP",
-        singkatan: "Pusat TIK KP",
-        isSatkerAnggaran: true,
-        createdBy: "init",
-        eselon: 2,
-      },
-    ],
-  });
+  // const organisasi = await dbHonorarium.organisasi.createMany({
+  //   data: [
+  //     {
+  //       nama: "Kementerian Luar Negeri",
+  //       singkatan: "Kemlu",
+  //       createdBy: "init",
+  //     },
+  //     {
+  //       nama: "Sekretariat Jenderal",
+  //       singkatan: "Setjen",
+  //       isSatkerAnggaran: true,
+  //       eselon: 1,
+  //       createdBy: "init",
+  //     },
+  //     {
+  //       nama: "Pusat Pendidikan dan Pelatihan",
+  //       singkatan: "Pusdiklat",
+  //       isSatkerAnggaran: true,
+  //       createdBy: "init",
+  //       eselon: 2,
+  //     },
+  //     {
+  //       nama: "Bidang Perencanaan, Pengembangan, dan Evaluasi",
+  //       singkatan: "PPE",
+  //       createdBy: "init",
+  //     },
+  //     {
+  //       nama: "Bidang Pendidikan dan Pelatihan Nondiplomatik",
+  //       singkatan: "PPN",
+  //       createdBy: "init",
+  //     },
+  //     {
+  //       nama: "Bidang Pendidikan dan Pelatihan Teknis",
+  //       singkatan: "PPT",
+  //       createdBy: "init",
+  //     },
+  //     {
+  //       nama: "Bidang Kerja Sama Pendidikan dan Pelatihan",
+  //       singkatan: "KSPP",
+  //       createdBy: "init",
+  //     },
+  //     {
+  //       nama: "Tata Usaha",
+  //       singkatan: "TU",
+  //       createdBy: "init",
+  //       eselon: 3,
+  //     },
+  //     {
+  //       nama: "UPT Sekdilu",
+  //       singkatan: "UPT Sekdilu",
+  //       createdBy: "init",
+  //     },
+  //     {
+  //       nama: "UPT Sesdilu",
+  //       singkatan: "UPT Sesdilu ",
+  //       createdBy: "init",
+  //     },
+  //     {
+  //       nama: "UPT Sesparlu",
+  //       singkatan: "UPT Sesparlu",
+  //       createdBy: "init",
+  //     },
+  //     {
+  //       nama: "Pusat TIK KP",
+  //       singkatan: "Pusat TIK KP",
+  //       isSatkerAnggaran: true,
+  //       createdBy: "init",
+  //       eselon: 2,
+  //     },
+  //   ],
+  // });
 
   const jenisPejabatPerbendaharaan =
     await dbHonorarium.jenisJabatanPerbendaharaan.createMany({
