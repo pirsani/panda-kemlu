@@ -30,7 +30,7 @@ interface FormUnitKerjaProps {
   onCancel?: () => void;
   handleFormSubmitComplete?: (isSuccess: Boolean) => void;
   className?: string;
-  unitKerja?: Partial<UnitKerja>;
+  unitKerja?: Partial<UnitKerja> | null;
 }
 const FormUnitKerja = ({
   onCancel,
@@ -40,7 +40,7 @@ const FormUnitKerja = ({
 }: FormUnitKerjaProps) => {
   const form = useForm<UnitKerja>({
     resolver: zodResolver(unitKerjaSchema),
-    defaultValues: {
+    defaultValues: unitKerja || {
       nama: "",
       singkatan: "",
       eselon: null,
@@ -54,7 +54,7 @@ const FormUnitKerja = ({
       const unitKerja = await simpanDataUnitKerja(data);
       if (unitKerja.success) {
         toast.success(
-          `Berhasil menyimpan data unitKerja ${unitKerja.data?.kode} ${unitKerja.data?.nama}`
+          `Berhasil menyimpan data unitKerja ${unitKerja.data?.nama} }`
         );
         form.reset();
       }
@@ -137,9 +137,13 @@ const FormUnitKerja = ({
                 <FormItem className="flex flex-row items-center  gap-2 py-2">
                   <FormControl>
                     <Checkbox
-                      {...field}
-                      value="isSatkerAnggaran"
-                      className="h-6 w-6 "
+                      checked={field.value || false} // Ensure the value is always a boolean
+                      onCheckedChange={(checked) => field.onChange(checked)} // Handle the checked state properly
+                      className="h-6 w-6"
+                      name={field.name}
+                      ref={field.ref}
+                      onBlur={field.onBlur}
+                      disabled={field.disabled}
                     />
                   </FormControl>
                   <FormLabel className="items-center pb-2">
@@ -154,7 +158,7 @@ const FormUnitKerja = ({
                 "flex flex-col sm:flex-row  sm:justify-end gap-2 mt-6"
               )}
             >
-              <Button type="submit">Tambah</Button>
+              <Button type="submit">Simpan</Button>
               <Button type="button" variant={"outline"} onClick={onCancel}>
                 Batal
               </Button>

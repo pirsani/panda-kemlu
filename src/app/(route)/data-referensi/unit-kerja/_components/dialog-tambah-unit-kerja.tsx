@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "@/components/ui/button";
-
 import {
   Dialog,
   DialogContent,
@@ -10,24 +9,25 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { UnitKerja as ZUnitkerja } from "@/zod/schemas/unit-kerja";
 import { BookOpen, GraduationCap, Grid, Plus } from "lucide-react";
-import { useState } from "react";
+import { Chicle } from "next/font/google";
+import { Children, useEffect, useState } from "react";
 import FormUnitKerja from "./form-unit-kerja";
 
-export const DialogTambahUnitKerja = () => {
-  const [open, setOpen] = useState(false);
-
-  const onCancel = () => {
-    setOpen(false);
-  };
-
-  // Closes the dialog if the form submission is successful
-  const handleFormSubmitComplete = (isSuccess: Boolean) => {
-    if (isSuccess) {
-      setOpen(false);
-    }
-  };
-
+interface DialogUnitKerjaProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  children?: React.ReactNode;
+}
+export const DialogUnitKerja = ({
+  open,
+  setOpen,
+  children,
+}: DialogUnitKerjaProps) => {
+  useEffect(() => {
+    setOpen(open);
+  }, [open, setOpen]);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -44,10 +44,7 @@ export const DialogTambahUnitKerja = () => {
             Isi form di bawah untuk menambahkan UnitKerja baru
           </DialogDescription>
         </DialogHeader>
-        <FormUnitKerja
-          onCancel={onCancel}
-          handleFormSubmitComplete={handleFormSubmitComplete}
-        />
+        {children}
       </DialogContent>
     </Dialog>
   );

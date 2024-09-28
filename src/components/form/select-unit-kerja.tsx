@@ -41,6 +41,7 @@ const SelectUnitKerja = ({
   return (
     <Select
       instanceId={fieldName}
+      inputId={`${fieldName}-${genId}`}
       options={options}
       isClearable
       onChange={(option: SingleValue<Option>) =>

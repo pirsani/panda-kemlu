@@ -7,6 +7,7 @@ import {
 } from "@/actions/unit-kerja";
 import ConfirmDialog from "@/components/confirm-dialog";
 import { KolomAksi, TabelGeneric } from "@/components/tabel-generic";
+import { useSearchTerm } from "@/hooks/use-search-term";
 import {
   unitKerjaSchema,
   UnitKerja as ZunitKerja,
@@ -32,10 +33,12 @@ import { ZodError } from "zod";
 interface TabelUnitKerjaProps {
   data: UnitKerjaWithInduk[];
   optionsUnitKerja: { value: string; label: string }[];
+  onEdit: (row: UnitKerjaWithInduk) => void;
 }
 export const TabelUnitKerja = ({
   data: initialData,
   optionsUnitKerja,
+  onEdit = () => {},
 }: TabelUnitKerjaProps) => {
   const [data, setData] = useState<UnitKerjaWithInduk[]>(initialData);
   const [isEditing, setIsEditing] = useState(false);
@@ -43,6 +46,26 @@ export const TabelUnitKerja = ({
   const [originalData, setOriginalData] = useState<UnitKerjaWithInduk | null>(
     null
   );
+
+  const { searchTerm } = useSearchTerm();
+
+  const filteredData = data.filter((row) => {
+    if (!searchTerm || searchTerm === "") return true;
+    const lowercasedSearchTerm = searchTerm.toLowerCase();
+    //const searchWords = lowercasedSearchTerm.split(" ").filter(Boolean);
+    const searchWords =
+      lowercasedSearchTerm
+        .match(/"[^"]+"|\S+/g)
+        ?.map((word) => word.replace(/"/g, "")) || [];
+
+    return searchWords.every(
+      (word) =>
+        row.nama?.toLowerCase().includes(word) ||
+        row.singkatan?.toLowerCase().includes(word) ||
+        row.indukOrganisasi?.nama?.toLowerCase().includes(word)
+    );
+  });
+
   const columns: ColumnDef<UnitKerjaWithInduk>[] = [
     {
       id: "rowNumber",
@@ -133,8 +156,9 @@ export const TabelUnitKerja = ({
     // Implement your edit logic here
     setOriginalData(row.original); // Store the original data
 
-    setIsEditing(true);
-    setEditableRowIndex(row.id);
+    onEdit(row.original);
+    // setIsEditing(true);
+    // setEditableRowIndex(row.id);
   };
 
   const handleOnSave = async (row: UnitKerjaWithInduk) => {
@@ -189,7 +213,7 @@ export const TabelUnitKerja = ({
   return (
     <div>
       <TabelGeneric
-        data={data}
+        data={filteredData}
         columns={columns}
         frozenColumnCount={1}
         isEditing={isEditing}

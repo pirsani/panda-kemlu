@@ -11,6 +11,7 @@ const stringToNumberOrNull = z
   });
 
 export const unitKerjaSchema = z.object({
+  id: z.string().cuid().optional(),
   nama: z
     .string()
     .min(6, {

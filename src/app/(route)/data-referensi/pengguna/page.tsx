@@ -1,4 +1,4 @@
-const ReresensiPenggunaPage = () => {
+const ReferensiPenggunaPage = () => {
   return (
     <div>
       <h1>Referensi Pengguna</h1>
@@ -6,4 +6,4 @@ const ReresensiPenggunaPage = () => {
   );
 };
 
-export default ReresensiPenggunaPage;
+export default ReferensiPenggunaPage;

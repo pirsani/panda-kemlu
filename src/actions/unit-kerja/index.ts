@@ -26,10 +26,17 @@ export const simpanDataUnitKerja = async (
   data: ZUnitKerja
 ): Promise<ActionResponse<UnitKerja>> => {
   try {
-    const unitKerjaBaru = await dbHonorarium.organisasi.create({
-      data: {
+    const unitKerjaBaru = await dbHonorarium.organisasi.upsert({
+      where: {
+        id: data.id,
+      },
+      create: {
         ...data,
         createdBy: "admin",
+      },
+      update: {
+        ...data,
+        updatedBy: "admin",
       },
     });
     revalidatePath("/data-referensi/unit-kerja");
