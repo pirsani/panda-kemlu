@@ -1,10 +1,10 @@
 "use client";
-import { simpanDataUnitKerja } from "@/actions/unit-kerja";
+import { simpanDataPengguna } from "@/actions/pengguna";
 //import SelectKegiatan from "@/components/form/select-kegiatan";
 import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
 
-import SelectUnitKerja from "@/components/form/select-unit-kerja";
+import SelectRoles from "@/components/form/select-roles";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
@@ -16,7 +16,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { UnitKerja, unitKerjaSchema } from "@/zod/schemas/unit-kerja";
+import { Pengguna, penggunaSchema } from "@/zod/schemas/pengguna";
+import { es } from "@faker-js/faker";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -26,41 +27,57 @@ const SelectKegiatan = dynamic(
   { ssr: false, loading: () => <p>Loading daftar kegiatan...</p> }
 );
 
-interface FormUnitKerjaProps {
+interface FormPenggunaProps {
   onCancel?: () => void;
   handleFormSubmitComplete?: (isSuccess: Boolean) => void;
   className?: string;
-  unitKerja?: Partial<UnitKerja> | null;
+  pengguna?: Partial<Pengguna> | null;
 }
-const FormUnitKerja = ({
+const FormPengguna = ({
   onCancel,
   handleFormSubmitComplete,
   className,
-  unitKerja,
-}: FormUnitKerjaProps) => {
-  const form = useForm<UnitKerja>({
-    resolver: zodResolver(unitKerjaSchema),
-    defaultValues: unitKerja || {
-      nama: "",
-      singkatan: "",
-      eselon: null,
-      isSatkerAnggaran: false,
+  pengguna,
+}: FormPenggunaProps) => {
+  const form = useForm<Pengguna>({
+    resolver: zodResolver(penggunaSchema),
+    defaultValues: {
+      ...pengguna,
+      password: "", // Ensure password is empty initially
+      rePassword: "", // Ensure rePassword is empty initially
+    } || {
+      name: "",
+      NIP: "",
+      email: "",
+      password: "",
+      rePassword: "",
     },
   });
 
-  const { handleSubmit } = form;
-  const onSubmit = async (data: UnitKerja) => {
+  const {
+    handleSubmit,
+    formState: { errors },
+    getValues,
+  } = form;
+  const onSubmit = async (data: Pengguna) => {
+    console.log("Form data before validation:", getValues());
+
+    console.log(data);
     try {
-      const unitKerja = await simpanDataUnitKerja(data);
-      if (unitKerja.success) {
+      const pengguna = await simpanDataPengguna(data);
+      if (pengguna.success) {
         toast.success(
-          `Berhasil menyimpan data unitKerja ${unitKerja.data?.nama}`
+          `Berhasil menyimpan data pengguna ${pengguna.data?.name}`
         );
         form.reset();
+        handleFormSubmitComplete?.(pengguna.success);
+      } else {
+        toast.error(
+          `Gagal menyimpan data pengguna ${pengguna.message}, error-code:${pengguna.error}`
+        );
       }
-      handleFormSubmitComplete?.(unitKerja.success);
     } catch (error) {
-      toast.error("Gagal menyimpan data unitKerja");
+      toast.error("Gagal menyimpan data pengguna");
     }
     console.log(data);
   };
@@ -71,58 +88,14 @@ const FormUnitKerja = ({
           <div className="flex flex-col gap-2">
             <FormField
               control={form.control}
-              name="indukOrganisasiId"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>Induk Organisasi</FormLabel>
-                  <FormControl>
-                    <SelectUnitKerja
-                      onChange={field.onChange}
-                      value={field.value}
-                      fieldName={field.name}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="nama"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama Unit</FormLabel>
-                  <FormControl>
-                    <Input placeholder="[Direktorat .....]" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="singkatan"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Singkatan</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Dirjen A....." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="eselon"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Eselon</FormLabel>
+                  <FormLabel>Nama</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="1 2 3"
+                      placeholder="fulan"
                       {...field}
-                      className="w-[150px]"
                       value={field.value ?? ""} // Ensure value is never null
                     />
                   </FormControl>
@@ -132,27 +105,81 @@ const FormUnitKerja = ({
             />
             <FormField
               control={form.control}
-              name="isSatkerAnggaran"
+              name="NIP"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-center  gap-2 py-2">
+                <FormItem>
+                  <FormLabel>NIP</FormLabel>
                   <FormControl>
-                    <Checkbox
-                      checked={field.value || false} // Ensure the value is always a boolean
-                      onCheckedChange={(checked) => field.onChange(checked)} // Handle the checked state properly
-                      className="h-6 w-6"
-                      name={field.name}
-                      ref={field.ref}
-                      onBlur={field.onBlur}
-                      disabled={field.disabled}
+                    <Input
+                      placeholder="fulan"
+                      {...field}
+                      value={field.value ?? ""} // Ensure value is never null
                     />
                   </FormControl>
-                  <FormLabel className="items-center pb-2">
-                    Satker Anggaran
-                  </FormLabel>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="fulan@pirsani.id" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="1 2 3"
+                      {...field}
+                      className="w-full"
+                      value={field.value ?? ""} // Ensure value is never null
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="rePassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>re-enter Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="********"
+                      {...field}
+                      className="w-full"
+                      value={field.value ?? ""} // Ensure value is never null
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div>
+              {Object.keys(errors).map((key) => (
+                <p key={key} style={{ color: "red" }}>
+                  {errors[key as keyof typeof errors]?.message}
+                </p>
+              ))}
+            </div>
+
             <div
               className={cn(
                 "flex flex-col sm:flex-row  sm:justify-end gap-2 mt-6"
@@ -170,4 +197,4 @@ const FormUnitKerja = ({
   );
 };
 
-export default FormUnitKerja;
+export default FormPengguna;

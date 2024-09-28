@@ -68,11 +68,13 @@ model User {
   emailVerified        DateTime?       @map("email_verified")
   image                String?
   sessions             Session[]
-  nip                  String?         @unique
+  NIP                  String?         @unique @map("nip")
   organisasiId         String?         @map("organisasi_id")
   organisasi           Organisasi?     @relation(fields: [organisasiId], references: [id])
+  createdBy            String          @default("init") @map("created_by")
   createdAt            DateTime        @default(now()) @map("created_at")
-  updatedAt            DateTime        @updatedAt @map("updated_at")
+  updatedBy            String?         @map("updated_by")
+  updatedAt            DateTime?       @updatedAt @map("updated_at")
   riwayatProsesCreator RiwayatProses[] @relation("riwayat_proses_creator")
   riwayatProsesUpdater RiwayatProses[] @relation("riwayat_proses_updater")
   kegiatanCreator      Kegiatan[]      @relation("kegiatan_creator")
