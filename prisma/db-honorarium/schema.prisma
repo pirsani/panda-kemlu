@@ -763,7 +763,7 @@ model Organisasi {
   nama                   String
   singkatan              String?
   status                 StatusAktif             @default(AKTIF) // Mengganti aktif dengan enum status
-  eselon                 Int?                    @default(-1)
+  eselon                 Int? //@default(-1)
   isSatkerAnggaran       Boolean?                @default(false) @map("is_satker_anggaran")
   satkerAnggaranId       String?                 @map("anggaran_satker_id")
   satkerAnggaran         Organisasi?             @relation("satkerAnggaran", fields: [satkerAnggaranId], references: [id])

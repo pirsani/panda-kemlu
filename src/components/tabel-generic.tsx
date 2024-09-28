@@ -399,24 +399,24 @@ export const TabelGeneric = <T,>({
                                 }} // Use field here
                                 // autoFocus
                                 className="p-2 flex w-full"
-                                style={{
-                                  width: (() => {
-                                    const nextWidth =
-                                      cumulativeWidths[index + 1];
-                                    const currentWidth =
-                                      cumulativeWidths[index] || 0;
-                                    if (
-                                      isNaN(nextWidth) ||
-                                      isNaN(currentWidth)
-                                    ) {
-                                      console.error(
-                                        `Invalid width calculation on select: nextWidth=${nextWidth}, currentWidth=${currentWidth}`
-                                      );
-                                      return 0; // Provide a default value to avoid NaN
-                                    }
-                                    return nextWidth - currentWidth;
-                                  })(),
-                                }} // Set the width to match the column width
+                                // style={{
+                                //   width: (() => {
+                                //     const nextWidth =
+                                //       cumulativeWidths[index + 1];
+                                //     const currentWidth =
+                                //       cumulativeWidths[index] || 0;
+                                //     if (
+                                //       isNaN(nextWidth) ||
+                                //       isNaN(currentWidth)
+                                //     ) {
+                                //       console.error(
+                                //         `Invalid width calculation on select: nextWidth=${nextWidth}, currentWidth=${currentWidth}`
+                                //       );
+                                //       return 0; // Provide a default value to avoid NaN
+                                //     }
+                                //     return nextWidth - currentWidth;
+                                //   })(),
+                                // }} // Set the width to match the column width
                               >
                                 {cell.column.columnDef.meta?.options?.map(
                                   (option) => (
