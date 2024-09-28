@@ -179,6 +179,13 @@ export const dataReferensiRoutes: RouteItem[] = [
     displayAsMenu: true,
   },
   {
+    name: "referensi-satker",
+    title: "Satker Anggaran",
+    href: "/data-referensi/satker-anggaran",
+    icon: "brick-wall",
+    order: 9,
+  },
+  {
     name: "referensi-unit-kerja",
     title: "Unit Kerja",
     href: "/data-referensi/unit-kerja",

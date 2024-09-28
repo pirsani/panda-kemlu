@@ -223,6 +223,7 @@ export const TabelGeneric = <T,>({
                       colSpan={header.colSpan}
                       rowSpan={rowSpan}
                       className={cn(
+                        header.column.columnDef.meta?.className,
                         "px-2 border border-gray-300",
                         !isGroupHeader
                           ? "hover:cursor-pointer bg-gray-50"
@@ -331,7 +332,9 @@ export const TabelGeneric = <T,>({
                         if (cell.column.id === "rowNumber") {
                           // Display the row number, considering pagination
                           return (
-                            <span>{rowIndex + 1 + pageSize * pageIndex}</span>
+                            <span className="w-1/12">
+                              {rowIndex + 1 + pageSize * pageIndex}
+                            </span>
                           );
                         }
 
@@ -543,6 +546,27 @@ export const PaginationControls = <T,>({
         ))}
       </select>
     </div>
+  );
+};
+
+export const KolomAksiDelete = <T,>(
+  info: CellContext<T, unknown>,
+  onDelete?: (row: T) => void
+) => {
+  const handleOnClickDelete = () => {
+    console.log("Delete clicked");
+    onDelete && onDelete(info.row.original);
+  };
+
+  return (
+    <Button
+      variant="destructive"
+      size="sm"
+      onClick={handleOnClickDelete}
+      className=""
+    >
+      <Trash size={20} />
+    </Button>
   );
 };
 

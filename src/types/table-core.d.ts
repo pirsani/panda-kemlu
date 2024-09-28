@@ -16,5 +16,7 @@ declare module "@tanstack/react-table" {
     options?: { value: string | number; label: string }[];
     field?: string; // Field name that need to be updated when the value option changes
     isCellEditable?: boolean;
+    width?: string;
+    className?: string;
   }
 }
