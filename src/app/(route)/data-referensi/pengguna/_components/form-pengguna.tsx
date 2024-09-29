@@ -41,17 +41,19 @@ const FormPengguna = ({
 }: FormPenggunaProps) => {
   const form = useForm<Pengguna>({
     resolver: zodResolver(penggunaSchema),
-    defaultValues: {
-      ...pengguna,
-      password: "", // Ensure password is empty initially
-      rePassword: "", // Ensure rePassword is empty initially
-    } || {
-      name: "",
-      NIP: "",
-      email: "",
-      password: "",
-      rePassword: "",
-    },
+    defaultValues: pengguna
+      ? {
+          ...pengguna,
+          password: "", // Ensure password is empty initially
+          rePassword: "", // Ensure rePassword is empty initially
+        }
+      : {
+          name: "",
+          NIP: "",
+          email: "",
+          password: "",
+          rePassword: "",
+        },
   });
 
   const {

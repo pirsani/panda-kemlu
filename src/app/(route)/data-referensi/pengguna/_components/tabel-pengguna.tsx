@@ -8,7 +8,7 @@ import ConfirmDialog from "@/components/confirm-dialog";
 import { KolomAksi, TabelGeneric } from "@/components/tabel-generic";
 import { useSearchTerm } from "@/hooks/use-search-term";
 import { penggunaSchema, Pengguna as ZPengguna } from "@/zod/schemas/pengguna";
-import { asPengguna, User } from "@prisma-honorarium/client";
+import { User as Pengguna } from "@prisma-honorarium/client";
 
 import {
   ColumnDef,
