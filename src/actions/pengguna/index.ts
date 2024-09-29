@@ -10,9 +10,29 @@ import { ZodError } from "zod";
 
 // pada prinsipnya, Satker anggaran adalah unit kerja dalam organisasi yang memiliki anggaran
 
-export interface PenggunaWithRoles extends Omit<Pengguna, "password"> {}
+export interface PenggunaWithRoles extends Omit<Pengguna, "password"> {
+  userRole: { role: { id: string; name: string } }[];
+  organisasi: {
+    id: string;
+    nama: string;
+    indukOrganisasi: { id: string; nama: string };
+  };
+}
 export const getPengguna = async (pengguna?: string) => {
-  const dataPengguna = await dbHonorarium.user.findMany({});
+  const dataPengguna = await dbHonorarium.user.findMany({
+    include: {
+      userRole: {
+        include: {
+          role: true,
+        },
+      },
+      organisasi: {
+        include: {
+          indukOrganisasi: true,
+        },
+      },
+    },
+  });
   return dataPengguna as PenggunaWithRoles[];
 };
 

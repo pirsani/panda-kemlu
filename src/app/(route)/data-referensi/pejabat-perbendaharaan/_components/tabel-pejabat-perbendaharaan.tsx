@@ -73,6 +73,7 @@ export const TabelPejabatPerbendaharaan = ({
         inputType: "select",
         options: optionsSatker,
         field: "satkerId",
+        className: "w-[200px]",
       },
     },
     {
@@ -90,6 +91,7 @@ export const TabelPejabatPerbendaharaan = ({
       accessorKey: "nama",
       header: "Nama",
       cell: (info) => info.getValue(),
+      meta: { className: "w-[200px]" },
     },
     {
       accessorKey: "NIP",

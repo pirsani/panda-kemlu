@@ -79,6 +79,12 @@ export const TabelPengguna = ({
       footer: "Singkatan",
     },
     {
+      accessorKey: "organisasi.nama",
+      header: "Unit Kerja",
+      cell: (info) => info.getValue(),
+      footer: "Unit Kerja",
+    },
+    {
       accessorKey: "email",
       header: "Email",
       cell: (info) => info.getValue(),
@@ -97,7 +103,7 @@ export const TabelPengguna = ({
           handleUndoEdit,
           isEditing
         ),
-      meta: { isKolomAksi: true },
+      meta: { isKolomAksi: true, className: "w-[100px]" },
       enableSorting: false, // Disable sorting for this column
     },
   ];

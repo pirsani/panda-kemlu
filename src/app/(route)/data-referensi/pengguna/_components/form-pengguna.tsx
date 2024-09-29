@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
 
 import SelectRoles from "@/components/form/select-roles";
+import SelectUnitKerja from "@/components/form/select-unit-kerja";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
@@ -88,6 +89,23 @@ const FormPengguna = ({
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
+            <FormField
+              control={form.control}
+              name="organisasiId"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Unit Kerja</FormLabel>
+                  <FormControl>
+                    <SelectUnitKerja
+                      onChange={field.onChange}
+                      value={field.value ?? ""}
+                      fieldName={field.name}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="name"

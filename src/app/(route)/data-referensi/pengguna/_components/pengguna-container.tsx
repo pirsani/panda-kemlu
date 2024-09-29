@@ -9,8 +9,13 @@ import TabelPengguna from "./tabel-pengguna";
 interface PenggunaContainerProps {
   data: PenggunaWithRoles[];
   optionsRole: { value: string; label: string }[];
+  optionsUnitKerja: { value: string; label: string }[];
 }
-const PenggunaContainer = ({ data, optionsRole }: PenggunaContainerProps) => {
+const PenggunaContainer = ({
+  data,
+  optionsRole,
+  optionsUnitKerja,
+}: PenggunaContainerProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [editableRow, setEditableRow] = useState<ZUnitkerja | null>(null);
 

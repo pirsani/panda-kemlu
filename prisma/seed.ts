@@ -20,7 +20,7 @@ const seedUnitKerja = async (): Promise<void> => {
 
   await dbHonorarium.organisasi.create({
     data: {
-      id: "kemlu",
+      id: "cm1n901tl0000w0u0zzwkdzw0",
       nama: "Kementerian Luar Negeri",
       singkatan: "Kemlu",
       createdBy: "init",

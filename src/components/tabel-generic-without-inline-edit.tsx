@@ -162,6 +162,7 @@ export const TabelGenericWithoutInlineEdit = <T,>({
                       colSpan={header.colSpan}
                       rowSpan={rowSpan}
                       className={cn(
+                        header.column.columnDef.meta?.className,
                         "px-2 border border-gray-300",
                         !isGroupHeader
                           ? "hover:cursor-pointer bg-gray-50"

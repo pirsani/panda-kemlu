@@ -82,7 +82,7 @@ export const TabelNarasumber = ({
       header: "Nama",
       cell: (info) => info.getValue(),
       footer: "Nama",
-      meta: { rowSpan: 2 },
+      meta: { className: "w-[400px]" }, // have no effect on big table
     },
     {
       accessorKey: "id",

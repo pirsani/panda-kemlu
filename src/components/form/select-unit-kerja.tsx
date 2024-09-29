@@ -40,6 +40,7 @@ const SelectUnitKerja = ({
 
   return (
     <Select
+      className="w-full flex-grow-0"
       instanceId={fieldName}
       inputId={`${fieldName}-${genId}`}
       options={options}
@@ -53,8 +54,8 @@ const SelectUnitKerja = ({
       filterOption={(option, inputValue) =>
         option.label.toLowerCase().includes(inputValue.toLowerCase())
       }
-      // menuPortalTarget={document.body} // Ensure the menu is rendered in the document body so it doesn't get clipped by overflow:hidden containers
-      // styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }} // Ensure the menu has a high z-index
+      //menuPortalTarget={document.body} // Ensure the menu is rendered in the document body so it doesn't get clipped by overflow:hidden containers
+      //styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }} // Ensure the menu has a high z-index
       aria-labelledby={`${fieldName}-${genId}`}
     />
   );

@@ -65,7 +65,7 @@ export const TabelMateri = ({ data: initialData }: TabelMateriProps) => {
           handleUndoEdit,
           isEditing
         ),
-      meta: { isKolomAksi: true },
+      meta: { isKolomAksi: true, className: "w-[100px]" },
       enableSorting: false, // Disable sorting for this column
     },
   ];

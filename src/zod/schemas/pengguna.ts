@@ -11,7 +11,8 @@ const passwordSchema = z.string().min(8).regex(complexPasswordRegex, {
 
 export const penggunaSchema = z
   .object({
-    id: z.string().cuid().optional(),
+    id: z.union([z.string().cuid(), z.literal("admin")]).optional(),
+    organisasiId: z.string().cuid().optional(),
     name: z
       .string()
       .min(5, {
