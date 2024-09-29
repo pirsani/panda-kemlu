@@ -4,14 +4,15 @@ import {
   simpanPejabatPerbendaharaan,
 } from "@/actions/pejabat-perbendaharaan";
 import ZodErrorList from "@/approute/data-referensi/_components/zod-error-list";
+
 import {
-  formatCurrency,
   KolomAksi,
-  PaginationControls,
-  TabelGeneric,
-} from "@/components/tabel-generic";
+  KolomPilihanAksi,
+  TabelGenericWithoutInlineEdit,
+} from "@/components/tabel-generic-without-inline-edit";
 import { Button } from "@/components/ui/button";
 import { PejabatPerbendaharaanWithStringDate } from "@/data/pejabat-perbendaharaan";
+import { useSearchTerm } from "@/hooks/use-search-term";
 import {
   pejabatPerbendaharaanSchema,
   PejabatPerbendaharaan as ZPejabatPerbendaharaan,
@@ -37,15 +38,13 @@ const data: PejabatPerbendaharaanWithStringDate[] = [];
 
 interface TabelPejabatPerbendaharaanProps {
   data: PejabatPerbendaharaanWithStringDate[];
-  optionsJenisJabatan?: { value: string; label: string }[];
-  optionsSatker?: { value: string; label: string }[];
   frozenColumnCount?: number;
+  onEdit?: (row: PejabatPerbendaharaanWithStringDate) => void;
 }
 export const TabelPejabatPerbendaharaan = ({
   data: initialData,
-  optionsJenisJabatan = [],
-  optionsSatker = [],
   frozenColumnCount = 3,
+  onEdit = () => {},
 }: TabelPejabatPerbendaharaanProps) => {
   const [data, setData] =
     useState<PejabatPerbendaharaanWithStringDate[]>(initialData);
@@ -54,6 +53,26 @@ export const TabelPejabatPerbendaharaan = ({
   const [originalData, setOriginalData] =
     useState<PejabatPerbendaharaanWithStringDate | null>(null);
   const [errors, setErrors] = useState<ZodError | null>(null);
+
+  const { searchTerm } = useSearchTerm();
+
+  const filteredData = data.filter((row) => {
+    if (!searchTerm || searchTerm === "") return true;
+    const lowercasedSearchTerm = searchTerm.toLowerCase();
+    //const searchWords = lowercasedSearchTerm.split(" ").filter(Boolean);
+    const searchWords =
+      lowercasedSearchTerm
+        .match(/"[^"]+"|\S+/g)
+        ?.map((word) => word.replace(/"/g, "")) || [];
+
+    return searchWords.every(
+      (word) =>
+        row.nama?.toLowerCase().includes(word) ||
+        row.jabatan.nama?.toLowerCase().includes(word) ||
+        row.satker?.nama?.toLowerCase().includes(word)
+    );
+  });
+
   const columnHelper =
     createColumnHelper<PejabatPerbendaharaanWithStringDate>();
 
@@ -69,23 +88,12 @@ export const TabelPejabatPerbendaharaan = ({
       header: "Satker",
       cell: (info) => info.getValue(),
       footer: "Satker",
-      meta: {
-        inputType: "select",
-        options: optionsSatker,
-        field: "satkerId",
-        className: "w-[200px]",
-      },
     },
     {
       accessorKey: "jabatan.nama",
       header: "Jabatan",
       cell: (info) => info.getValue(),
       footer: "Jabatan",
-      meta: {
-        inputType: "select",
-        options: optionsJenisJabatan,
-        field: "jabatanId",
-      },
     },
     {
       accessorKey: "nama",
@@ -134,13 +142,12 @@ export const TabelPejabatPerbendaharaan = ({
       accessorKey: "_additionalKolomAksi",
       header: "Aksi",
       cell: (info) =>
-        KolomAksi<PejabatPerbendaharaanWithStringDate>(
+        KolomPilihanAksi<PejabatPerbendaharaanWithStringDate>(
           info,
+          ["edit", "delete"],
+          isEditing,
           handleEdit,
-          handleDelete,
-          handleOnSave,
-          handleUndoEdit,
-          isEditing
+          handleDelete
         ),
       meta: { isKolomAksi: true },
       enableSorting: false, // Disable sorting for this column
@@ -151,48 +158,7 @@ export const TabelPejabatPerbendaharaan = ({
     console.log("Edit row:", row);
     // Implement your edit logic here
     setOriginalData(row.original); // Store the original data
-
-    setIsEditing(true);
-    setEditableRowIndex(row.id);
-  };
-
-  const handleOnSave = async (row: PejabatPerbendaharaanWithStringDate) => {
-    console.log("Save row:", row);
-    // Implement your save logic here
-
-    try {
-      const parsed = pejabatPerbendaharaanSchema.parse(row);
-      const update = await simpanPejabatPerbendaharaan(parsed);
-      if (update.success) {
-        console.log("Data berhasil disimpan");
-        alert("Data berhasil disimpan");
-      } else {
-        console.error("Data gagal disimpan");
-        alert("Data gagal disimpan");
-      }
-      setEditableRowIndex(null);
-      setIsEditing(false);
-    } catch (error) {
-      if (error instanceof ZodError) {
-        setErrors(error);
-      } else {
-        console.error("Error saving row:", error);
-      }
-      console.error("Error saving row:", error);
-    }
-  };
-
-  const handleUndoEdit = (row: PejabatPerbendaharaanWithStringDate) => {
-    console.log("Undo edit row:", row);
-    // Implement your undo edit logic here
-    if (originalData) {
-      setData((prevData) =>
-        prevData.map((item) => (item.id === row.id ? originalData : item))
-      );
-    }
-    setErrors(null);
-    setIsEditing(false);
-    setEditableRowIndex(null);
+    onEdit(row.original);
   };
 
   const handleDelete = async (row: PejabatPerbendaharaanWithStringDate) => {
@@ -222,8 +188,8 @@ export const TabelPejabatPerbendaharaan = ({
   return (
     <>
       {errors && <ZodErrorList error={errors} />}
-      <TabelGeneric
-        data={data}
+      <TabelGenericWithoutInlineEdit
+        data={filteredData}
         columns={columns}
         frozenColumnCount={frozenColumnCount}
         isEditing={isEditing}

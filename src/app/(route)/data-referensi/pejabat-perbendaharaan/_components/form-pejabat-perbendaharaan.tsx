@@ -26,22 +26,26 @@ interface FormPejabatPerbendaharaanProps {
   onCancel?: () => void;
   handleFormSubmitComplete?: (isSuccess: Boolean) => void;
   className?: string;
+  pejabat?: Partial<PejabatPerbendaharaan> | null;
 }
 const FormPejabatPerbendaharaan = ({
   className,
   onCancel,
   handleFormSubmitComplete = () => {}, // Provide a default no-op function
+  pejabat,
 }: FormPejabatPerbendaharaanProps) => {
   const form = useForm<PejabatPerbendaharaan>({
     resolver: zodResolver(pejabatPerbendaharaanSchema),
-    defaultValues: {
-      nama: "",
-      NIK: "",
-      NIP: "",
-      pangkatGolonganId: "",
-      satkerId: "",
-      jabatanId: "",
-    },
+    defaultValues: pejabat
+      ? pejabat
+      : {
+          nama: "",
+          NIK: "",
+          NIP: "",
+          pangkatGolonganId: "",
+          satkerId: "",
+          jabatanId: "",
+        },
   });
   const {
     control,

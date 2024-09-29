@@ -14,43 +14,38 @@ import {
 import { Contact, GraduationCap, Plus, Signature } from "lucide-react";
 import { useState } from "react";
 
-export const DialogTambahPejabatPerbendaharaan = () => {
-  const [open, setOpen] = useState(false);
-  const onCancel = () => {
-    setOpen(false);
-  };
-
-  // Closes the dialog if the form submission is successful
-  const handleFormSubmitComplete = (isSuccess: Boolean) => {
-    if (isSuccess) {
-      setOpen(false);
-    }
-  };
-
+interface DialogFormPejabatPerbendaharaanProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  children?: React.ReactNode;
+}
+export const DialogFormPejabatPerbendaharaan = ({
+  open,
+  setOpen,
+  children,
+}: DialogFormPejabatPerbendaharaanProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-1 w-64">
+        <Button className="gap-1 w-32">
           <Plus size={18} />
           <Contact size={18} />
-          <span className="hidden sm:block">Pejabat Perbendaharaan</span>
+          <span className="hidden sm:block">Pejabat</span>
           <Signature className="block sm:hidden" size={24} />
         </Button>
       </DialogTrigger>
       <DialogContent className="w-full sm:min-w-[750px] max-h-[90vh] overflow-auto">
         <DialogHeader>
-          <DialogTitle>Pejabat Perbendaharaan</DialogTitle>
+          <DialogTitle>Pejabat Penanggung Jawab Pengelola Keuangan</DialogTitle>
           <DialogDescription>
-            Isi form di bawah untuk menambahkan pejabat perbendaharaan baru
+            Isi form di bawah untuk menambahkan/memperbarui Pejabat Penanggung
+            Jawab Pengelola Keuangan
           </DialogDescription>
         </DialogHeader>
-        <FormPejabatPerbendaharaan
-          onCancel={onCancel}
-          handleFormSubmitComplete={handleFormSubmitComplete}
-        />
+        <div className="w-full max-w-full overflow-hidden p-1">{children}</div>
       </DialogContent>
     </Dialog>
   );
 };
 
-export default DialogTambahPejabatPerbendaharaan;
+export default DialogFormPejabatPerbendaharaan;

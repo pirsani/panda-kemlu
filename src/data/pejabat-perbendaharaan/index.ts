@@ -24,8 +24,12 @@ export const convertPejabatPerbendaharaanToStringDate = (
 ) => {
   return data.map((item) => ({
     ...item,
-    tmtMulai: item.tmtMulai?.toISOString() ?? "",
-    tmtSelesai: item.tmtSelesai?.toISOString() ?? "",
+    tmtMulai: item.tmtMulai
+      ? new Date(item.tmtMulai).toISOString().slice(0, 10)
+      : "",
+    tmtSelesai: item.tmtSelesai
+      ? new Date(item.tmtSelesai).toISOString().slice(0, 10)
+      : "",
   }));
 };
 

@@ -354,6 +354,78 @@ export const PaginationControls = <T,>({
   );
 };
 
+// interface Aksi {
+//   aksi: "edit" | "delete" | "view";
+// }
+export const KolomPilihanAksi = <T,>(
+  info: CellContext<T, unknown>,
+  aksi: Array<"edit" | "delete" | "view">,
+  isEditing?: boolean,
+  onEdit?: (row: Row<T>) => void,
+  onDelete?: (row: T) => void,
+  onView?: (row: T) => void
+) => {
+  const handleOnClickEdit = () => {
+    console.log("Edit clicked");
+    onEdit && onEdit(info.row);
+  };
+
+  const handleOnClickDelete = () => {
+    console.log("Delete clicked");
+    onDelete && onDelete(info.row.original);
+  };
+
+  const handleOnClickView = () => {
+    console.log("View clicked");
+    onView && onView(info.row.original);
+  };
+  return (
+    <>
+      <div className="flex gap-2">
+        {aksi.map((item) => {
+          switch (item) {
+            case "edit":
+              return (
+                <Button
+                  key={item}
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleOnClickEdit}
+                >
+                  <Pencil size={20} />
+                </Button>
+              );
+            case "delete":
+              return (
+                <Button
+                  key={item}
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleOnClickDelete}
+                >
+                  <Trash2 size={20} />
+                </Button>
+              );
+            case "view":
+              return (
+                <Button
+                  key={item}
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleOnClickView}
+                >
+                  <Eye size={20} />
+                </Button>
+              );
+            default:
+              return null;
+          }
+        })}
+      </div>
+    </>
+  );
+};
+
 export const KolomAksi = <T,>(
   info: CellContext<T, unknown>,
   onEdit?: (row: Row<T>) => void,

@@ -43,7 +43,7 @@ export const DialogFormPengguna = ({
             Isi form di bawah untuk menambahkan/mengubah Pengguna
           </DialogDescription>
         </DialogHeader>
-        <div className="w-full max-w-full overflow-hidden">{children}</div>
+        <div className="w-full max-w-full overflow-hidden p-1">{children}</div>
       </DialogContent>
     </Dialog>
   );
