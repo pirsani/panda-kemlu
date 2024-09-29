@@ -299,32 +299,14 @@ export const TabelGeneric = <T,>({
                           colRefs.current[index] = el;
                         }
                       }}
-                      className={cn("h-10 px-2 border border-gray-300 ", {
+                      className={cn("px-2 border border-gray-300 ", {
                         [`sticky left-0 bg-gray-100 z-${10 - index}`]:
                           index < frozenColumnCount, // Sticky columns
                         "left-0": index >= frozenColumnCount, // Default position for other columns
                       })}
                       style={
                         index < frozenColumnCount
-                          ? {
-                              //left: `${cumulativeWidths[index] || 0}px`,
-                              width: (() => {
-                                const nextWidth = cumulativeWidths[index + 1];
-                                const currentWidth =
-                                  cumulativeWidths[index] || 0;
-                                if (
-                                  index + 1 >= cumulativeWidths.length ||
-                                  isNaN(nextWidth) ||
-                                  isNaN(currentWidth)
-                                ) {
-                                  console.error(
-                                    `Invalid width calculation: nextWidth=${nextWidth}, currentWidth=${currentWidth}`
-                                  );
-                                  return 0; // Provide a default value to avoid NaN
-                                }
-                                return nextWidth - currentWidth;
-                              })(),
-                            }
+                          ? { left: `${cumulativeWidths[index] || 0}px` }
                           : undefined
                       }
                     >
@@ -560,7 +542,7 @@ export const KolomAksiDelete = <T,>(
 
   return (
     <Button
-      variant="destructive"
+      variant="outline"
       size="sm"
       onClick={handleOnClickDelete}
       className=""
