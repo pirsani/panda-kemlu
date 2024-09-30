@@ -10,7 +10,7 @@ export const roleSchema = z.object({
   permissions: z.array(z.string().cuid()).optional().nullable(),
   name: z
     .string()
-    .min(6, {
+    .min(5, {
       message: "Nama Role minimal 5 karakter",
     })
     .max(128, {

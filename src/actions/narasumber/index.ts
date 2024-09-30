@@ -1,5 +1,6 @@
 "use server";
-import { ActionResponse } from "@/actions";
+import { ActionResponse, getUserId } from "@/actions";
+import { hasPermission } from "@/data/user";
 import { dbHonorarium, Prisma } from "@/lib/db-honorarium";
 import { CustomPrismaClientError } from "@/types/custom-prisma-client-error";
 import saveFile from "@/utils/file-operations/save";
@@ -19,6 +20,18 @@ export const simpanNarasumber = async (
   // step 1: parse the form data
   const obj = formDataToObject(formData);
   console.log("[parsedForm]", obj);
+
+  const userId = await getUserId();
+  if (!userId) {
+    return {
+      success: false,
+      error: "Unauthorized",
+      message: "User is not authenticated",
+    };
+  }
+
+  const permitted = await hasPermission(userId, "narasumber:create");
+  console.log("[permitted]", permitted);
 
   try {
     const data = narasumberSchema.parse(obj);
@@ -40,6 +53,7 @@ export const simpanNarasumber = async (
       });
       console.log("File saved at:", filePath);
       const savedFile = await logUploadedFile(
+        uniqueFilename,
         file.name,
         relativePath,
         fileHash,
@@ -51,7 +65,14 @@ export const simpanNarasumber = async (
       // log saved file to database
     }
 
-    const saved = await saveDataToDatabase(data, "admin");
+    delete data.dokumenPeryataanRekeningBerbeda;
+    const objNarasumber = data as Narasumber;
+    if (uniqueFilename) {
+      objNarasumber.dokumenPeryataanRekeningBerbeda = uniqueFilename;
+    }
+
+    const byUser = "admin";
+    const saved = await saveDataToDatabase(objNarasumber, byUser);
     revalidatePath("/data-referensi/narasumber");
 
     return {
@@ -78,59 +99,8 @@ export const updateNarasumber = async (
   id: string
 ): Promise<ActionResponse<Narasumber>> => {
   // step 1: parse the form data
-  const obj = formDataToObject(formData);
-  console.log("[parsedForm]", obj);
-
-  try {
-    const data = narasumberSchema.parse(obj);
-
-    const file = data.dokumenPeryataanRekeningBerbeda;
-    let uniqueFilename: string | null = null;
-    const saveto = join("dokumen-pernyataan-rekening-berbeda", data.id);
-    if (file) {
-      // Save the file to disk
-      // Extract the file extension
-      const fileExtension = extname(file.name);
-      // Generate a unique filename using nanoid
-      uniqueFilename = `${nanoid()}${fileExtension}`;
-
-      const { filePath, relativePath, fileHash, fileType } = await saveFile({
-        file,
-        fileName: uniqueFilename,
-        directory: saveto,
-      });
-      console.log("File saved at:", filePath);
-      const savedFile = await logUploadedFile(
-        file.name,
-        relativePath,
-        fileHash,
-        fileType.mime,
-        "admin"
-      );
-      console.log("File saved to database:", savedFile);
-
-      // log saved file to database
-    }
-
-    const saved = await updateDataToDatabase(data, id, "admin");
-    revalidatePath("/data-referensi/narasumber");
-    return {
-      success: true,
-      data: saved,
-    };
-  } catch (error) {
-    if (error instanceof ZodError) {
-      console.error("Validation failed:", error.errors);
-    } else {
-      console.error("Unexpected error:", error);
-    }
-    const e = error as Error;
-    return {
-      success: false,
-      error: "Error saving data to database",
-      message: e.message,
-    };
-  }
+  formData.append("id", id);
+  return simpanNarasumber(formData);
 };
 
 // Function to convert FormData to a plain object
@@ -148,17 +118,21 @@ const formDataToObject = (formData: FormData) => {
   return obj;
 };
 
-const saveDataToDatabase = async (data: ZNarasumber, createdBy: string) => {
-  const dataCreatedBy = {
-    ...data,
-    dokumenPeryataanRekeningBerbeda: data.dokumenPeryataanRekeningBerbeda?.name,
-    createdBy,
-  };
+const saveDataToDatabase = async (data: Narasumber, byUser: string) => {
+  // const dataCreatedBy = {
+  //   ...data,
+  //   //dokumenPeryataanRekeningBerbeda: data.dokumenPeryataanRekeningBerbeda?.name,
+  //   createdBy,
+  // };
   // Save data to database
   try {
     //const result = await dbHonorarium.$transaction(async (prisma) => {
-    const newNarasumber = await dbHonorarium.narasumber.create({
-      data: dataCreatedBy,
+    const newNarasumber = await dbHonorarium.narasumber.upsert({
+      where: {
+        id: data.id,
+      },
+      update: { ...data, updatedBy: byUser },
+      create: { ...data, createdBy: byUser },
     });
     // Save data to database
     return newNarasumber;
@@ -218,6 +192,7 @@ const updateDataToDatabase = async (
 };
 
 const logUploadedFile = async (
+  id: string,
   filename: string,
   filePath: string,
   fileHash: string,
@@ -227,6 +202,7 @@ const logUploadedFile = async (
   // Save the file path to the database
   const uploadedFile = await dbHonorarium.uploadedFile.create({
     data: {
+      id,
       originalFilename: filename,
       filePath,
       hash: fileHash,

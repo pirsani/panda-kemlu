@@ -43,8 +43,8 @@ model Role {
 }
 
 model RolePermission {
-  roleId       String
-  permissionId String
+  roleId       String     @map("role_id")
+  permissionId String     @map("permission_id")
   Role         Role       @relation(fields: [roleId], references: [id])
   Permission   Permission @relation(fields: [permissionId], references: [id])
 
@@ -53,8 +53,8 @@ model RolePermission {
 }
 
 model UserRole {
-  userId String
-  roleId String
+  userId String @map("user_id")
+  roleId String @map("role_id")
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
@@ -824,7 +824,7 @@ model PejabatPerbendaharaan {
 }
 
 model UploadedFile {
-  id               Int      @id @default(autoincrement())
+  id               String   @id @default(cuid())
   originalFilename String   @map("original_filename")
   filePath         String   @map("file_path")
   mimeType         String?  @map("mime_type")

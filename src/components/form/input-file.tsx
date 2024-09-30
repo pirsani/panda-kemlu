@@ -28,7 +28,11 @@ export const InputFile = ({
       {currentFile && (
         <div className="flex flex-row gap-1">
           <Input type="text" readOnly value={currentFile.name} />
-          <Button variant={"outline"} onClick={() => inputRef.current?.click()}>
+          <Button
+            type="button"
+            variant={"outline"}
+            onClick={() => inputRef.current?.click()}
+          >
             Choose File
           </Button>
         </div>

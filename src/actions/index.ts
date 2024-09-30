@@ -1,3 +1,5 @@
+import { auth } from "@/auth";
+
 export type {
   ActionResponse,
   ErrorResponse,
@@ -17,4 +19,12 @@ export const formDataToObject = (formData: FormData) => {
     }
   });
   return obj;
+};
+
+export const getUserId = async () => {
+  const session = await auth();
+  if (!session || !session.user || !session.user.id) {
+    return null;
+  }
+  return session.user.id;
 };

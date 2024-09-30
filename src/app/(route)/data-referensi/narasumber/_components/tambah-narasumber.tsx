@@ -13,6 +13,7 @@ import {
 import { Narasumber } from "@/zod/schemas/narasumber";
 import { GraduationCap, Plus } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const TambahNarasumber = () => {
   const [open, setOpen] = useState(false);
@@ -60,11 +61,11 @@ const TambahNarasumber = () => {
       // Handle API response
       if (!simpan.success) {
         console.error("Error saving narasumber:", simpan.error);
-        alert(`Gagal menyimpan narasumber: ${simpan.message}`);
+        toast.error(`Gagal menyimpan narasumber: ${simpan.message}`);
       } else {
-        alert("Berhasil menyimpan narasumber");
+        toast.success("Berhasil menyimpan narasumber");
         console.log("Berhasil menyimpan narasumber:", data);
-        //setOpen(false);
+        setOpen(false);
       }
     } catch (error) {
       // Generic error handling

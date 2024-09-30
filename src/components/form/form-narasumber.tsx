@@ -18,6 +18,7 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import InputFile from "./input-file";
+import Required from "./required";
 
 interface FormNarasumberProps {
   onCancel?: () => void;
@@ -60,7 +61,10 @@ const FormNarasumber = ({
           control={control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nama</FormLabel>
+              <FormLabel>
+                Nama
+                <Required />
+              </FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>
@@ -74,7 +78,10 @@ const FormNarasumber = ({
             control={control}
             render={({ field }) => (
               <FormItem className="sm:w-1/3">
-                <FormLabel>NIK</FormLabel>
+                <FormLabel>
+                  NIK
+                  <Required />
+                </FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -87,7 +94,10 @@ const FormNarasumber = ({
             control={control}
             render={({ field }) => (
               <FormItem className="sm:w-1/3">
-                <FormLabel>NIP</FormLabel>
+                <FormLabel>
+                  NIP
+                  <Required />
+                </FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -100,7 +110,10 @@ const FormNarasumber = ({
             control={control}
             render={({ field }) => (
               <FormItem className="sm:w-1/3">
-                <FormLabel>NPWP</FormLabel>
+                <FormLabel>
+                  NPWP
+                  <Required />
+                </FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -116,7 +129,10 @@ const FormNarasumber = ({
             control={control}
             render={({ field }) => (
               <FormItem className="sm:w-10/12">
-                <FormLabel>Jabatan</FormLabel>
+                <FormLabel>
+                  Jabatan
+                  <Required />
+                </FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
