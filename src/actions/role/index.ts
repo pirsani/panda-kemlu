@@ -8,9 +8,16 @@ import { revalidatePath } from "next/cache";
 
 // pada prinsipnya, Satker anggaran adalah unit kerja dalam organisasi yang memiliki anggaran
 
-export interface roleWithPermissions extends Role {}
+export interface RoleWithPermissions extends Role {
+  RolePermission: RolePermission[];
+}
 export const getRoles = async (role?: string) => {
-  const dataRole = await dbHonorarium.role.findMany({});
+  const dataRole = await dbHonorarium.role.findMany({
+    include: {
+      RolePermission: true,
+    },
+  });
+  console.log("dataRole", dataRole);
   return dataRole;
 };
 
@@ -51,21 +58,75 @@ export const getOptionsRole = async () => {
   return optionsRole;
 };
 
+interface RolePermission {
+  permissionId: string;
+  roleId?: string;
+}
 export const simpanDataRole = async (
   data: ZRole
 ): Promise<ActionResponse<Role>> => {
   try {
+    const { permissions, ...roleWithoutPermission } = data;
+    // create array permission object
+    const objPermissions: RolePermission[] = (permissions ?? []).map(
+      (p: string) => {
+        const px: RolePermission = {
+          permissionId: p,
+        };
+        return px;
+      }
+    );
+    let permissionsToRemove: RolePermission[] = [];
+    let permissionsToAdd: RolePermission[] = [];
+    if (data.id) {
+      // Fetch existing permissions
+      const existingPermissions = await dbHonorarium.rolePermission.findMany({
+        where: {
+          roleId: data.id,
+        },
+      });
+      // Determine permissions to add and remove
+      const existingPermissionIds = new Set(
+        existingPermissions.map((p) => p.roleId)
+      );
+      const newPermissionIds = new Set(
+        objPermissions.map((p) => p.permissionId)
+      );
+
+      permissionsToAdd = objPermissions.filter(
+        (p) => !existingPermissionIds.has(p.permissionId)
+      );
+      permissionsToRemove = existingPermissions.filter(
+        (p) => !newPermissionIds.has(p.roleId)
+      );
+    }
+
     const roleBaru = await dbHonorarium.role.upsert({
       where: {
-        id: data.id,
+        id: data.id || "it-should-never-be-this",
       },
       create: {
-        ...data,
+        ...roleWithoutPermission,
         createdBy: "admin",
+        RolePermission: {
+          createMany: {
+            data: objPermissions,
+          },
+        },
       },
       update: {
-        ...data,
+        ...roleWithoutPermission,
         updatedBy: "admin",
+        RolePermission: {
+          deleteMany: {
+            permissionId: {
+              in: permissionsToRemove.map((p) => p.permissionId),
+            },
+          },
+          createMany: {
+            data: permissionsToAdd,
+          },
+        },
       },
     });
     revalidatePath("/data-referensi/role");
@@ -74,6 +135,7 @@ export const simpanDataRole = async (
       data: roleBaru,
     };
   } catch (error) {
+    console.error("Error saving role:", error);
     return {
       success: false,
       error: "Not implemented",

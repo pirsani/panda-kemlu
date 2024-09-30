@@ -109,14 +109,14 @@ export const TabelGenericWithoutInlineEdit = <T,>({
         [0]
       );
       setCumulativeWidths(cumulativeWidths);
-      console.log("cumulativeWidths", cumulativeWidths);
+      //console.log("cumulativeWidths", cumulativeWidths);
     }
   }, [frozenColumnCount, colRefs]); // Only run when frozen column count or refs change
   //[table.getRowModel().rows]); // Recalculate when rows change
 
   useEffect(() => {
-    console.log("is Editing", isEditing);
-    console.log("editableRowId", editableRowId);
+    //console.log("is Editing", isEditing);
+    //console.log("editableRowId", editableRowId);
     // setEditableRowId(initialEditableRowId);
     // setIsEditing(initialIsEditing);
   }, [isEditing, editableRowId]);
@@ -366,17 +366,17 @@ export const KolomPilihanAksi = <T,>(
   onView?: (row: T) => void
 ) => {
   const handleOnClickEdit = () => {
-    console.log("Edit clicked");
+    //console.log("Edit clicked");
     onEdit && onEdit(info.row);
   };
 
   const handleOnClickDelete = () => {
-    console.log("Delete clicked");
+    //console.log("Delete clicked");
     onDelete && onDelete(info.row.original);
   };
 
   const handleOnClickView = () => {
-    console.log("View clicked");
+    //console.log("View clicked");
     onView && onView(info.row.original);
   };
   return (
@@ -436,17 +436,17 @@ export const KolomAksi = <T,>(
   const [oldRow, setOldRow] = useState<T>(info.row.original);
 
   const handleOnClickEdit = () => {
-    console.log("Edit clicked");
+    //console.log("Edit clicked");
     onEdit && onEdit(info.row);
   };
 
   const handleOnClickDelete = () => {
-    console.log("Delete clicked");
+    //console.log("Delete clicked");
     onDelete && onDelete(info.row.original);
   };
 
   const handleOnClickView = () => {
-    console.log("View clicked");
+    //console.log("View clicked");
     onView && onView(info.row.original);
   };
 

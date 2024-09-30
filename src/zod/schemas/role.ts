@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const roleSchema = z.object({
   id: z.string().cuid().optional(),
+  permissions: z.array(z.string().cuid()).optional().nullable(),
   name: z
     .string()
     .min(6, {

@@ -7,6 +7,43 @@ import { tr } from "date-fns/locale";
 import fs from "fs";
 import path, { resolve } from "path";
 
+interface permission {
+  name: string;
+  description: string;
+}
+
+const seedPermission = async (): Promise<void> => {
+  console.log("Seeding Permission data");
+  const results: permission[] = [];
+  const csvPath = "docs/data-referensi/permission.csv";
+  const permissionDataPath = path.resolve(process.cwd(), csvPath);
+  return new Promise((resolve, reject) => {
+    fs.createReadStream(permissionDataPath)
+      .pipe(csv({ separator: ";" }))
+      .on("data", (data) => results.push(data))
+      .on("end", async () => {
+        try {
+          for (const row of results) {
+            //console.log(row);
+            await dbHonorarium.permission.create({
+              data: {
+                name: row.name,
+                description: row.description,
+                createdBy: "init",
+                createdAt: new Date(),
+              },
+            });
+          }
+          console.log("Data Permission seeded successfully");
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      })
+      .on("error", (error) => reject(error));
+  });
+};
+
 interface unitKerja {
   nama: string;
   singkatan: string;
@@ -251,6 +288,7 @@ const deleteExisting = async (): Promise<void> => {
 
 async function main() {
   await deleteExisting();
+  await seedPermission();
   await seedUnitKerja();
   await seedNegara();
   await seedProvinsi();
