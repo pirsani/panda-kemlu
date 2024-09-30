@@ -1,7 +1,12 @@
 import { z } from "zod";
 
+export const roleIdSchema = z.union([
+  z.string().cuid(),
+  z.literal("superadmin"),
+]);
+
 export const roleSchema = z.object({
-  id: z.string().cuid().optional(),
+  id: roleIdSchema.optional(),
   permissions: z.array(z.string().cuid()).optional().nullable(),
   name: z
     .string()

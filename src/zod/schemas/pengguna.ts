@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { roleIdSchema } from "./role";
 
 // Regular expression for a complex password
 const complexPasswordRegex =
@@ -9,10 +10,14 @@ const passwordSchema = z.string().min(8).regex(complexPasswordRegex, {
     "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.",
 });
 
+const emptyStringToNull = z
+  .string()
+  .transform((val) => (val === "" || val === "-" ? null : val));
+
 export const penggunaSchema = z
   .object({
     id: z.union([z.string().cuid(), z.literal("admin")]).optional(),
-    organisasiId: z.string().cuid().optional(),
+    organisasiId: z.string().cuid().optional().nullable(),
     name: z
       .string()
       .min(5, {
@@ -24,6 +29,7 @@ export const penggunaSchema = z
     email: z.string().email(),
     password: z.string().optional(),
     rePassword: z.string().optional(),
+    roles: z.array(roleIdSchema).optional().nullable(),
     NIP: z
       .union([
         z
@@ -46,14 +52,14 @@ export const penggunaSchema = z
       if (!data.password) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Password is required when id is null or undefined",
+          message: "Password is required for new user",
           path: ["password"],
         });
       }
       if (!data.rePassword) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "rePassword is required when id is null or undefined",
+          message: "rePassword is required for new user",
           path: ["rePassword"],
         });
       }

@@ -9,12 +9,12 @@ import { revalidatePath } from "next/cache";
 // pada prinsipnya, Satker anggaran adalah unit kerja dalam organisasi yang memiliki anggaran
 
 export interface RoleWithPermissions extends Role {
-  RolePermission: RolePermission[];
+  rolePermission: RolePermission[];
 }
 export const getRoles = async (role?: string) => {
   const dataRole = await dbHonorarium.role.findMany({
     include: {
-      RolePermission: true,
+      rolePermission: true,
     },
   });
   console.log("dataRole", dataRole);
@@ -108,7 +108,7 @@ export const simpanDataRole = async (
       create: {
         ...roleWithoutPermission,
         createdBy: "admin",
-        RolePermission: {
+        rolePermission: {
           createMany: {
             data: objPermissions,
           },
@@ -117,7 +117,7 @@ export const simpanDataRole = async (
       update: {
         ...roleWithoutPermission,
         updatedBy: "admin",
-        RolePermission: {
+        rolePermission: {
           deleteMany: {
             permissionId: {
               in: permissionsToRemove.map((p) => p.permissionId),

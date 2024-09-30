@@ -22,7 +22,7 @@ interface Option {
   label: string;
 }
 
-const SelectRoles = ({
+export const SelectRoles = ({
   inputId,
   onChange,
   values,

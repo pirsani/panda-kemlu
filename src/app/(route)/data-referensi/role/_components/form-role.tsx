@@ -81,7 +81,7 @@ const FormRole = ({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Singkatan</FormLabel>
+                  <FormLabel>Nama Role</FormLabel>
                   <FormControl>
                     <Input placeholder="Dirjen A....." {...field} />
                   </FormControl>

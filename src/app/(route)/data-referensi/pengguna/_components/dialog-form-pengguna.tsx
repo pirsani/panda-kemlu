@@ -36,7 +36,7 @@ export const DialogFormPengguna = ({
           <span className="hidden sm:block">Pengguna</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-full sm:min-w-[500px]">
+      <DialogContent className="w-full sm:min-w-[500px] max-h-[calc(100vh-50px)] overflow-auto">
         <DialogHeader>
           <DialogTitle>Pengguna</DialogTitle>
           <DialogDescription>

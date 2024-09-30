@@ -23,21 +23,21 @@ model Permission {
   createdAt      DateTime         @default(now()) @map("created_at")
   updatedBy      String?          @map("updated_by")
   updatedAt      DateTime?        @updatedAt @map("updated_at")
-  RolePermission RolePermission[]
+  rolePermission RolePermission[]
 
   @@map("permissions")
 }
 
 model Role {
   id             String           @id @default(cuid())
-  name           String
+  name           String           @unique
   description    String?
   createdBy      String           @map("created_by")
   createdAt      DateTime         @default(now()) @map("created_at")
   updatedBy      String?          @map("updated_by")
   updatedAt      DateTime?        @updatedAt @map("updated_at")
-  UserRole       UserRole[]
-  RolePermission RolePermission[]
+  userRole       UserRole[]
+  rolePermission RolePermission[]
 
   @@map("roles")
 }
@@ -64,7 +64,7 @@ model UserRole {
 
 model User {
   id                   String          @id @default(cuid())
-  name                 String?
+  name                 String
   email                String          @unique
   password             String?
   emailVerified        DateTime?       @map("email_verified")

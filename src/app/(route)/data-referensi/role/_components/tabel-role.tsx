@@ -65,6 +65,7 @@ export const TabelRole = ({
       header: "#",
       // cell: (info) => info.row.index + 1, // Display row number (1-based index)
       footer: "#",
+      meta: { className: "w-[50px]" },
     },
     {
       accessorKey: "name",

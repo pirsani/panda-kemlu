@@ -271,6 +271,8 @@ const deleteExisting = async (): Promise<void> => {
     await dbHonorarium.sbmHonorarium.deleteMany({});
     await dbHonorarium.pmkAcuan.deleteMany({});
     await dbHonorarium.user.deleteMany({});
+    await dbHonorarium.rolePermission.deleteMany({});
+    await dbHonorarium.permission.deleteMany({});
     await dbHonorarium.userRole.deleteMany({});
     await dbHonorarium.role.deleteMany({});
     await dbHonorarium.sbmUangRepresentasi.deleteMany({});
@@ -371,80 +373,6 @@ async function main() {
     ],
   });
 
-  // INITIATE ORGANISASI
-  // UPT sekdilu dasar hukumnya apa ?
-  // const organisasi = await dbHonorarium.organisasi.createMany({
-  //   data: [
-  //     {
-  //       nama: "Kementerian Luar Negeri",
-  //       singkatan: "Kemlu",
-  //       createdBy: "init",
-  //     },
-  //     {
-  //       nama: "Sekretariat Jenderal",
-  //       singkatan: "Setjen",
-  //       isSatkerAnggaran: true,
-  //       eselon: 1,
-  //       createdBy: "init",
-  //     },
-  //     {
-  //       nama: "Pusat Pendidikan dan Pelatihan",
-  //       singkatan: "Pusdiklat",
-  //       isSatkerAnggaran: true,
-  //       createdBy: "init",
-  //       eselon: 2,
-  //     },
-  //     {
-  //       nama: "Bidang Perencanaan, Pengembangan, dan Evaluasi",
-  //       singkatan: "PPE",
-  //       createdBy: "init",
-  //     },
-  //     {
-  //       nama: "Bidang Pendidikan dan Pelatihan Nondiplomatik",
-  //       singkatan: "PPN",
-  //       createdBy: "init",
-  //     },
-  //     {
-  //       nama: "Bidang Pendidikan dan Pelatihan Teknis",
-  //       singkatan: "PPT",
-  //       createdBy: "init",
-  //     },
-  //     {
-  //       nama: "Bidang Kerja Sama Pendidikan dan Pelatihan",
-  //       singkatan: "KSPP",
-  //       createdBy: "init",
-  //     },
-  //     {
-  //       nama: "Tata Usaha",
-  //       singkatan: "TU",
-  //       createdBy: "init",
-  //       eselon: 3,
-  //     },
-  //     {
-  //       nama: "UPT Sekdilu",
-  //       singkatan: "UPT Sekdilu",
-  //       createdBy: "init",
-  //     },
-  //     {
-  //       nama: "UPT Sesdilu",
-  //       singkatan: "UPT Sesdilu ",
-  //       createdBy: "init",
-  //     },
-  //     {
-  //       nama: "UPT Sesparlu",
-  //       singkatan: "UPT Sesparlu",
-  //       createdBy: "init",
-  //     },
-  //     {
-  //       nama: "Pusat TIK KP",
-  //       singkatan: "Pusat TIK KP",
-  //       isSatkerAnggaran: true,
-  //       createdBy: "init",
-  //       eselon: 2,
-  //     },
-  //   ],
-  // });
-
   const jenisPejabatPerbendaharaan =
     await dbHonorarium.jenisJabatanPerbendaharaan.createMany({
       data: [
@@ -488,36 +416,42 @@ async function main() {
         createdBy: "init",
       },
       {
-        id: "admin",
+        name: "Admin",
+        createdBy: "init",
+      },
+      {
         name: "Bendahara",
         createdBy: "init",
       },
       {
-        id: "operator-keuangan",
         name: "Operator Keuangan",
         createdBy: "init",
       },
       {
-        id: "uploader",
         name: "Uploader",
         createdBy: "init",
       },
       {
-        id: "viewer",
         name: "Viewer",
         createdBy: "init",
       },
     ],
   });
 
+  const password = await bcrypt.hash(
+    process.env.INIT_ADMIN_PASSWORD || "123456",
+    10
+  );
+
   const pass = bcrypt.hashSync("123456", 10);
   const user = await dbHonorarium.user.createMany({
     data: [
       {
         id: "admin",
-        password: pass,
+        password: password,
         name: "admin",
         email: "admin@super.id",
+        organisasiId: "cm1n901tl0000w0u0zzwkdzw0",
       },
     ],
   });

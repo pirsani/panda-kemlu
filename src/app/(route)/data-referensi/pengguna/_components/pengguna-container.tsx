@@ -1,6 +1,6 @@
 "use client";
 import { PenggunaWithRoles } from "@/actions/pengguna";
-import { Pengguna as ZUnitkerja } from "@/zod/schemas/pengguna";
+import { Pengguna as ZPengguna } from "@/zod/schemas/pengguna";
 import { useState } from "react";
 import { DialogFormPengguna } from "./dialog-form-pengguna";
 import FormPengguna from "./form-pengguna";
@@ -17,12 +17,19 @@ const PenggunaContainer = ({
   optionsUnitKerja,
 }: PenggunaContainerProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [editableRow, setEditableRow] = useState<ZUnitkerja | null>(null);
+  const [editableRow, setEditableRow] = useState<ZPengguna | null>(null);
 
   const onEdit = (row: PenggunaWithRoles) => {
-    //const { createdAt, updatedAt, ...omittedData } = row;
+    // transform permissions to array of string
+
+    const userRoles = row.userRole.map((r) => r.roleId);
+    const pengguna: ZPengguna = {
+      ...row,
+      roles: userRoles,
+    };
+
     setIsOpen(true);
-    setEditableRow(row as ZUnitkerja);
+    setEditableRow(pengguna);
     console.log("onEdit form-narasumber-container", row);
   };
 

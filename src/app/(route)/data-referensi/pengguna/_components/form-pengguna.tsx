@@ -4,7 +4,8 @@ import { simpanDataPengguna } from "@/actions/pengguna";
 import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
 
-import SelectRoles from "@/components/form/select-roles";
+import Required from "@/components/form/required";
+import { SelectRoles } from "@/components/form/select-roles";
 import SelectUnitKerja from "@/components/form/select-unit-kerja";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -62,6 +63,7 @@ const FormPengguna = ({
     formState: { errors },
     getValues,
   } = form;
+  const hasErrors = Object.keys(errors).length > 0;
   const onSubmit = async (data: Pengguna) => {
     console.log("Form data before validation:", getValues());
 
@@ -108,10 +110,31 @@ const FormPengguna = ({
             />
             <FormField
               control={form.control}
+              name="roles"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Roles</FormLabel>
+                  <FormControl>
+                    <SelectRoles
+                      isMulti
+                      inputId={field.name}
+                      onChange={field.onChange}
+                      values={field.value ?? []} // Ensure value is passed correctly
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama</FormLabel>
+                  <FormLabel>
+                    Nama
+                    <Required />
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="fulan"
@@ -128,7 +151,10 @@ const FormPengguna = ({
               name="NIP"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>NIP</FormLabel>
+                  <FormLabel>
+                    NIP
+                    <Required />
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="fulan"
@@ -145,7 +171,10 @@ const FormPengguna = ({
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>
+                    Email
+                    <Required />
+                  </FormLabel>
                   <FormControl>
                     <Input placeholder="fulan@pirsani.id" {...field} />
                   </FormControl>
@@ -192,13 +221,13 @@ const FormPengguna = ({
               )}
             />
 
-            <div>
-              {Object.keys(errors).map((key) => (
-                <p key={key} style={{ color: "red" }}>
-                  {errors[key as keyof typeof errors]?.message}
-                </p>
-              ))}
-            </div>
+            {hasErrors && (
+              <div className="bg-red-500 text-white mt-4 p-2">
+                {Object.keys(errors).map((key) => (
+                  <p key={key}>{errors[key as keyof typeof errors]?.message}</p>
+                ))}
+              </div>
+            )}
 
             <div
               className={cn(

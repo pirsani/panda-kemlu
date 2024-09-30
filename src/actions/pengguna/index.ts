@@ -11,7 +11,7 @@ import { ZodError } from "zod";
 // pada prinsipnya, Satker anggaran adalah unit kerja dalam organisasi yang memiliki anggaran
 
 export interface PenggunaWithRoles extends Omit<Pengguna, "password"> {
-  userRole: { role: { id: string; name: string } }[];
+  userRole: UserRole[];
   organisasi: {
     id: string;
     nama: string;
@@ -75,6 +75,10 @@ export const getOptionsPengguna = async () => {
   return optionsPengguna;
 };
 
+interface UserRole {
+  roleId: string;
+  userId?: string;
+}
 export const simpanDataPengguna = async (
   data: ZPengguna
 ): Promise<ActionResponse<Pengguna>> => {
@@ -95,18 +99,62 @@ export const simpanDataPengguna = async (
       delete parsed.password;
     }
 
-    console.log("parsed", parsed);
+    const { roles, ...userWithoutRoles } = parsed;
+    // create array role object
+    const objRoles: UserRole[] = (roles ?? []).map((roleId) => {
+      return {
+        roleId,
+      };
+    });
+
+    let rolesToRemove: UserRole[] = [];
+    let rolesToAdd: UserRole[] = [];
+
+    if (data.id) {
+      // Fetch existing roles
+      const existingRoles = await dbHonorarium.userRole.findMany({
+        where: {
+          userId: data.id,
+        },
+      });
+      // Compare existing roles with new roles
+      rolesToRemove = existingRoles.filter(
+        (er) => !objRoles.some((r) => r.roleId === er.roleId)
+      );
+      rolesToAdd = objRoles.filter(
+        (r) => !existingRoles.some((er) => er.roleId === r.roleId)
+      );
+    } else {
+      rolesToAdd = objRoles;
+    }
+
+    console.log("parsed", userWithoutRoles);
     const penggunaUpsert = await dbHonorarium.user.upsert({
       where: {
-        id: parsed.id || "falback-id",
+        id: userWithoutRoles.id || "falback-id",
       },
       create: {
-        ...parsed,
+        ...userWithoutRoles,
         createdBy: "admin",
+        userRole: {
+          createMany: {
+            data: rolesToAdd,
+          },
+        },
       },
       update: {
-        ...parsed,
+        ...userWithoutRoles,
         updatedBy: "admin",
+        userRole: {
+          deleteMany: {
+            roleId: {
+              in: rolesToRemove.map((r) => r.roleId),
+            },
+          },
+          createMany: {
+            data: rolesToAdd,
+          },
+        },
       },
     });
     console.log("sesudah", penggunaUpsert);
