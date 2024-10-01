@@ -1,6 +1,6 @@
 import { dbHonorarium } from "@/lib/db-honorarium";
 import { es, faker } from "@faker-js/faker";
-import { LOKASI, Provinsi } from "@prisma-honorarium/client";
+import { LOKASI, Organisasi, Provinsi } from "@prisma-honorarium/client";
 import bcrypt from "bcryptjs"; // Import bcrypt for password hashing and comparison
 import csv from "csv-parser";
 import { tr } from "date-fns/locale";
@@ -44,7 +44,7 @@ const seedPermission = async (): Promise<void> => {
   });
 };
 
-interface unitKerja {
+interface UnitKerjaCsvColumns {
   nama: string;
   singkatan: string;
   isSatkerAnggaran: boolean;
@@ -52,8 +52,10 @@ interface unitKerja {
   indukOrganisasiId: string;
 }
 
-const seedUnitKerja = async (): Promise<void> => {
+const seedUnitKerja = async (): Promise<Organisasi[]> => {
   console.log("set Kemlu");
+
+  const unitKerja: Organisasi[] = [];
 
   await dbHonorarium.organisasi.create({
     data: {
@@ -65,7 +67,7 @@ const seedUnitKerja = async (): Promise<void> => {
   });
 
   console.log("Seeding unit kerja data");
-  const results: unitKerja[] = [];
+  const results: UnitKerjaCsvColumns[] = [];
   const csvPath = "docs/data-referensi/unit-kerja.csv";
   const unitKerjaDataPath = path.resolve(process.cwd(), csvPath);
   return new Promise((resolve, reject) => {
@@ -76,7 +78,7 @@ const seedUnitKerja = async (): Promise<void> => {
         try {
           for (const row of results) {
             //console.log(row);
-            await dbHonorarium.organisasi.create({
+            const newUnitKerja = await dbHonorarium.organisasi.create({
               data: {
                 nama: row.nama,
                 singkatan: row.singkatan,
@@ -87,9 +89,10 @@ const seedUnitKerja = async (): Promise<void> => {
                 createdAt: new Date(),
               },
             });
+            unitKerja.push(newUnitKerja);
           }
           console.log("Data seeded successfully");
-          resolve();
+          resolve(unitKerja);
         } catch (error) {
           reject(error);
         }
@@ -120,7 +123,7 @@ const seedNegara = async (): Promise<void> => {
       .on("end", async () => {
         try {
           for (const row of results) {
-            //console.log(row);
+            console.log("insert negara", row);
             await dbHonorarium.negara.create({
               data: {
                 id: row.id,
@@ -291,7 +294,7 @@ const deleteExisting = async (): Promise<void> => {
 async function main() {
   await deleteExisting();
   await seedPermission();
-  await seedUnitKerja();
+  const initialUnitKerja = await seedUnitKerja();
   await seedNegara();
   await seedProvinsi();
   await seedKota();
@@ -453,6 +456,12 @@ async function main() {
         email: "admin@super.id",
         organisasiId: "cm1n901tl0000w0u0zzwkdzw0",
       },
+      {
+        password: pass,
+        name: "admin.pusdiklat",
+        email: "admin.pusdiklat@pirsani.id",
+        organisasiId: initialUnitKerja[10].id,
+      },
     ],
   });
 
@@ -475,7 +484,8 @@ async function main() {
       lokasi: LOKASI.LUAR_KOTA,
       dokumenNodinMemoSk: "123456789.pdf",
       dokumenJadwal: "123456789.pdf",
-      //organisasiId: "1",
+      satkerId: initialUnitKerja[10].id,
+      unitKerjaId: initialUnitKerja[10].id,
       provinsiId: 18,
       status: "setup-kegiatan",
     },
@@ -491,7 +501,8 @@ async function main() {
       lokasi: LOKASI.LUAR_NEGERI,
       dokumenNodinMemoSk: "123456789.pdf",
       dokumenJadwal: "123456789.pdf",
-      //organisasiId: "1",
+      satkerId: initialUnitKerja[10].id,
+      unitKerjaId: initialUnitKerja[10].id,
       status: "setup-kegiatan",
     },
   });
@@ -506,7 +517,8 @@ async function main() {
       lokasi: LOKASI.DALAM_KOTA,
       dokumenNodinMemoSk: "123456789.pdf",
       dokumenJadwal: "123456789.pdf",
-      //organisasiId: "1",
+      satkerId: initialUnitKerja[10].id,
+      unitKerjaId: initialUnitKerja[10].id,
       status: "setup-kegiatan",
     },
   });

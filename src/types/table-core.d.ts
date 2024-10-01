@@ -18,5 +18,7 @@ declare module "@tanstack/react-table" {
     isCellEditable?: boolean;
     width?: string;
     className?: string;
+    hideOnExpand?: boolean;
+    showOnExpand?: boolean;
   }
 }

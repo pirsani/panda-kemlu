@@ -49,7 +49,7 @@ const UserButtonDropdown = ({ user }: IUserButtonProps) => (
         </AvatarFallback>
       </Avatar>
     </DropdownMenuTrigger>
-    <DropdownMenuContent>
+    <DropdownMenuContent className="mr-2">
       <DropdownMenuLabel>
         {user.name ?? user.email ?? "Unknown"}
       </DropdownMenuLabel>

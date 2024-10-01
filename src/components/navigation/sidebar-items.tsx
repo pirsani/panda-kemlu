@@ -3,6 +3,7 @@ import useToggleSidebar from "@/hooks/use-toggle-sidebar";
 import { cn } from "@/lib/utils";
 import { RouteItem } from "@/route";
 import {
+  Activity,
   AlertTriangle,
   Banknote,
   BookOpen,
@@ -24,9 +25,12 @@ import {
   LucideIcon,
   MapPinned,
   Milestone,
+  MonitorPause,
+  MonitorPlay,
   Settings,
   Settings2,
   Signature,
+  SquareActivity,
   Table,
   User,
   User2,
@@ -63,6 +67,10 @@ const iconMap: { [key: string]: LucideIcon } = {
   flag: Flag,
   "book-open": BookOpen,
   grid: Grid,
+  gauge: Gauge,
+  "monitor-pause": MonitorPause,
+  "monitor-play": MonitorPlay,
+  "square-activity": SquareActivity,
 };
 
 interface SidebarItemProps {

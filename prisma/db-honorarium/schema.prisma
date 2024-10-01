@@ -403,6 +403,10 @@ model Kegiatan {
   statusHonorarium    String?                @map("status_honorarium")
   statusUhDalamNegeri String?                @map("status_uh_dalam_negeri")
   statusUhLuarNegeri  String?                @map("status_uh_luar_negeri")
+  satkerId            String                 @map("satker_id")
+  satker              Organisasi             @relation(fields: [satkerId], references: [id], name: "satker_kegiatan")
+  unitKerjaId         String                 @map("unit_kerja_id")
+  unitKerja           Organisasi             @relation(fields: [unitKerjaId], references: [id], name: "unit_kerja_kegiatan")
   createdBy           String                 @map("created_by")
   creator             User                   @relation(fields: [createdBy], references: [id], name: "kegiatan_creator")
   createdAt           DateTime               @default(now()) @map("created_at")
@@ -723,7 +727,7 @@ model Provinsi {
 
 model Negara {
   id          String @id // ISO 3166-1 alpha-3 code
-  urutan      Int?   @default(autoincrement()) // menurut SBM
+  urutan      Int? // menurut SBM
   nama        String @map("nama")
   namaInggris String @map("nama_inggris")
   kodeAlpha2  String @unique @map("kode_alpha_2") // ISO 3166-1 alpha-2 code
@@ -781,6 +785,8 @@ model Organisasi {
   unitOrganisasiKelolaan Organisasi[]            @relation("satkerAnggaran")
   PejabatPerbendaharaan  PejabatPerbendaharaan[]
   User                   User[]
+  KegiatanSatker         Kegiatan[]              @relation("satker_kegiatan")
+  KegiatanUnitKerja      Kegiatan[]              @relation("unit_kerja_kegiatan")
 
   @@map("organisasi")
 }

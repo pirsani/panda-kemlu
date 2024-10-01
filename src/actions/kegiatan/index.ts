@@ -1,11 +1,24 @@
 "use server";
 
 import { dbHonorarium } from "@/lib/db-honorarium";
+import { Organisasi } from "@prisma-honorarium/client";
 
 import { Itinerary, Kegiatan, Provinsi } from "@prisma-honorarium/client";
 
-export const getKegiatan = async (kegiatan?: string) => {
-  const dataKegiatan = await dbHonorarium.kegiatan.findMany({});
+export interface KegiatanWithSatker extends Kegiatan {
+  satker: Organisasi;
+  unitKerja: Organisasi;
+}
+
+export const getKegiatan = async (
+  kegiatan?: string
+): Promise<KegiatanWithSatker[]> => {
+  const dataKegiatan = await dbHonorarium.kegiatan.findMany({
+    include: {
+      satker: true,
+      unitKerja: true,
+    },
+  });
   return dataKegiatan;
 };
 

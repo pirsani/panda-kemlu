@@ -9,8 +9,12 @@ declare module "next-auth" {
   interface User {
     id: string;
     nip?: string | null;
-    organisasiId?: string;
-    organisasiNama?: string;
+    unitKerjaId?: string | null; // ini basically adalah organisasiId
+    unitKerjaNama?: string | null;
+    satkerId?: string | null; // sedangkan ini adalah organisasiId terdekat yang merupakan satker anggaran
+    satkerNama?: string | null;
+    organisasiId?: string | null;
+    organisasiNama?: string | null;
     roles?: string[];
     permissions?: string[];
   }
@@ -24,8 +28,8 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     roles: string[];
-    organisasiId: string;
-    organisasiNama: string;
+    organisasiId?: string | null;
+    organisasiNama?: string | null;
     nip?: string | null;
     permissions?: string[];
   }

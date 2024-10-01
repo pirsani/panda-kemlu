@@ -12,12 +12,12 @@ export interface RouteItem {
 
 export const publicRoutes: RouteItem[] = [
   {
-    name: "home",
-    title: "Home",
-    href: "/",
-    icon: "home",
-    order: 1,
-    displayAsMenu: true,
+    name: "doc",
+    title: "Documentation",
+    href: "/doc",
+    icon: "key",
+    order: 2,
+    displayAsMenu: false,
   },
   {
     name: "login",
@@ -34,6 +34,33 @@ export const publicRoutes: RouteItem[] = [
     icon: "square-asterisk",
     order: 3,
     displayAsMenu: false,
+  },
+];
+
+export const dashboardRoutes: RouteItem[] = [
+  {
+    name: "dashboard",
+    title: "Dashboard",
+    href: "/dashboard",
+    icon: "gauge",
+    order: 0,
+    displayAsMenu: true,
+  },
+  {
+    name: "workbench",
+    title: "Workbench",
+    href: "/workbench",
+    icon: "square-activity",
+    order: 1,
+    displayAsMenu: true,
+  },
+  {
+    name: "pending",
+    title: "Pending Matters",
+    href: "/pending",
+    icon: "monitor-pause",
+    order: 1,
+    displayAsMenu: true,
   },
 ];
 

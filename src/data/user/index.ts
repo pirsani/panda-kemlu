@@ -6,6 +6,9 @@ export const getUser = async (email?: string) => {
     where: {
       email: email,
     },
+    include: {
+      organisasi: true,
+    },
   });
   return user;
 };
