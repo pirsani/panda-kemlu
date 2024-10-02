@@ -1,4 +1,13 @@
 "use client";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import useTahunAnggaranStore from "@/hooks/use-tahun-anggaran-store";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -20,25 +29,34 @@ const SelectTahunAnggaran = () => {
 
   // Check if tahunAnggaran is defined
   if (tahunAnggaran === undefined || tahunAnggaran === null) {
-    return <div>Loading...</div>; // Render a loading state or nothing
+    return (
+      <div className="bg-primary py-2 px-3 rounded-md text-white">tahun...</div>
+    ); // Render a loading state or nothing
   }
 
   return (
-    <select
-      value={tahunAnggaran ?? "2025"}
-      onChange={async (e) => {
-        await setTahunAnggaranYear(parseInt(e.target.value));
+    <Select
+      value={`${tahunAnggaran}`}
+      onValueChange={async (val) => {
+        await setTahunAnggaranYear(parseInt(val));
         router.refresh();
       }}
-      className="appearance-none p-2 mx-4 rounded-sm font-semibold text-white bg-primary pr-8"
     >
-      <option value="2024">2024</option>
-      <option value="2025">2025</option>
-      <option value="2026">2026</option>
-      <option value="2027">2027</option>
-      <option value="2028">2028</option>
-      <option value="2029">2029</option>
-    </select>
+      <SelectTrigger className="bg-primary text-white font-semibold gap-1">
+        <SelectValue placeholder="Tahun" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Tahun</SelectLabel>
+          <SelectItem value="2024">2024</SelectItem>
+          <SelectItem value="2025">2025</SelectItem>
+          <SelectItem value="2026">2026</SelectItem>
+          <SelectItem value="2027">2027</SelectItem>
+          <SelectItem value="2028">2028</SelectItem>
+          <SelectItem value="2029">2029</SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   );
 };
 
