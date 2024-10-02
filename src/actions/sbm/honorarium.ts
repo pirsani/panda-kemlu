@@ -1,4 +1,5 @@
 "use server";
+import { getTahunAnggaran as getTahunAnggranPilihan } from "@/actions/pengguna/preference";
 import { ActionResponse } from "@/actions/response";
 import { SbmHonorariumPlainObject } from "@/data/sbm-honorarium";
 import { dbHonorarium } from "@/lib/db-honorarium";
@@ -11,7 +12,12 @@ import { revalidatePath } from "next/cache";
 export type { SbmHonorariumPlainObject } from "@/data/sbm-honorarium";
 
 export const getSbmHonorarium = async (sbmHonorarium?: string) => {
-  const dataSbmHonorarium = await dbHonorarium.sbmHonorarium.findMany({});
+  const tahunAnggaran = await getTahunAnggranPilihan();
+  const dataSbmHonorarium = await dbHonorarium.sbmHonorarium.findMany({
+    where: {
+      tahun: tahunAnggaran,
+    },
+  });
   return dataSbmHonorarium;
 };
 

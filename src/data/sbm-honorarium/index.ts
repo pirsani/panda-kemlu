@@ -1,3 +1,4 @@
+import { getTahunAnggaran as getTahunAnggranPilihan } from "@/actions/pengguna/preference";
 import { dbHonorarium } from "@/lib/db-honorarium";
 import { SbmHonorarium } from "@prisma-honorarium/client";
 import Decimal from "decimal.js";
@@ -19,7 +20,12 @@ export type SbmHonorariumPlainObject = Omit<
 };
 
 const getReferensiSbmHonorarium = async () => {
+  const tahunAnggaran = await getTahunAnggranPilihan();
+
   const sbmHonorarium = await dbHonorarium.sbmHonorarium.findMany({
+    where: {
+      tahun: tahunAnggaran,
+    },
     orderBy: {
       tahun: "asc",
     },

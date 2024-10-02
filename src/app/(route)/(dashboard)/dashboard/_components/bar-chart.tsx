@@ -31,6 +31,14 @@ const getSoftColor = (): string => {
   return `rgba(${r}, ${g}, ${b}, 0.6)`; // 0.6 opacity for softness
 };
 
+// Heler function to generate hard color
+const getHardColor = (): string => {
+  const r = Math.floor(Math.random() * 255); // 0 to 255 for harder red
+  const g = Math.floor(Math.random() * 255); // 0 to 255 for harder green
+  const b = Math.floor(Math.random() * 255); // 0 to 255 for harder blue
+  return `rgba(${r}, ${g}, ${b}, 1)`; // 1 opacity for hardness
+};
+
 interface BarChartProps {
   labels: string[];
   values: number[];
@@ -39,7 +47,7 @@ interface BarChartProps {
 
 const BarChart: React.FC<BarChartProps> = ({ labels, values, label }) => {
   // Generate soft colors for each bar
-  const backgroundColors = values.map(() => getSoftColor());
+  const backgroundColors = values.map(() => getHardColor());
   const borderColors = backgroundColors.map((color) =>
     color.replace("0.6", "1")
   ); // Make border fully opaque
