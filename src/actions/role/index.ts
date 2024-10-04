@@ -3,9 +3,15 @@ import { ActionResponse } from "@/actions/response";
 import { dbHonorarium } from "@/lib/db-honorarium";
 import { CustomPrismaClientError } from "@/types/custom-prisma-client-error";
 import { Role as ZRole } from "@/zod/schemas/role";
+import { createId } from "@paralleldrive/cuid2";
 import { Role } from "@prisma-honorarium/client";
 import { revalidatePath } from "next/cache";
-
+import { Logger } from "tslog";
+import { getPrismaErrorResponse } from "../prisma-error-response";
+// Create a Logger instance with custom settings
+const logger = new Logger({
+  hideLogPositionForProduction: true,
+});
 // pada prinsipnya, Satker anggaran adalah unit kerja dalam organisasi yang memiliki anggaran
 
 export interface RoleWithPermissions extends Role {
@@ -17,7 +23,7 @@ export const getRoles = async (role?: string) => {
       rolePermission: true,
     },
   });
-  console.log("dataRole", dataRole);
+  logger.info("dataRole", dataRole);
   return dataRole;
 };
 
@@ -36,11 +42,8 @@ export const deleteRole = async (id: string): Promise<ActionResponse<Role>> => {
       data: deleted,
     };
   } catch (error) {
-    return {
-      success: false,
-      error: "Not implemented",
-      message: "Not implemented",
-    };
+    logger.error("Error deleting role:", error);
+    return getPrismaErrorResponse(error as Error);
   }
 };
 
@@ -103,7 +106,7 @@ export const simpanDataRole = async (
 
     const roleBaru = await dbHonorarium.role.upsert({
       where: {
-        id: data.id || "it-should-never-be-this",
+        id: data.id || createId(),
       },
       create: {
         ...roleWithoutPermission,
@@ -135,7 +138,7 @@ export const simpanDataRole = async (
       data: roleBaru,
     };
   } catch (error) {
-    console.error("Error saving role:", error);
+    logger.error("Error saving role:", error);
     return {
       success: false,
       error: "Not implemented",

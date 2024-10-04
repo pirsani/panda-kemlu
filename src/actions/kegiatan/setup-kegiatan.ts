@@ -9,12 +9,34 @@ import kegiatanSchema, { Kegiatan as ZKegiatan } from "@/zod/schemas/kegiatan";
 import { Kegiatan } from "@prisma-honorarium/client";
 import { format } from "date-fns";
 import { never } from "zod";
+import { getSessionPengguna } from "../pengguna";
 
 export const setupKegiatan = async (
   formData: FormData
 ): Promise<ActionResponse<Kegiatan>> => {
   let dataparsed: ZKegiatan;
   let dataPesertaDariExcel: ParseExcelResult;
+
+  // get satkerId and unitKerjaId from the user
+  const pengguna = await getSessionPengguna();
+  if (!pengguna) {
+    return {
+      success: false,
+      error: "E-UAuth-01",
+      message: "User not found",
+    };
+  }
+
+  if (!pengguna.data?.satkerId || !pengguna.data?.unitKerjaId) {
+    return {
+      success: false,
+      error: "E-UORG-01",
+      message: "User tidak mempunyai satkerId atau unitKerjaId",
+    };
+  }
+
+  const satkerId = pengguna.data.satkerId;
+  const unitKerjaId = pengguna.data.unitKerjaId;
 
   // step 1: parse the form data
   try {
@@ -46,7 +68,12 @@ export const setupKegiatan = async (
   try {
     const result = await dbHonorarium.$transaction(async (prisma) => {
       // Create the main kegiatan entry
-      const kegiatanBaru = await createKegiatan(prisma, dataparsed);
+      const kegiatanBaru = await createKegiatan(
+        prisma,
+        dataparsed,
+        satkerId,
+        unitKerjaId
+      );
       // insert peserta dari excel
       const peserta = await insertPesertaDariExcel(
         prisma,
@@ -154,7 +181,9 @@ async function parseDataPesertaDariExcel(dataparsed: ZKegiatan) {
 
 async function createKegiatan(
   prisma: Prisma.TransactionClient,
-  dataparsed: ZKegiatan
+  dataparsed: ZKegiatan,
+  satkerId: string,
+  unitKerjaId: string
 ) {
   return prisma.kegiatan.create({
     data: {
@@ -165,6 +194,8 @@ async function createKegiatan(
       lokasi: dataparsed.lokasi,
       dokumenNodinMemoSk: dataparsed.dokumenNodinMemoSk?.name!,
       dokumenJadwal: dataparsed.dokumenJadwal?.name!,
+      satkerId: satkerId,
+      unitKerjaId: unitKerjaId,
       createdBy: "admin",
       provinsiId: dataparsed.provinsi,
     },
@@ -173,7 +204,7 @@ async function createKegiatan(
 
 async function insertPesertaDariExcel(
   prisma: Prisma.TransactionClient,
-  kegiatanBaruId: number,
+  kegiatanBaruId: string,
   pesertaKegiatan: Record<string, any>[]
 ) {
   const pesertaBaru = await Promise.all(
@@ -208,7 +239,7 @@ async function insertPesertaDariExcel(
 
 async function insertDokumenSuratTugas(
   prisma: Prisma.TransactionClient,
-  kegiatanBaruId: number,
+  kegiatanBaruId: string,
   dataparsed: ZKegiatan
 ) {
   if (dataparsed.dokumenSuratTugas) {

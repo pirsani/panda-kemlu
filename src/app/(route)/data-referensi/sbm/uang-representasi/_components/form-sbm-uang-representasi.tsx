@@ -35,7 +35,7 @@ interface FormSbmUangRepresentasiProps {
 }
 const FormSbmUangRepresentasi = ({
   onCancel,
-  handleFormSubmitComplete,
+  handleFormSubmitComplete = () => {},
   className,
   sbmUangRepresentasi,
 }: FormSbmUangRepresentasiProps) => {
@@ -53,6 +53,12 @@ const FormSbmUangRepresentasi = ({
   const onSubmit = async (data: SbmUangRepresentasi) => {
     try {
       const kelas = await simpanDataSbmUangRepresentasi(data);
+      if (kelas.success) {
+        toast.success("Berhasil menyimpan data kelas");
+        handleFormSubmitComplete(true);
+      } else {
+        toast.error(kelas.message);
+      }
     } catch (error) {
       toast.error("Gagal menyimpan data kelas");
     }

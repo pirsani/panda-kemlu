@@ -6,6 +6,13 @@ import { Negara as ZNegara } from "@/zod/schemas/negara";
 import { Negara } from "@prisma-honorarium/client";
 import { revalidatePath } from "next/cache";
 
+import { createId } from "@paralleldrive/cuid2";
+import { Logger } from "tslog";
+// Create a Logger instance with custom settings
+const logger = new Logger({
+  hideLogPositionForProduction: true,
+});
+
 export const getNegara = async (negara?: string) => {
   const dataNegara = await dbHonorarium.negara.findMany({});
   return dataNegara;
@@ -51,7 +58,7 @@ export const updateDataNegara = async (
   try {
     const negaraUpdated = await dbHonorarium.negara.upsert({
       where: {
-        id: id,
+        id: id || createId(),
       },
       create: {
         ...data,
@@ -63,7 +70,7 @@ export const updateDataNegara = async (
         updatedBy: "admin",
       },
     });
-    console.log(negaraUpdated);
+    logger.info(negaraUpdated);
     revalidatePath("/data-referensi/negara");
     return {
       success: true,
@@ -96,7 +103,7 @@ export const deleteDataNegara = async (
     const customError = error as CustomPrismaClientError;
     switch (customError.code) {
       case "P2025":
-        console.error("Negara not found");
+        logger.error("Negara not found");
         return {
           success: false,
           error: "Negara not found",
@@ -105,7 +112,7 @@ export const deleteDataNegara = async (
         break;
 
       case "P2003":
-        console.error("Negara is being referenced by other data");
+        logger.error("Negara is being referenced by other data");
         return {
           success: false,
           error: "Negara is being referenced by other data",

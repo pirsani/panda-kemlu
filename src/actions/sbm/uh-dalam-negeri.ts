@@ -5,10 +5,16 @@ import { dbHonorarium } from "@/lib/db-honorarium";
 import { CustomPrismaClientError } from "@/types/custom-prisma-client-error";
 import { convertSpecialTypesToPlain } from "@/utils/convert-obj-to-plain";
 import { SbmUhDalamNegeri as ZSbmUhDalamNegeri } from "@/zod/schemas/sbm-uh-dalam-negeri";
+import { createId } from "@paralleldrive/cuid2";
 import { SbmUhDalamNegeri } from "@prisma-honorarium/client";
 import Decimal from "decimal.js";
 import { revalidatePath } from "next/cache";
+import { Logger } from "tslog";
 export type { SbmUhDalamNegeriPlainObject } from "@/data/sbm-uh-dalam-negeri";
+// Create a Logger instance with custom settings
+const logger = new Logger({
+  hideLogPositionForProduction: true,
+});
 
 export const getSbmUhDalamNegeri = async (sbmUhDalamNegeri?: string) => {
   const dataSbmUhDalamNegeri = await dbHonorarium.sbmUhDalamNegeri.findMany({});
@@ -46,7 +52,7 @@ export const updateDataSbmUhDalamNegeri = async (
   try {
     const sbmUhDalamNegeriBaru = await dbHonorarium.sbmUhDalamNegeri.upsert({
       where: {
-        id: id,
+        id: id || createId(), // fallback to create new data if id is not provided
       },
       create: {
         ...data,
@@ -62,7 +68,7 @@ export const updateDataSbmUhDalamNegeri = async (
       convertSpecialTypesToPlain<SbmUhDalamNegeriPlainObject>(
         sbmUhDalamNegeriBaru
       );
-    //console.log("[PLAIN OBJECT]", plainObject);
+    //logger.info("[PLAIN OBJECT]", plainObject);
     revalidatePath("/data-referensi/sbm/uh-dalam-negeri");
     return {
       success: true,
@@ -97,7 +103,7 @@ export const deleteDataSbmUhDalamNegeri = async (
     const customError = error as CustomPrismaClientError;
     switch (customError.code) {
       case "P2025":
-        console.error("Sbm UHDalam Negeri not found");
+        logger.error("Sbm UHDalam Negeri not found");
         return {
           success: false,
           error: "Sbm UHDalam Negeri not found",
@@ -106,7 +112,7 @@ export const deleteDataSbmUhDalamNegeri = async (
         break;
 
       case "P2003":
-        console.error("Sbm UHDalam Negeri is being referenced by other data");
+        logger.error("Sbm UHDalam Negeri is being referenced by other data");
         return {
           success: false,
           error: "Sbm UHDalam Negeri is being referenced by other data",

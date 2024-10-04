@@ -6,6 +6,13 @@ import { Materi as ZMateri } from "@/zod/schemas/materi";
 import { Materi } from "@prisma-honorarium/client";
 import { revalidatePath } from "next/cache";
 
+import { createId } from "@paralleldrive/cuid2";
+import { Logger } from "tslog";
+// Create a Logger instance with custom settings
+const logger = new Logger({
+  hideLogPositionForProduction: true,
+});
+
 export const getMateri = async (materi?: string) => {
   const dataMateri = await dbHonorarium.materi.findMany({
     orderBy: {
@@ -31,6 +38,7 @@ export const simpanDataMateri = async (
       data: materiBaru,
     };
   } catch (error) {
+    logger.error("error", error);
     return {
       success: false,
       error: "Not implemented",
@@ -41,12 +49,12 @@ export const simpanDataMateri = async (
 
 export const updateDataMateri = async (
   data: ZMateri,
-  id: number
+  id: string
 ): Promise<ActionResponse<Materi>> => {
   try {
     const materiBaru = await dbHonorarium.materi.upsert({
       where: {
-        id: id,
+        id: id || createId(),
       },
       create: {
         ...data,
@@ -72,7 +80,7 @@ export const updateDataMateri = async (
 };
 
 export const deleteDataMateri = async (
-  id: number
+  id: string
 ): Promise<ActionResponse<Materi>> => {
   try {
     const deleted = await dbHonorarium.materi.delete({
@@ -86,6 +94,7 @@ export const deleteDataMateri = async (
       data: deleted,
     };
   } catch (error) {
+    logger.error("error", error);
     const customError = error as CustomPrismaClientError;
     switch (customError.code) {
       case "P2025":

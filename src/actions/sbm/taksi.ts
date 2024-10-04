@@ -5,10 +5,16 @@ import { dbHonorarium } from "@/lib/db-honorarium";
 import { CustomPrismaClientError } from "@/types/custom-prisma-client-error";
 import { convertSpecialTypesToPlain } from "@/utils/convert-obj-to-plain";
 import { SbmTaksi as ZSbmTaksi } from "@/zod/schemas/sbm-taksi";
+import { createId } from "@paralleldrive/cuid2";
 import { SbmTaksi } from "@prisma-honorarium/client";
 import Decimal from "decimal.js";
 import { revalidatePath } from "next/cache";
+import { Logger } from "tslog";
 export type { SbmTaksiPlainObject } from "@/data/sbm-taksi";
+// Create a Logger instance with custom settings
+const logger = new Logger({
+  hideLogPositionForProduction: true,
+});
 
 export const getSbmTaksi = async (sbmTaksi?: string) => {
   const dataSbmTaksi = await dbHonorarium.sbmTaksi.findMany({});
@@ -46,7 +52,7 @@ export const updateDataSbmTaksi = async (
   try {
     const sbmTaksiBaru = await dbHonorarium.sbmTaksi.upsert({
       where: {
-        id: id,
+        id: id || createId(), // fallback to create new data if id is not provided
       },
       create: {
         ...data,
@@ -60,7 +66,7 @@ export const updateDataSbmTaksi = async (
     //const plainObject = sbmTaksiBaru as SbmTaksiPlainObject;
     const plainObject =
       convertSpecialTypesToPlain<SbmTaksiPlainObject>(sbmTaksiBaru);
-    //console.log("[PLAIN OBJECT]", plainObject);
+    //logger.info("[PLAIN OBJECT]", plainObject);
     revalidatePath("/data-referensi/sbm/taksi");
     return {
       success: true,
@@ -95,7 +101,7 @@ export const deleteDataSbmTaksi = async (
     const customError = error as CustomPrismaClientError;
     switch (customError.code) {
       case "P2025":
-        console.error("Sbm Taksi not found");
+        logger.error("Sbm Taksi not found");
         return {
           success: false,
           error: "Sbm Taksi not found",
@@ -104,7 +110,7 @@ export const deleteDataSbmTaksi = async (
         break;
 
       case "P2003":
-        console.error("Sbm Taksi is being referenced by other data");
+        logger.error("Sbm Taksi is being referenced by other data");
         return {
           success: false,
           error: "Sbm Taksi is being referenced by other data",

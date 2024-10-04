@@ -16,7 +16,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 interface FormPengajuanGenerateRampunganProps {
-  kegiatanId: number | null;
+  kegiatanId: string | null;
   className?: string;
   handleSuccess?: (kegiatan: Kegiatan) => void;
 }

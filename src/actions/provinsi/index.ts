@@ -3,8 +3,14 @@ import { ActionResponse } from "@/actions/response";
 import { dbHonorarium } from "@/lib/db-honorarium";
 import { CustomPrismaClientError } from "@/types/custom-prisma-client-error";
 import { Provinsi as ZProvinsi } from "@/zod/schemas/provinsi";
+import { createId } from "@paralleldrive/cuid2";
 import { Provinsi } from "@prisma-honorarium/client";
 import { revalidatePath } from "next/cache";
+import { Logger } from "tslog";
+// Create a Logger instance with custom settings
+const logger = new Logger({
+  hideLogPositionForProduction: true,
+});
 
 export const getProvinsi = async (provinsi?: string) => {
   const dataProvinsi = await dbHonorarium.provinsi.findMany({});
@@ -22,7 +28,7 @@ export const simpanDataProvinsi = async (
         createdBy: "admin",
       },
     });
-    console.log(provinsiBaru);
+    logger.info(provinsiBaru);
     revalidatePath("/data-referensi/provinsi");
     return {
       success: true,
@@ -47,12 +53,12 @@ export const simpanDataProvinsi = async (
 
 export const updateDataProvinsi = async (
   data: ZProvinsi,
-  id: number
+  id: string
 ): Promise<ActionResponse<Provinsi>> => {
   try {
     const provinsiUpdated = await dbHonorarium.provinsi.upsert({
       where: {
-        id: id,
+        id: id || createId(),
       },
       create: {
         ...data,
@@ -64,7 +70,7 @@ export const updateDataProvinsi = async (
         updatedBy: "admin",
       },
     });
-    console.log(provinsiUpdated);
+    logger.info(provinsiUpdated);
     revalidatePath("/data-referensi/provinsi");
     return {
       success: true,
@@ -80,7 +86,7 @@ export const updateDataProvinsi = async (
 };
 
 export const deleteDataProvinsi = async (
-  id: number
+  id: string
 ): Promise<ActionResponse<Provinsi>> => {
   try {
     const deleted = await dbHonorarium.provinsi.delete({
@@ -97,7 +103,7 @@ export const deleteDataProvinsi = async (
     const customError = error as CustomPrismaClientError;
     switch (customError.code) {
       case "P2025":
-        console.error("Provinsi not found");
+        logger.error("Provinsi not found");
         return {
           success: false,
           error: "Provinsi not found",
@@ -106,7 +112,7 @@ export const deleteDataProvinsi = async (
         break;
 
       case "P2003":
-        console.error("Provinsi is being referenced by other data");
+        logger.error("Provinsi is being referenced by other data");
         return {
           success: false,
           error: "Provinsi is being referenced by other data",

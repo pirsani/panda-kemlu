@@ -144,6 +144,7 @@ async function saveDataSbmUhDalamNegeriToDatabase(
   try {
     const sbmUhDalamNegeri: SbmUhDalamNegeri[] = data.map((row) => {
       const mappedData = mapColumnExcelToField(row, columnsMap);
+      mappedData.provinsiId = mappedData.provinsiId.toString();
       mappedData.createdBy = createdBy;
       mappedData.id =
         mappedData.nomor.toString() + "-" + mappedData.tahun.toString();

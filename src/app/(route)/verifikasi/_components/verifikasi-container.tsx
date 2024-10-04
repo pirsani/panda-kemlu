@@ -15,11 +15,11 @@ const SelectKegiatan = dynamic(
 );
 
 const VerifikasiContainer = () => {
-  const [kegiatanId, setKegiatanId] = useState<number | null>(null);
+  const [kegiatanId, setKegiatanId] = useState<string | null>(null);
   const [kegiatan, setKegiatan] = useState<Kegiatan | null>(null);
   const { fileUrl, isPreviewHidden } = useFileStore();
 
-  const handleKegiatanChange = (value: number | null) => {
+  const handleKegiatanChange = (value: string | null) => {
     console.log(value);
     setKegiatanId(value); // after this set, it will trigger re-render PreviewKegiatan
   };

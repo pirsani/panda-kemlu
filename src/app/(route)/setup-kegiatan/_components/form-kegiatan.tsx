@@ -44,7 +44,7 @@ const SelectSbmProvinsi = dynamic(() => import("./select-sbm-provinsi"), {
 type FormValues<T> = T extends true ? KegiatanEditMode : Kegiatan;
 
 interface FormKegiatanProps {
-  editId?: number | null;
+  editId?: string | null;
 }
 
 export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
@@ -55,7 +55,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
     defaultValues: {
       nama: "",
       lokasi: LOKASI.DALAM_KOTA, // Default value for lokasi atau nantinya bisa diisi dari data yang sudah ada klo mode edit
-      provinsi: 31, // Default value for provinsi atau nantinya bisa diisi dari data yang sudah ada klo mode edit
+      provinsi: "31", // Default value for provinsi atau nantinya bisa diisi dari data yang sudah ada klo mode edit
       dokumenSuratTugas: undefined,
       dokumenJadwal: undefined,
       dokumenNodinMemoSk: undefined,

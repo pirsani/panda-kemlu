@@ -6,10 +6,16 @@ import { dbHonorarium } from "@/lib/db-honorarium";
 import { CustomPrismaClientError } from "@/types/custom-prisma-client-error";
 import { convertSpecialTypesToPlain } from "@/utils/convert-obj-to-plain";
 import { SbmHonorarium as ZSbmHonorarium } from "@/zod/schemas/sbm-honorarium";
+import { createId } from "@paralleldrive/cuid2";
 import { SbmHonorarium } from "@prisma-honorarium/client";
 import Decimal from "decimal.js";
 import { revalidatePath } from "next/cache";
+import { Logger } from "tslog";
 export type { SbmHonorariumPlainObject } from "@/data/sbm-honorarium";
+// Create a Logger instance with custom settings
+const logger = new Logger({
+  hideLogPositionForProduction: true,
+});
 
 export const getSbmHonorarium = async (sbmHonorarium?: string) => {
   const tahunAnggaran = await getTahunAnggranPilihan();
@@ -47,12 +53,12 @@ export const simpanDataSbmHonorarium = async (
 
 export const updateDataSbmHonorarium = async (
   data: ZSbmHonorarium,
-  id: number
+  id: string
 ): Promise<ActionResponse<SbmHonorariumPlainObject>> => {
   try {
     const sbmHonorariumBaru = await dbHonorarium.sbmHonorarium.upsert({
       where: {
-        id: id,
+        id: id || createId(), // fallback to create new data if id is not provided
       },
       create: {
         ...data,
@@ -66,7 +72,7 @@ export const updateDataSbmHonorarium = async (
     //const plainObject = sbmHonorariumBaru as SbmHonorariumPlainObject;
     const plainObject =
       convertSpecialTypesToPlain<SbmHonorariumPlainObject>(sbmHonorariumBaru);
-    //console.log("[PLAIN OBJECT]", plainObject);
+    //logger.info("[PLAIN OBJECT]", plainObject);
     revalidatePath("/data-referensi/sbm/honorarium");
     return {
       success: true,
@@ -82,7 +88,7 @@ export const updateDataSbmHonorarium = async (
 };
 
 export const deleteDataSbmHonorarium = async (
-  id: number
+  id: string
 ): Promise<ActionResponse<SbmHonorariumPlainObject>> => {
   try {
     const deleted = await dbHonorarium.sbmHonorarium.delete({
@@ -101,7 +107,7 @@ export const deleteDataSbmHonorarium = async (
     const customError = error as CustomPrismaClientError;
     switch (customError.code) {
       case "P2025":
-        console.error("Sbm Uang Representasi not found");
+        logger.error("Sbm Uang Representasi not found");
         return {
           success: false,
           error: "Sbm Uang Representasi not found",
@@ -110,9 +116,7 @@ export const deleteDataSbmHonorarium = async (
         break;
 
       case "P2003":
-        console.error(
-          "Sbm Uang Representasi is being referenced by other data"
-        );
+        logger.error("Sbm Uang Representasi is being referenced by other data");
         return {
           success: false,
           error: "Sbm Uang Representasi is being referenced by other data",

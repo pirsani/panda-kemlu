@@ -36,7 +36,7 @@ export const baseKegiatanSchema = z.object({
   tanggalMulai: tanggalSchema,
   tanggalSelesai: tanggalSchema,
   lokasi: LokasiEnum, // Use the Zod enum schema for lokasi
-  provinsi: z.number(),
+  provinsi: z.string(),
   dokumenNodinMemoSk: fileSchema({ required: true }),
   dokumenJadwal: fileSchema({ required: true }),
   dokumenSuratTugas: z.union([

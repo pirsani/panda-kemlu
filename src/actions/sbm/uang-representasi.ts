@@ -1,10 +1,19 @@
 "use server";
 import { ActionResponse } from "@/actions/response";
+import { sbmUangRepresentasiWithPejabat } from "@/data/sbm-uang-representasi";
 import { dbHonorarium } from "@/lib/db-honorarium";
 import { CustomPrismaClientError } from "@/types/custom-prisma-client-error";
 import { SbmUangRepresentasi as ZSbmUangRepresentasi } from "@/zod/schemas/sbm-uang-representasi";
+import { createId } from "@paralleldrive/cuid2";
 import { SbmUangRepresentasi } from "@prisma-honorarium/client";
 import { revalidatePath } from "next/cache";
+import { Logger } from "tslog";
+import { getPrismaErrorResponse } from "../prisma-error-response";
+export type { sbmUangRepresentasiWithPejabat } from "@/data/sbm-uang-representasi";
+// Create a Logger instance with custom settings
+const logger = new Logger({
+  hideLogPositionForProduction: true,
+});
 
 export const simpanDataSbmUangRepresentasi = async (
   data: ZSbmUangRepresentasi
@@ -23,23 +32,20 @@ export const simpanDataSbmUangRepresentasi = async (
       data: sbmUangRepresentasiBaru,
     };
   } catch (error) {
-    return {
-      success: false,
-      error: "Not implemented",
-      message: "Not implemented",
-    };
+    logger.error(error);
+    return getPrismaErrorResponse(error as Error, "SBM Uang Representasi");
   }
 };
 
 export const updateDataSbmUangRepresentasi = async (
   data: ZSbmUangRepresentasi,
-  id: number
+  id: string
 ): Promise<ActionResponse<SbmUangRepresentasi>> => {
   try {
     const sbmUangRepresentasiBaru =
       await dbHonorarium.sbmUangRepresentasi.upsert({
         where: {
-          id: id,
+          id: id || createId(), // fallback to create new data if id is not provided
         },
         create: {
           ...data,
@@ -56,6 +62,7 @@ export const updateDataSbmUangRepresentasi = async (
       data: sbmUangRepresentasiBaru,
     };
   } catch (error) {
+    logger.error(error);
     return {
       success: false,
       error: "Not implemented",
@@ -65,7 +72,7 @@ export const updateDataSbmUangRepresentasi = async (
 };
 
 export const deleteDataSbmUangRepresentasi = async (
-  id: number
+  id: string
 ): Promise<ActionResponse<SbmUangRepresentasi>> => {
   try {
     const deleted = await dbHonorarium.sbmUangRepresentasi.delete({
@@ -82,7 +89,7 @@ export const deleteDataSbmUangRepresentasi = async (
     const customError = error as CustomPrismaClientError;
     switch (customError.code) {
       case "P2025":
-        console.error("Sbm Uang Representasi not found");
+        logger.error("Sbm Uang Representasi not found");
         return {
           success: false,
           error: "Sbm Uang Representasi not found",
@@ -91,9 +98,7 @@ export const deleteDataSbmUangRepresentasi = async (
         break;
 
       case "P2003":
-        console.error(
-          "Sbm Uang Representasi is being referenced by other data"
-        );
+        logger.error("Sbm Uang Representasi is being referenced by other data");
         return {
           success: false,
           error: "Sbm Uang Representasi is being referenced by other data",

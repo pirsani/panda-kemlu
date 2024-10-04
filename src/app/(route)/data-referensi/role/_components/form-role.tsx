@@ -4,6 +4,7 @@ import { simpanDataRole } from "@/actions/role";
 import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
 
+import CummulativeErrors from "@/components/form/cummulative-error";
 import SelectPermissions from "@/components/form/select-permissions";
 import {
   default as SelectRole,
@@ -83,7 +84,7 @@ const FormRole = ({
                 <FormItem>
                   <FormLabel>Nama Role</FormLabel>
                   <FormControl>
-                    <Input placeholder="Dirjen A....." {...field} />
+                    <Input placeholder="pelaksana" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -109,11 +110,7 @@ const FormRole = ({
             />
 
             <div>
-              {Object.keys(errors).map((key) => (
-                <p key={key} style={{ color: "red" }}>
-                  {errors[key as keyof typeof errors]?.message}
-                </p>
-              ))}
+              <CummulativeErrors errors={errors} />
             </div>
 
             <div

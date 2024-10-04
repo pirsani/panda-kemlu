@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs"; // Import bcrypt for password hashing and comparison
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { getNearestSatkerAnggaran } from "./data/organisasi";
 import { getUser } from "./data/user";
 import { UncomplexLoginSchema } from "./zod/schemas/login";
 
@@ -51,12 +52,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           // model user yang diharapkan oleh next-auth lihat referensi di bawah
           // https://authjs.dev/getting-started/adapters/prisma
           // kemudian sesuaikan dengan model user yang ada di aplikasi dengan memodifikasi `src/next-auth.d.ts`
+
+          // get Nearest Satker Anggaran
+          let satkerAnggaran = null;
+          if (user.organisasiId) {
+            satkerAnggaran = await getNearestSatkerAnggaran(user.organisasiId);
+          }
+
           return {
             ...user,
             //organisasiId: "pusdiklat", // TODO contoh unit kerja id nanti diambil dari user.organisasiId
             //organisasiNama: user.organisasi?.nama, // TODO contoh unit kerja nama nanti diambil dari user.organisasiNama
             unitKerjaId: user.organisasiId,
             unitKerjaNama: user.organisasi?.nama,
+            satkerId: satkerAnggaran?.id,
+            satkerNama: satkerAnggaran?.nama,
           };
         }
         return null;
@@ -83,8 +93,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.user.organisasiNama = token.organisasiNama as string;
       session.user.unitKerjaId = token.unitKerjaId as string;
       session.user.unitKerjaNama = token.unitKerjaNama as string;
-      session.user.satkerId = token.satkerId as string;
-      session.user.satkerNama = token.satkerNama as string;
+      // session.user.satkerId = token.satkerId as string;
+      // session.user.satkerNama = token.satkerNama as string;
       session.user.roles = token.roles as string[];
       session.user.permissions = token.permissions as string[];
       return session;
@@ -101,8 +111,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.organisasiNama = user.organisasiNama;
         token.unitKerjaId = user.unitKerjaId;
         token.unitKerjaNama = user.unitKerjaNama;
-        token.satkerId = user.satkerId;
-        token.satkerNama = user.satkerNama;
+        // token.satkerId = user.satkerId;
+        // token.satkerNama = user.satkerNama;
         token.roles = user.roles;
         token.permissions = user.permissions;
       }

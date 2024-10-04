@@ -32,7 +32,7 @@ type FormValues<T> = T extends true
   : DokumenUhDalamNegeri;
 
 interface UhDalamNegeriContainerProps {
-  kegiatanId: number;
+  kegiatanId: string;
   editId?: number | null;
 }
 const UhDalamNegeriContainer = ({

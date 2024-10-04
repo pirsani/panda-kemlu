@@ -1,5 +1,6 @@
 "use server";
 import { ActionResponse } from "@/actions/response";
+import { auth } from "@/auth";
 import { dbHonorarium } from "@/lib/db-honorarium";
 import { CustomPrismaClientError } from "@/types/custom-prisma-client-error";
 import { penggunaSchema, Pengguna as ZPengguna } from "@/zod/schemas/pengguna";
@@ -7,6 +8,13 @@ import { User as Pengguna } from "@prisma-honorarium/client";
 import bcrypt from "bcryptjs"; // Import bcrypt for password hashing and comparison
 import { revalidatePath } from "next/cache";
 import { ZodError } from "zod";
+
+import { createId } from "@paralleldrive/cuid2";
+import { Logger } from "tslog";
+// Create a Logger instance with custom settings
+const logger = new Logger({
+  hideLogPositionForProduction: true,
+});
 
 // pada prinsipnya, Satker anggaran adalah unit kerja dalam organisasi yang memiliki anggaran
 
@@ -82,7 +90,7 @@ interface UserRole {
 export const simpanDataPengguna = async (
   data: ZPengguna
 ): Promise<ActionResponse<Pengguna>> => {
-  console.log("sebelum", data);
+  //logger.info("sebelum", data);
   try {
     const parsed = penggunaSchema.parse(data);
 
@@ -128,10 +136,10 @@ export const simpanDataPengguna = async (
       rolesToAdd = objRoles;
     }
 
-    console.log("parsed", userWithoutRoles);
+    logger.info("parsed", userWithoutRoles);
     const penggunaUpsert = await dbHonorarium.user.upsert({
       where: {
-        id: userWithoutRoles.id || "falback-id",
+        id: userWithoutRoles.id || createId(),
       },
       create: {
         ...userWithoutRoles,
@@ -157,16 +165,16 @@ export const simpanDataPengguna = async (
         },
       },
     });
-    console.log("sesudah", penggunaUpsert);
+    logger.info("sesudah", penggunaUpsert);
     revalidatePath("/data-referensi/pengguna");
     return {
       success: true,
       data: penggunaUpsert,
     };
   } catch (error) {
-    console.error("Error parsing form data", error);
+    logger.error("Error parsing form data", error);
     if (error instanceof ZodError) {
-      console.error("[ZodError]", error.errors);
+      logger.error("[ZodError]", error.errors);
     } else {
       const customError = error as CustomPrismaClientError;
       if (customError.code === "P2002") {
@@ -176,7 +184,7 @@ export const simpanDataPengguna = async (
           message: "Pengguna yang sama sudah ada",
         };
       }
-      console.error("[customError]", customError.code, customError.message);
+      logger.error("[customError]", customError.code, customError.message);
     }
     return {
       success: false,
@@ -184,4 +192,20 @@ export const simpanDataPengguna = async (
       message: "Error parsing form data",
     };
   }
+};
+
+export const getSessionPengguna = async () => {
+  const session = await auth();
+  if (!session || !session.user || !session.user.id) {
+    return {
+      success: false,
+      message: "Not authenticated",
+      error: "Not authenticated",
+    };
+  }
+
+  return {
+    success: true,
+    data: session.user,
+  };
 };

@@ -25,7 +25,7 @@ const SelectKegiatan = dynamic(
 );
 
 const PengajuanContainer = () => {
-  const [kegiatanId, setKegiatanId] = useState<number | null>(null);
+  const [kegiatanId, setKegiatanId] = useState<string | null>(null);
   const [kegiatan, setKegiatan] = useState<Kegiatan | null>(null);
   const [riwayatProses, setRiwayatProses] = useState<RiwayatProses[]>([]);
   const [jenisPengajuan, setJenisPengajuan] = useState<JenisPengajuan | null>(
@@ -38,7 +38,7 @@ const PengajuanContainer = () => {
     setJenisPengajuan(jenis);
   };
 
-  const handleKegiatanChange = (value: number | null) => {
+  const handleKegiatanChange = (value: string | null) => {
     console.log(value);
     setJenisPengajuan(null);
     setKegiatanId(value); // after this set, it will trigger re-render PreviewKegiatan

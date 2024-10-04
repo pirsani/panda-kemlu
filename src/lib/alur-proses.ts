@@ -13,7 +13,7 @@ export interface Kegiatan {
 // Define the LogEntry interface for logging purposes
 interface LogEntry {
   id: number;
-  kegiatanId: number;
+  kegiatanId: string;
   langkahSekarang: string;
   langkahSelanjutnya: string | null;
   status: StatusLangkah;

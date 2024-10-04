@@ -14,12 +14,19 @@ import { revalidatePath } from "next/cache";
 import { basename, extname, join } from "path";
 import { ZodError } from "zod";
 
+import { createId } from "@paralleldrive/cuid2";
+import { Logger } from "tslog";
+// Create a Logger instance with custom settings
+const logger = new Logger({
+  hideLogPositionForProduction: true,
+});
+
 export const simpanNarasumber = async (
   formData: FormData
 ): Promise<ActionResponse<Narasumber>> => {
   // step 1: parse the form data
   const obj = formDataToObject(formData);
-  console.log("[parsedForm]", obj);
+  logger.info("[parsedForm]", obj);
 
   const userId = await getUserId();
   if (!userId) {
@@ -31,7 +38,7 @@ export const simpanNarasumber = async (
   }
 
   const permitted = await hasPermission(userId, "narasumber:create");
-  console.log("[permitted]", permitted);
+  logger.info("[permitted]", permitted);
 
   try {
     const data = narasumberSchema.parse(obj);
@@ -51,7 +58,7 @@ export const simpanNarasumber = async (
         fileName: uniqueFilename,
         directory: saveto,
       });
-      console.log("File saved at:", filePath);
+      logger.info("File saved at:", filePath);
       const savedFile = await logUploadedFile(
         uniqueFilename,
         file.name,
@@ -60,7 +67,7 @@ export const simpanNarasumber = async (
         fileType.mime,
         "admin"
       );
-      console.log("File saved to database:", savedFile);
+      logger.info("File saved to database:", savedFile);
 
       // log saved file to database
     }
@@ -81,9 +88,9 @@ export const simpanNarasumber = async (
     };
   } catch (error) {
     if (error instanceof ZodError) {
-      console.error("Validation failed:", error.errors);
+      logger.error("Validation failed:", error.errors);
     } else {
-      console.error("Unexpected error:", error);
+      logger.error("Unexpected error:", error);
     }
     const e = error as Error;
     return {
@@ -129,7 +136,7 @@ const saveDataToDatabase = async (data: Narasumber, byUser: string) => {
     //const result = await dbHonorarium.$transaction(async (prisma) => {
     const newNarasumber = await dbHonorarium.narasumber.upsert({
       where: {
-        id: data.id,
+        id: data.id || createId(),
       },
       update: { ...data, updatedBy: byUser },
       create: { ...data, createdBy: byUser },
@@ -141,10 +148,10 @@ const saveDataToDatabase = async (data: Narasumber, byUser: string) => {
   } catch (error) {
     const e = error as CustomPrismaClientError;
     if (e.code === "P2002") {
-      console.log("There is a unique constraint violation");
+      logger.info("There is a unique constraint violation");
       throw new Error("Narasumber dengan NIK yang sama sudah ada");
     }
-    console.error("Error saving data to database:", e);
+    logger.error("Error saving data to database:", e);
     throw new Error(e.message);
   }
 };
@@ -176,17 +183,17 @@ const updateDataToDatabase = async (
     const e = error as CustomPrismaClientError;
     switch (e.code) {
       case "P2002":
-        console.log("There is a unique constraint violation");
+        logger.info("There is a unique constraint violation");
         throw new Error("Narasumber dengan NIK yang sama sudah ada");
         break;
       case "P2025":
-        console.log("There is a foreign key constraint violation");
+        logger.info("There is a foreign key constraint violation");
         throw new Error("Narasumber tidak ditemukan");
         break;
       default:
         break;
     }
-    console.error("Error saving data to database:", e);
+    logger.error("Error saving data to database:", e);
     throw new Error(e.message);
   }
 };
@@ -232,7 +239,7 @@ export const deleteNarasumber = async (
     const e = error as CustomPrismaClientError;
     switch (e.code) {
       case "P2025":
-        console.error("Narasumber not found");
+        logger.error("Narasumber not found");
         return {
           success: false,
           error: "Narasumber not found",
@@ -241,7 +248,7 @@ export const deleteNarasumber = async (
         break;
 
       case "P2003":
-        console.error("Narasumber is being referenced by other data");
+        logger.error("Narasumber is being referenced by other data");
         return {
           success: false,
           error: "Narasumber is being referenced by other data",
@@ -253,7 +260,7 @@ export const deleteNarasumber = async (
         break;
     }
 
-    console.error("Error deleting narasumber:", error);
+    logger.error("Error deleting narasumber:", error);
     return {
       success: false,
       error: "Error deleting narasumber",

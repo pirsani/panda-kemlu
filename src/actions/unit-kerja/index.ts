@@ -3,8 +3,15 @@ import { ActionResponse } from "@/actions/response";
 import { dbHonorarium } from "@/lib/db-honorarium";
 import { CustomPrismaClientError } from "@/types/custom-prisma-client-error";
 import { UnitKerja as ZUnitKerja } from "@/zod/schemas/unit-kerja";
+import { createId } from "@paralleldrive/cuid2";
 import { Organisasi as UnitKerja } from "@prisma-honorarium/client";
 import { revalidatePath } from "next/cache";
+import { Logger } from "tslog";
+
+// Create a Logger instance with custom settings
+const logger = new Logger({
+  hideLogPositionForProduction: true,
+});
 
 export interface UnitKerjaWithInduk extends UnitKerja {
   indukOrganisasi: UnitKerja | null;
@@ -28,7 +35,7 @@ export const simpanDataUnitKerja = async (
   try {
     const unitKerjaBaru = await dbHonorarium.organisasi.upsert({
       where: {
-        id: data.id,
+        id: data.id || createId(), // fallback to create new data if id is not provided
       },
       create: {
         ...data,
@@ -45,6 +52,7 @@ export const simpanDataUnitKerja = async (
       data: unitKerjaBaru,
     };
   } catch (error) {
+    logger.error("error", error);
     return {
       success: false,
       error: "Not implemented",
@@ -60,7 +68,7 @@ export const updateDataUnitKerja = async (
   try {
     const unitKerjaBaru = await dbHonorarium.organisasi.upsert({
       where: {
-        id: id,
+        id: id || createId(),
       },
       create: {
         ...data,
@@ -103,7 +111,7 @@ export const deleteDataUnitKerja = async (
     const customError = error as CustomPrismaClientError;
     switch (customError.code) {
       case "P2025":
-        console.error("UnitKerja not found");
+        logger.error("UnitKerja not found");
         return {
           success: false,
           error: "UnitKerja not found",
@@ -112,7 +120,7 @@ export const deleteDataUnitKerja = async (
         break;
 
       case "P2003":
-        console.error("UnitKerja is being referenced by other data");
+        logger.error("UnitKerja is being referenced by other data");
         return {
           success: false,
           error: "UnitKerja is being referenced by other data",

@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { ActionResponse } from "../response";
 
 export const getStatusPengajuanGenerateRampungan = async (
-  kegiatanId: number
+  kegiatanId: string
 ) => {
   const existingRiwayatProses = await dbHonorarium.riwayatProses.findFirst({
     where: {
@@ -18,7 +18,7 @@ export const getStatusPengajuanGenerateRampungan = async (
   return existingRiwayatProses;
 };
 
-export const getRiwayatProses = async (kegiatanId: number) => {
+export const getRiwayatProses = async (kegiatanId: string) => {
   const riwayat = await dbHonorarium.riwayatProses.findMany({
     where: {
       kegiatanId,
@@ -28,7 +28,7 @@ export const getRiwayatProses = async (kegiatanId: number) => {
   return riwayat;
 };
 
-export const pengajuanGenerateRampungan = async (kegiatanId: number) => {
+export const pengajuanGenerateRampungan = async (kegiatanId: string) => {
   //jika sudah ada pengajuan generate rampungan, maka update status pengajuannya dan tanggal statusnya
 
   const updateStatusRampungan = await dbHonorarium.kegiatan.update({
@@ -63,7 +63,7 @@ export type StatusRampungan =
   | "ditolak"
   | "selesai";
 export const updateStatusRampungan = async (
-  kegiatanId: number,
+  kegiatanId: string,
   statusRampunganBaru: StatusRampungan
 ): Promise<ActionResponse<Kegiatan>> => {
   // TODO check permission disini untuk update status rampungan

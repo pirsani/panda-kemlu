@@ -4,7 +4,7 @@ import { dbHonorarium } from "@/lib/db-honorarium";
 import { PesertaKegiatan } from "@prisma-honorarium/client";
 
 const getPesertaKegiatanDalamNegeri = async (
-  kegiatanId: number
+  kegiatanId: string
 ): Promise<ActionResponse<PesertaKegiatan[]>> => {
   const data = await dbHonorarium.pesertaKegiatan.findMany({
     where: {

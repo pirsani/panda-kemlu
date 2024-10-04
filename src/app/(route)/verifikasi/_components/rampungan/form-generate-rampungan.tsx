@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Kegiatan } from "@prisma-honorarium/client";
 
 interface FormGenerateRampunganProps {
-  kegiatanId: number;
+  kegiatanId: string;
   handleSelesai?: (kegiatan: Kegiatan) => void;
   handleGenerate?: () => void;
 }

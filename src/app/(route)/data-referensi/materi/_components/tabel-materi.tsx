@@ -6,6 +6,7 @@ import {
 } from "@/actions/materi";
 import ConfirmDialog from "@/components/confirm-dialog";
 import { KolomAksi, TabelGeneric } from "@/components/tabel-generic";
+import { useSearchTerm } from "@/hooks/use-search-term";
 import { materiSchema, Materi as ZMateri } from "@/zod/schemas/materi";
 import { Materi } from "@prisma-honorarium/client";
 
@@ -33,6 +34,24 @@ export const TabelMateri = ({ data: initialData }: TabelMateriProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editableRowId, setEditableRowIndex] = useState<string | null>(null);
   const [originalData, setOriginalData] = useState<Materi | null>(null);
+  const { searchTerm } = useSearchTerm();
+
+  const filteredData = data.filter((row) => {
+    if (!searchTerm || searchTerm === "") return true;
+    const lowercasedSearchTerm = searchTerm.toLowerCase();
+    //const searchWords = lowercasedSearchTerm.split(" ").filter(Boolean);
+    const searchWords =
+      lowercasedSearchTerm
+        .match(/"[^"]+"|\S+/g)
+        ?.map((word) => word.replace(/"/g, "")) || [];
+
+    return searchWords.every(
+      (word) =>
+        row.nama.toLowerCase().includes(word) ||
+        row.kode?.toLowerCase().includes(word)
+    );
+  });
+
   const columns: ColumnDef<Materi>[] = [
     {
       id: "rowNumber",
@@ -158,7 +177,7 @@ export const TabelMateri = ({ data: initialData }: TabelMateriProps) => {
   return (
     <div>
       <TabelGeneric
-        data={data}
+        data={filteredData}
         columns={columns}
         frozenColumnCount={1}
         isEditing={isEditing}

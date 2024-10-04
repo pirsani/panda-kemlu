@@ -6,11 +6,16 @@ import {
   permissionSchema,
   Permission as ZPermission,
 } from "@/zod/schemas/permission";
+import { createId } from "@paralleldrive/cuid2";
 import { Permission } from "@prisma-honorarium/client";
 import bcrypt from "bcryptjs"; // Import bcrypt for password hashing and comparison
 import { revalidatePath } from "next/cache";
+import { Logger } from "tslog";
 import { ZodError } from "zod";
-
+// Create a Logger instance with custom settings
+const logger = new Logger({
+  hideLogPositionForProduction: true,
+});
 // pada prinsipnya, Satker anggaran adalah unit kerja dalam organisasi yang memiliki anggaran
 
 export const getPermission = async (permission?: string) => {
@@ -60,14 +65,14 @@ export const getOptionsPermission = async () => {
 export const simpanDataPermission = async (
   data: ZPermission
 ): Promise<ActionResponse<Permission>> => {
-  console.log("sebelum", data);
+  logger.info("sebelum", data);
   try {
     const parsed = permissionSchema.parse(data);
 
-    console.log("parsed", parsed);
+    logger.info("parsed", parsed);
     const permissionUpsert = await dbHonorarium.permission.upsert({
       where: {
-        id: parsed.id || "falback-id",
+        id: parsed.id || createId(),
       },
       create: {
         ...parsed,
@@ -78,16 +83,16 @@ export const simpanDataPermission = async (
         updatedBy: "admin",
       },
     });
-    console.log("sesudah", permissionUpsert);
+    logger.info("sesudah", permissionUpsert);
     revalidatePath("/data-referensi/permission");
     return {
       success: true,
       data: permissionUpsert,
     };
   } catch (error) {
-    console.error("Error parsing form data", error);
+    logger.error("Error parsing form data", error);
     if (error instanceof ZodError) {
-      console.error("[ZodError]", error.errors);
+      logger.error("[ZodError]", error.errors);
     } else {
       const customError = error as CustomPrismaClientError;
       if (customError.code === "P2002") {
@@ -97,7 +102,7 @@ export const simpanDataPermission = async (
           message: "Permission yang sama sudah ada",
         };
       }
-      console.error("[customError]", customError.code, customError.message);
+      logger.error("[customError]", customError.code, customError.message);
     }
     return {
       success: false,

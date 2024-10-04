@@ -15,7 +15,7 @@ const GeneratorRampungan = () => {
 // tiba dan dari sama untu dari[x] dan ke[x]
 // dar1 = ke6 adalah tempat kedudukan
 interface RampunganData {
-  kegiatanId: number;
+  kegiatanId: string;
   namaPpk: string;
   nipPpk: string;
 
@@ -52,7 +52,7 @@ interface RampunganData {
 }
 
 const getDataRampungan = async (
-  kegiatanId: number
+  kegiatanId: string
 ): Promise<RampunganData | null> => {
   const kegiatan = await getKegiatanById(kegiatanId);
 
@@ -151,11 +151,11 @@ const fillFormRampungan = async (rampunganData: RampunganData | null) => {
 export async function downloadDokumenRampungan(req: Request, slug: string[]) {
   // slug[0] is the document type, slug[1] is the kegiatanId
   // check if slug[1] is exist and is a number
-  if (!slug[1] || isNaN(parseInt(slug[1]))) {
+  if (!slug[1]) {
     return new NextResponse("Invalid request", { status: 400 });
   }
 
-  const kegiatanId = parseInt(slug[1]);
+  const kegiatanId = slug[1];
   //const kegiatan = await getKegiatanById(kegiatanId);
   const dataRampungan = await getDataRampungan(kegiatanId);
   return fillFormRampungan(dataRampungan);

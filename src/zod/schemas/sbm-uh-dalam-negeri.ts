@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const sbmUhDalamNegeriSchema = z.object({
-  provinsiId: z.coerce.number().int(),
+  provinsiId: z.string(),
   satuan: z.string().min(2).max(25),
   fullboard: z.coerce.number().int(),
   fulldayHalfday: z.coerce.number().int(),

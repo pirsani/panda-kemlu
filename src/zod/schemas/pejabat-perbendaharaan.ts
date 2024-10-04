@@ -7,7 +7,7 @@ import {
 import { tanggalSchema, tanggalSchemaOptional } from "./tanggal";
 
 export const pejabatPerbendaharaanSchema = z.object({
-  id: z.number().optional(),
+  id: z.string().optional(),
   NIK: z
     .string()
     .min(16, {

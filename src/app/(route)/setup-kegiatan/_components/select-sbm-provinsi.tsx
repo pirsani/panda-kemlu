@@ -5,12 +5,12 @@ import Select, { SingleValue } from "react-select";
 
 interface SelectSbmProvinsiProps {
   fullKey: string;
-  onChange: (value: number | null) => void;
-  value: number | null;
+  onChange: (value: string | null) => void;
+  value: string | null;
 }
 
 interface Option {
-  value: number;
+  value: string;
   label: string;
 }
 
@@ -20,7 +20,7 @@ const SelectSbmProvinsi = ({
   value,
 }: SelectSbmProvinsiProps) => {
   const [options, setOptions] = useState<Option[]>([]);
-  const [selectedValue, setSelectedValue] = useState<number | null>(value);
+  const [selectedValue, setSelectedValue] = useState<string | null>(value);
 
   useEffect(() => {
     const fetchOptions = async () => {

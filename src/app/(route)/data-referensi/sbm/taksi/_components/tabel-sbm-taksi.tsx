@@ -35,7 +35,7 @@ const data: SbmTaksiPlainObject[] = [];
 
 interface TabelSbmTaksiProps {
   data: SbmTaksiPlainObject[];
-  optionsProvinsi: { value: number; label: string }[];
+  optionsProvinsi: { value: string; label: string }[];
   frozenColumnCount?: number;
 }
 export const TabelSbmTaksi = ({

@@ -5,12 +5,12 @@ import Select, { SingleValue } from "react-select";
 
 interface SelectMateriProps {
   inputId: string;
-  onChange: (value: number | null) => void;
-  value: number | null;
+  onChange: (value: string | null) => void;
+  value: string | null;
 }
 
 interface Option {
-  value: number;
+  value: string;
   label: string;
 }
 

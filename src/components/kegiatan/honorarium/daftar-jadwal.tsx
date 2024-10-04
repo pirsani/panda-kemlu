@@ -13,7 +13,7 @@ import NarasumberListItem from "./narasumber-list-item";
 
 export type Proses = "pengajuan" | "verfikasi" | "pembayaran";
 interface DaftarJadwalProps {
-  kegiatanId: number;
+  kegiatanId: string;
   proses: Proses;
 }
 const DaftarJadwal = ({ kegiatanId, proses }: DaftarJadwalProps) => {

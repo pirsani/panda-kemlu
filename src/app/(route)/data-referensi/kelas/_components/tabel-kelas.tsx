@@ -7,6 +7,7 @@ import {
 } from "@/actions/kelas";
 import ConfirmDialog from "@/components/confirm-dialog";
 import { KolomAksi, TabelGeneric } from "@/components/tabel-generic";
+import { useSearchTerm } from "@/hooks/use-search-term";
 import { kelasSchema, Kelas as Zkelas } from "@/zod/schemas/kelas";
 import { Kelas } from "@prisma-honorarium/client";
 
@@ -28,7 +29,7 @@ import { ZodError } from "zod";
 
 interface TabelKelasProps {
   data: kelasWithKegiatan[];
-  optionsKegiatan: { value: number; label: string }[];
+  optionsKegiatan: { value: string; label: string }[];
 }
 export const TabelKelas = ({
   data: initialData,
@@ -40,6 +41,26 @@ export const TabelKelas = ({
   const [originalData, setOriginalData] = useState<kelasWithKegiatan | null>(
     null
   );
+
+  const { searchTerm } = useSearchTerm();
+
+  const filteredData = data.filter((row) => {
+    if (!searchTerm || searchTerm === "") return true;
+    const lowercasedSearchTerm = searchTerm.toLowerCase();
+    //const searchWords = lowercasedSearchTerm.split(" ").filter(Boolean);
+    const searchWords =
+      lowercasedSearchTerm
+        .match(/"[^"]+"|\S+/g)
+        ?.map((word) => word.replace(/"/g, "")) || [];
+
+    return searchWords.every(
+      (word) =>
+        row.nama.toLowerCase().includes(word) ||
+        row.kode?.toLowerCase().includes(word) ||
+        row.kegiatan.nama.toLowerCase().includes(word)
+    );
+  });
+
   const columns: ColumnDef<kelasWithKegiatan>[] = [
     {
       id: "rowNumber",
@@ -130,8 +151,6 @@ export const TabelKelas = ({
   const handleOnSave = async (row: kelasWithKegiatan) => {
     console.log("Save row:", row);
     // Implement your save logic here
-    //convert back kegiatanId as number
-    row.kegiatanId = Number(row.kegiatanId);
 
     try {
       const parsed = kelasSchema.parse(row);
@@ -178,7 +197,7 @@ export const TabelKelas = ({
   return (
     <div>
       <TabelGeneric
-        data={data}
+        data={filteredData}
         columns={columns}
         frozenColumnCount={1}
         isEditing={isEditing}

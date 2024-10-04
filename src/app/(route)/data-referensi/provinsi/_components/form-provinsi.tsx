@@ -34,7 +34,7 @@ const FormProvinsi = ({
   const form = useForm<Provinsi>({
     resolver: zodResolver(provinsiSchema),
     defaultValues: {
-      kode: 999,
+      kode: "999",
       nama: "",
       singkatan: "",
       urutan: 999,

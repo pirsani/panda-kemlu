@@ -180,9 +180,9 @@ const seedProvinsi = async (): Promise<void> => {
             //console.log(row);
             await dbHonorarium.provinsi.create({
               data: {
-                id: parseInt(row.id),
+                id: row.id,
                 tahun: parseInt(row.tahun || "2022"),
-                kode: parseInt(row.kode),
+                kode: row.kode,
                 nama: row.nama,
                 singkatan: row.nama_singkatan || null,
                 aktif: true,
@@ -225,8 +225,8 @@ const seedKota = async (): Promise<void> => {
             //console.log(row);
             await dbHonorarium.kota.create({
               data: {
-                id: parseInt(row.id),
-                provinsiId: parseInt(row.provinsi_id),
+                id: row.id,
+                provinsiId: row.provinsi_id,
                 nama: row.nama,
                 aktif: true,
                 createdBy: "init",
@@ -273,6 +273,7 @@ const deleteExisting = async (): Promise<void> => {
     await dbHonorarium.pangkatGolongan.deleteMany({});
     await dbHonorarium.sbmHonorarium.deleteMany({});
     await dbHonorarium.pmkAcuan.deleteMany({});
+    await dbHonorarium.userPreference.deleteMany({});
     await dbHonorarium.user.deleteMany({});
     await dbHonorarium.rolePermission.deleteMany({});
     await dbHonorarium.permission.deleteMany({});
@@ -486,7 +487,7 @@ async function main() {
       dokumenJadwal: "123456789.pdf",
       satkerId: initialUnitKerja[10].id,
       unitKerjaId: initialUnitKerja[10].id,
-      provinsiId: 18,
+      provinsiId: "18",
       status: "setup-kegiatan",
     },
   });

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { fileSchema } from "./file-schema";
 
 export const DokumenUhDalamNegeriSchema = z.object({
-  kegiatanId: z.coerce.number(),
+  kegiatanId: z.string(),
   laporanKegiatan: fileSchema({ required: true }),
   daftarHadir: fileSchema({ required: true }),
   dokumentasi: fileSchema({ required: true }),

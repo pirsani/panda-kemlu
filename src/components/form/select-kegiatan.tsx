@@ -6,13 +6,13 @@ import Select, { SingleValue } from "react-select";
 
 interface SelectKegiatanProps {
   inputId: string;
-  onChange?: (value: number | null) => void;
-  value?: number;
+  onChange?: (value: string | null) => void;
+  value?: string;
   className?: string;
 }
 
 interface Option {
-  value: number;
+  value: string;
   label: string;
 }
 

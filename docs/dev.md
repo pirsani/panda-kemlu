@@ -99,10 +99,8 @@ pnpm run prisma:generate
 
 ### install zustand for state management
 
+```sh
 pnpm add zustand
 pnpm add lodash
 pnpm add -D @types/lodash
-
-```
-
 ```

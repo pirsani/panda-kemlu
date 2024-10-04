@@ -15,7 +15,7 @@ const stringOrNumberToNumberOrNull = z
   .nullable();
 
 export const provinsiSchema = z.object({
-  kode: z.coerce.number().int(),
+  kode: z.string(),
   tahun: z.coerce.number().int().nullable().optional(), // tahun SK Mendagri
   nama: z
     .string()

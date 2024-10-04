@@ -33,7 +33,7 @@ export const getUser = async (): Promise<ActionResponse<string>> => {
 };
 
 export const deleteDataPejabatPerbendaharaan = async (
-  id: number
+  id: string
 ): Promise<ActionResponse<PejabatPerbendaharaan>> => {
   const user = await getUser();
   if (!user) {

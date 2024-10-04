@@ -38,7 +38,7 @@ const data: SbmUhDalamNegeriPlainObject[] = [];
 
 interface TabelSbmUhDalamNegeriProps {
   data: SbmUhDalamNegeriPlainObject[];
-  optionsProvinsi: { value: number; label: string }[];
+  optionsProvinsi: { value: string; label: string }[];
   frozenColumnCount?: number;
 }
 export const TabelSbmUhDalamNegeri = ({

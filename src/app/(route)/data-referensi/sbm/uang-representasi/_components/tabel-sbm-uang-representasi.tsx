@@ -156,8 +156,6 @@ export const TabelSbmUangRepresentasi = ({
   const handleOnSave = async (row: sbmUangRepresentasiWithPejabat) => {
     console.log("Save row:", row);
     // Implement your save logic here
-    //convert back kegiatanId as number
-    row.pejabatId = Number(row.pejabatId);
 
     try {
       const parsed = sbmUangRepresentasiSchema.parse(row);

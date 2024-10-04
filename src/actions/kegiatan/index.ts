@@ -27,7 +27,7 @@ export interface KegiatanWithDetail extends Kegiatan {
   provinsi: Provinsi;
 }
 
-export const getKegiatanById = async (id: number) => {
+export const getKegiatanById = async (id: string) => {
   const kegiatan = await dbHonorarium.kegiatan.findUnique({
     where: { id },
     include: {

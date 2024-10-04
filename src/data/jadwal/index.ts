@@ -20,7 +20,7 @@ export interface JadwalKelasNarasumber extends Jadwal {
   jadwalNarasumber: JadwalNarsum[];
 }
 export const getJadwalByKegiatanId = async (
-  kegiatanId: number
+  kegiatanId: string
 ): Promise<JadwalKelasNarasumber[]> => {
   const jadwal = await dbHonorarium.jadwal.findMany({
     where: {

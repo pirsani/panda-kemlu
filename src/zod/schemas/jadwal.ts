@@ -2,8 +2,8 @@ import { date, z } from "zod";
 import { fileSchema } from "./file-schema";
 
 export const jadwalSchema = z.object({
-  materiId: z.number(),
-  kelasId: z.number(),
+  materiId: z.string(),
+  kelasId: z.string(),
   narasumberIds: z.array(z.string().min(16).max(16)),
   tanggal: z.coerce.date(),
   dokumenDaftarHadir: fileSchema({ required: true }),

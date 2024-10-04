@@ -4,7 +4,7 @@ import { dbHonorarium } from "@/lib/db-honorarium";
 import Decimal from "decimal.js";
 
 export interface OptionSbm {
-  value: number;
+  value: string;
   label: string;
   besaran?: Decimal;
   satuan?: string;

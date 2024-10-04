@@ -25,6 +25,7 @@ const SelectTahunAnggaran = () => {
     if (!initialized) {
       initializeTahunAnggaran();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Check if tahunAnggaran is defined

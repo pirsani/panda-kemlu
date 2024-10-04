@@ -3,12 +3,18 @@ import { ActionResponse } from "@/actions/response";
 import { dbHonorarium } from "@/lib/db-honorarium";
 import { CustomPrismaClientError } from "@/types/custom-prisma-client-error";
 import { Kelas as ZKelas } from "@/zod/schemas/kelas";
+import { createId } from "@paralleldrive/cuid2";
 import { Kelas } from "@prisma-honorarium/client";
 import { revalidatePath } from "next/cache";
+import { Logger } from "tslog";
+// Create a Logger instance with custom settings
+const logger = new Logger({
+  hideLogPositionForProduction: true,
+});
 
 export interface kelasWithKegiatan extends Kelas {
   kegiatan: {
-    id: number;
+    id: string;
     nama: string;
   };
 }
@@ -47,12 +53,12 @@ export const simpanDataKelas = async (
 
 export const updateDataKelas = async (
   data: ZKelas,
-  id: number
+  id: string
 ): Promise<ActionResponse<Kelas>> => {
   try {
     const kelasBaru = await dbHonorarium.kelas.upsert({
       where: {
-        id: id,
+        id: id || createId(),
       },
       create: {
         ...data,
@@ -69,16 +75,17 @@ export const updateDataKelas = async (
       data: kelasBaru,
     };
   } catch (error) {
+    logger.error("updateDataKelas error:", error);
     return {
       success: false,
-      error: "Not implemented",
+      error: "E-KU-003",
       message: "Not implemented",
     };
   }
 };
 
 export const deleteDataKelas = async (
-  id: number
+  id: string
 ): Promise<ActionResponse<Kelas>> => {
   try {
     const deleted = await dbHonorarium.kelas.delete({
@@ -92,10 +99,11 @@ export const deleteDataKelas = async (
       data: deleted,
     };
   } catch (error) {
+    logger.error("error", error);
     const customError = error as CustomPrismaClientError;
     switch (customError.code) {
       case "P2025":
-        console.error("Kelas not found");
+        logger.error("Kelas not found");
         return {
           success: false,
           error: "Kelas not found",
@@ -104,7 +112,7 @@ export const deleteDataKelas = async (
         break;
 
       case "P2003":
-        console.error("Kelas is being referenced by other data");
+        logger.error("Kelas is being referenced by other data");
         return {
           success: false,
           error: "Kelas is being referenced by other data",
