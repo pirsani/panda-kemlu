@@ -6,7 +6,7 @@ import { fileSchema } from "./file-schema";
 const LokasiEnum = z.enum(["DALAM_KOTA", "LUAR_KOTA", "LUAR_NEGERI"]);
 
 // Custom validation function to check if the input is a valid date string
-const isValidDateString = (value: string) => {
+const isValidDateString = (value: string): boolean => {
   const parsedDate = parseISO(value);
   return isValid(parsedDate);
 };

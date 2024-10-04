@@ -29,8 +29,10 @@ import ItineraryContainer from "./itinerary-container";
 import PesertaContainer from "./peserta-container";
 //import SelectSbmProvinsi from "./select-sbm-provinsi";
 import setupKegiatan from "@/actions/kegiatan/setup-kegiatan";
+import CummulativeErrors from "@/components/form/cummulative-error";
 import SelectLokasi from "@/components/form/select-lokasi";
 import { LOKASI } from "@prisma-honorarium/client";
+import { toast } from "sonner";
 
 //import Select, { SingleValue } from "react-select";
 
@@ -113,14 +115,14 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
 
     const kegiatanBaru = await setupKegiatan(formData);
     if (kegiatanBaru.success) {
-      alert("Kegiatan berhasil disimpan");
+      toast.success("Kegiatan berhasil disimpan");
       //reset(); // reset the form
 
       // resetField("dokumenSuratTugas");
       // resetField("dokumenNodinMemoSk");
       // resetField("dokumenJadwal");
     } else {
-      alert(kegiatanBaru.error);
+      toast.error(kegiatanBaru.error);
     }
   };
 
@@ -355,6 +357,9 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
           )}
         />
         {/* <PesertaContainer fieldName="pesertaXls" /> */}
+
+        <CummulativeErrors errors={errors} />
+
         <div className="flex flex-row gap-4 w-full mt-12">
           <Button
             className="w-5/6 h-12 bg-blue-600 hover:bg-blue-700"

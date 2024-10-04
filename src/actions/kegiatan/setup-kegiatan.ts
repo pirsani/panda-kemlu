@@ -8,8 +8,13 @@ import { splitEmptyValues } from "@/utils/excel/split-empty-values";
 import kegiatanSchema, { Kegiatan as ZKegiatan } from "@/zod/schemas/kegiatan";
 import { Kegiatan } from "@prisma-honorarium/client";
 import { format } from "date-fns";
-import { never } from "zod";
+import { Logger } from "tslog";
+import { never, ZodError } from "zod";
 import { getSessionPengguna } from "../pengguna";
+// Create a Logger instance with custom settings
+const logger = new Logger({
+  hideLogPositionForProduction: true,
+});
 
 export const setupKegiatan = async (
   formData: FormData
@@ -19,7 +24,8 @@ export const setupKegiatan = async (
 
   // get satkerId and unitKerjaId from the user
   const pengguna = await getSessionPengguna();
-  if (!pengguna) {
+  logger.info("Pengguna", pengguna);
+  if (!pengguna.success) {
     return {
       success: false,
       error: "E-UAuth-01",
@@ -43,9 +49,11 @@ export const setupKegiatan = async (
     // parse the form data
     dataparsed = prepareDataFromClient(formData);
   } catch (error) {
+    logger.info("formData", formData);
+    logger.error("[Error parsing form data]", error);
     return {
       success: false,
-      error: "Error parsing form data",
+      error: "E-KEG-01",
       message: "Error parsing form data",
     };
   }
@@ -122,7 +130,7 @@ const prepareDataFromClient = (formData: FormData) => {
     });
 
     // reformat the provinsi dan tanggal karen ketika dikirim dari client berbentuk string
-    formDataObj["provinsi"] = parseInt(formDataObj["provinsi"]);
+    // formDataObj["provinsi"] = parseInt(formDataObj["provinsi"]);
     formDataObj["tanggalMulai"] = format(
       new Date(formDataObj["tanggalMulai"]),
       "yyyy-MM-dd"
@@ -135,8 +143,13 @@ const prepareDataFromClient = (formData: FormData) => {
     const dataparsed = kegiatanSchema.parse(formDataObj);
     return dataparsed;
   } catch (error) {
-    console.error("Error parsing form data:", error);
-    throw new Error("Error parsing form data");
+    if (error instanceof ZodError) {
+      logger.error("[ZodErrors]", error.errors);
+      error.errors.forEach((err) => {
+        logger.error("[ZodError]", err.message, "at path", err.path);
+      });
+    }
+    throw error;
   }
 };
 

@@ -196,6 +196,7 @@ export const simpanDataPengguna = async (
 
 export const getSessionPengguna = async () => {
   const session = await auth();
+  logger.info("session", session);
   if (!session || !session.user || !session.user.id) {
     return {
       success: false,
