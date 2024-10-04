@@ -1,5 +1,5 @@
 import setTahunAnggaran, {
-  getTahunAnggaran,
+  getTahunAnggranPilihan,
 } from "@/actions/pengguna/preference";
 import { create, StateCreator } from "zustand";
 import { persist, PersistOptions } from "zustand/middleware";
@@ -21,7 +21,7 @@ const createState: StateCreator<TahunAnggaranState> = (set) => ({
     await setTahunAnggaran(year);
   },
   initializeTahunAnggaran: async () => {
-    const tahunAnggaran = await getTahunAnggaran();
+    const tahunAnggaran = await getTahunAnggranPilihan();
     set({ tahunAnggaran, initialized: true });
   },
 });

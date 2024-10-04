@@ -1,11 +1,11 @@
 import { getDataRealisasi } from "@/actions/dashboard";
-import { getTahunAnggaran } from "@/actions/pengguna/preference";
+import { getTahunAnggranPilihan } from "@/actions/pengguna/preference";
 import { get } from "lodash";
 import Card from "./_components/card";
 import ChartContainer from "./_components/chart-container";
 
 const DashboardPage = async () => {
-  const year = await getTahunAnggaran();
+  const year = await getTahunAnggranPilihan();
   const dataRealisasi = await getDataRealisasi(year);
   return (
     <div className="flex flex-col gap-2 p-4 bg-gray-200 rounded-md ">

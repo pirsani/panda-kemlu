@@ -47,11 +47,12 @@ export const importExcelSbmUhDalamNegeri = async (
           message: "No result Error saving data to database",
         };
       } else {
+        console.log("[revalidatePath]");
         revalidatePath("/data-referensi/sbm/uh-dalam-negeri");
         return {
           success: true,
           data: result,
-          message: "Data sbmUhDalamNegeri berhasil diimport",
+          message: "Data SBM  Uh Dalam Negeri berhasil diimport",
         };
       }
     }

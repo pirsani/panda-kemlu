@@ -25,7 +25,7 @@ export const setTahunAnggaran = async (tahunAnggaran: number) => {
   return tahunAnggaran;
 };
 
-export const getTahunAnggaran = async () => {
+export const getTahunAnggranPilihan = async () => {
   const session = await auth();
   if (!session || !session.user || !session.user.id) {
     throw new Error("Unauthorized");
