@@ -1,3 +1,4 @@
+import { getTahunAnggranPilihan } from "@/actions/pengguna/preference";
 import { getOptionsNegara, getOptionsProvinsi } from "@/actions/sbm";
 import getReferensiSbmUhLuarNegeri, {
   SbmUhLuarNegeriPlainObject,
@@ -7,16 +8,13 @@ import FormUploadExcelSbmUhLuarNegeri from "./_components/form-upload-excel-sbm-
 import { TabelSbmUhLuarNegeri } from "./_components/tabel-sbm-uh-luar-negeri";
 
 const ReferensiSbmUhLuarNegeriPage = async () => {
-  const data = await getReferensiSbmUhLuarNegeri();
+  const tahunAnggaran = await getTahunAnggranPilihan();
+  const data = await getReferensiSbmUhLuarNegeri(tahunAnggaran);
   const convertedData = data.map((item) => ({
     ...convertSpecialTypesToPlain<SbmUhLuarNegeriPlainObject>(item),
   }));
 
   const optionsNegara = await getOptionsNegara();
-  // const optionsProvinsi = [
-  //   { value: "Aceh", label: "Aceh" },
-  //   { value: "Sumatera Utara", label: "Sumatera Utara" },
-  // ];
 
   return (
     <div className="p-4 pb-24 h-auto min-h-full flex flex-col gap-2">

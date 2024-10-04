@@ -1,3 +1,4 @@
+import { getTahunAnggranPilihan } from "@/actions/pengguna/preference";
 import { dbHonorarium } from "@/lib/db-honorarium";
 import { Provinsi, SbmUhLuarNegeri } from "@prisma-honorarium/client";
 import Decimal from "decimal.js";
@@ -23,8 +24,12 @@ export type SbmUhLuarNegeriPlainObject = Omit<
   };
 };
 
-const getReferensiSbmUhLuarNegeri = async () => {
+const getReferensiSbmUhLuarNegeri = async (tahunAnggaran?: number) => {
+  const tahun = tahunAnggaran || new Date().getFullYear();
   const sbmUhLuarNegeri = await dbHonorarium.sbmUhLuarNegeri.findMany({
+    where: {
+      tahun: tahun,
+    },
     orderBy: {
       tahun: "asc",
     },

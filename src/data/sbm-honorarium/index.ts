@@ -19,12 +19,11 @@ export type SbmHonorariumPlainObject = Omit<
   updatedAt: Date | string;
 };
 
-const getReferensiSbmHonorarium = async () => {
-  const tahunAnggaran = await getTahunAnggranPilihan();
-
+const getReferensiSbmHonorarium = async (tahunAnggaran?: number) => {
+  const tahun = tahunAnggaran || new Date().getFullYear();
   const sbmHonorarium = await dbHonorarium.sbmHonorarium.findMany({
     where: {
-      tahun: tahunAnggaran,
+      tahun: tahun,
     },
     orderBy: {
       tahun: "asc",

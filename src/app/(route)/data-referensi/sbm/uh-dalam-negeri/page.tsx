@@ -1,3 +1,4 @@
+import { getTahunAnggranPilihan } from "@/actions/pengguna/preference";
 import { getOptionsProvinsi } from "@/actions/sbm";
 import getReferensiSbmUhDalamNegeri, {
   SbmUhDalamNegeriPlainObject,
@@ -7,7 +8,8 @@ import FormUploadExcelSbmUhDalamNegeri from "./_components/form-upload-excel-sbm
 import { TabelSbmUhDalamNegeri } from "./_components/tabel-sbm-uh-dalam-negeri";
 
 const ReferensiSbmUhDalamNegeriPage = async () => {
-  const data = await getReferensiSbmUhDalamNegeri();
+  const tahunAnggaran = await getTahunAnggranPilihan();
+  const data = await getReferensiSbmUhDalamNegeri(tahunAnggaran);
   const convertedData = data.map((item) => ({
     ...convertSpecialTypesToPlain<SbmUhDalamNegeriPlainObject>(item),
   }));

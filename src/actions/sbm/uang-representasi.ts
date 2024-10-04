@@ -6,22 +6,6 @@ import { SbmUangRepresentasi as ZSbmUangRepresentasi } from "@/zod/schemas/sbm-u
 import { SbmUangRepresentasi } from "@prisma-honorarium/client";
 import { revalidatePath } from "next/cache";
 
-export interface sbmUangRepresentasiWithPejabat extends SbmUangRepresentasi {
-  pejabat: {
-    id: number;
-    nama: string;
-  };
-}
-export const getSbmUangRepresentasi = async (sbmUangRepresentasi?: string) => {
-  const dataSbmUangRepresentasi =
-    await dbHonorarium.sbmUangRepresentasi.findMany({
-      include: {
-        pejabat: true,
-      },
-    });
-  return dataSbmUangRepresentasi;
-};
-
 export const simpanDataSbmUangRepresentasi = async (
   data: ZSbmUangRepresentasi
 ): Promise<ActionResponse<SbmUangRepresentasi>> => {

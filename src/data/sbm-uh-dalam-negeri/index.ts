@@ -23,12 +23,11 @@ export type SbmUhDalamNegeriPlainObject = Omit<
   provinsi: Provinsi;
 };
 
-const getReferensiSbmUhDalamNegeri = async () => {
-  const tahunAnggaran = await getTahunAnggranPilihan();
-
+const getReferensiSbmUhDalamNegeri = async (tahunAnggaran?: number) => {
+  const tahun = tahunAnggaran || new Date().getFullYear();
   const sbmUhDalamNegeri = await dbHonorarium.sbmUhDalamNegeri.findMany({
     where: {
-      tahun: tahunAnggaran,
+      tahun: tahun,
     },
     orderBy: {
       tahun: "asc",
