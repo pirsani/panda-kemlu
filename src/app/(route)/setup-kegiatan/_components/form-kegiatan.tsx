@@ -23,14 +23,21 @@ import kegiatanSchema, {
 } from "@/zod/schemas/kegiatan";
 import { zodResolver } from "@hookform/resolvers/zod";
 import dynamic from "next/dynamic";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import ItineraryContainer from "./itinerary-container";
 import PesertaContainer from "./peserta-container";
 //import SelectSbmProvinsi from "./select-sbm-provinsi";
 import setupKegiatan from "@/actions/kegiatan/setup-kegiatan";
 import CummulativeErrors from "@/components/form/cummulative-error";
+import FormFileImmediateUpload from "@/components/form/form-file-immediate-upload";
+import {
+  default as Required,
+  default as RequiredLabel,
+} from "@/components/form/required";
 import SelectLokasi from "@/components/form/select-lokasi";
+import { cn } from "@/lib/utils";
+import { createId } from "@paralleldrive/cuid2";
 import { LOKASI } from "@prisma-honorarium/client";
 import { toast } from "sonner";
 
@@ -59,8 +66,11 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
       lokasi: LOKASI.DALAM_KOTA, // Default value for lokasi atau nantinya bisa diisi dari data yang sudah ada klo mode edit
       provinsi: "31", // Default value for provinsi atau nantinya bisa diisi dari data yang sudah ada klo mode edit
       dokumenSuratTugas: undefined,
+      dokumenSuratTugasCuid: createId(),
       dokumenJadwal: undefined,
+      dokumenJadwalCuid: createId(),
       dokumenNodinMemoSk: undefined,
+      dokumenNodinMemoSkCuid: createId(),
     },
     //reValidateMode: "onChange",
   });
@@ -74,6 +84,15 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
     watch,
     trigger,
   } = form;
+
+  // Watch the value of DokumenJadwalCuid
+  const dokumenJadwalCuid = form.watch("dokumenJadwalCuid");
+  const dokumenNodinMemoSkCuid = form.watch("dokumenNodinMemoSkCuid");
+
+  // Use a ref to store the folderCuid
+  const folderCuidRef = useRef(createId());
+  const folderCuid = folderCuidRef.current;
+  setValue("cuid", folderCuid);
 
   const onSubmit: SubmitHandler<FormValues<FormMode>> = async (data) => {
     console.log("[onSubmit]", data);
@@ -100,17 +119,17 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
       }
     }
     // append the files to the form data
-    formData.append("dokumenNodinMemoSk", dokumenNodinMemoSk as File);
-    formData.append("dokumenJadwal", dokumenJadwal as File);
+    // formData.append("dokumenNodinMemoSk", dokumenNodinMemoSk as File);
+    // formData.append("dokumenJadwal", dokumenJadwal as File);
     formData.append("pesertaXlsx", pesertaXlsx as File);
 
     // append the files to the form data
     if (Array.isArray(dokumenSuratTugas)) {
       dokumenSuratTugas.forEach((file) => {
-        formData.append("dokumenSuratTugas", file as File);
+        //formData.append("dokumenSuratTugas", file as File);
       });
     } else {
-      formData.append("dokumenSuratTugas", dokumenSuratTugas as File);
+      //formData.append("dokumenSuratTugas", dokumenSuratTugas as File);
     }
 
     const kegiatanBaru = await setupKegiatan(formData);
@@ -122,7 +141,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
       // resetField("dokumenNodinMemoSk");
       // resetField("dokumenJadwal");
     } else {
-      toast.error(kegiatanBaru.error);
+      toast.error(kegiatanBaru.error + " " + kegiatanBaru.message);
     }
   };
 
@@ -165,19 +184,6 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
 
   return (
     <Form {...form}>
-      {/* Map errors to a div */}
-      {Object.keys(errors).length > 0 && displayAllErrors && (
-        <div className="bg-red-100 p-4 mt-4 rounded">
-          <h3 className="text-red-500 font-bold mb-2">Form Errors:</h3>
-          <ul className="list-disc list-inside text-red-500">
-            {Object.entries(errors).map(([key, error]) => (
-              <li key={key}>
-                {key}: {error?.message}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-2 w-full"
@@ -187,7 +193,9 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
           name="nama"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nama Kegiatan</FormLabel>
+              <FormLabel>
+                Nama Kegiatan <RequiredLabel />
+              </FormLabel>
               <FormControl>
                 <Input placeholder="nama kegiatan" {...field} tabIndex={0} />
               </FormControl>
@@ -201,7 +209,10 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             name="tanggalMulai"
             render={({ field }) => (
               <FormItem>
-                <FormLabel htmlFor="tanggalMulai">Tanggal Mulai</FormLabel>
+                <FormLabel htmlFor="tanggalMulai">
+                  Tanggal Mulai
+                  <RequiredLabel />
+                </FormLabel>
                 <FormControl>
                   <BasicDatePicker
                     name={field.name}
@@ -222,7 +233,10 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             name="tanggalSelesai"
             render={({ field }) => (
               <FormItem>
-                <FormLabel htmlFor="tanggalSelesai">Tanggal Selesai</FormLabel>
+                <FormLabel htmlFor="tanggalSelesai">
+                  Tanggal Selesai
+                  <RequiredLabel />
+                </FormLabel>
                 <FormControl>
                   <BasicDatePicker
                     name={field.name}
@@ -246,9 +260,12 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             <FormItem>
               <FormLabel htmlFor="dokumenNodinMemoSk">
                 Upload Nota Dinas/Memorandum/SK Tim
+                <RequiredLabel />
               </FormLabel>
               <FormControl>
-                <FormFileUpload
+                <FormFileImmediateUpload
+                  cuid={dokumenNodinMemoSkCuid}
+                  folder={folderCuid}
                   name={field.name}
                   onFileChange={handleFileChange}
                   className="bg-white"
@@ -265,9 +282,12 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             <FormItem>
               <FormLabel htmlFor="dokumenJadwal">
                 Dokumen Jadwal kegiatan
+                <RequiredLabel />
               </FormLabel>
               <FormControl>
-                <FormFileUpload
+                <FormFileImmediateUpload
+                  cuid={dokumenJadwalCuid}
+                  folder={folderCuid}
                   name={field.name}
                   onFileChange={handleFileChange}
                   className="bg-white"
@@ -284,6 +304,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             <FormItem>
               <FormLabel htmlFor={field.name}>
                 Surat Tugas (multiple files)
+                <RequiredLabel />
               </FormLabel>
               <FormControl
                 onBlur={() => {
@@ -292,6 +313,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
               >
                 <FormMultiFileUpload
                   name={field.name}
+                  folder={folderCuid}
                   text="Pilih dokumen Surat Tugas"
                   onFileChange={handleMultiFileChange}
                   className="bg-white w-full"
@@ -307,7 +329,10 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
           name="lokasi"
           render={({ field }) => (
             <FormItem>
-              <FormLabel htmlFor={field.name}>Lokasi</FormLabel>
+              <FormLabel htmlFor={field.name}>
+                Lokasi
+                <RequiredLabel />
+              </FormLabel>
               <FormControl>
                 <SelectLokasi
                   value={field.value}
@@ -326,7 +351,10 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             name="provinsi"
             render={({ field }) => (
               <FormItem>
-                <FormLabel htmlFor={field.name}>Provinsi</FormLabel>
+                <FormLabel htmlFor={field.name}>
+                  Provinsi
+                  <RequiredLabel />
+                </FormLabel>
                 <FormControl>
                   <SelectSbmProvinsi
                     fullKey={field.name}
@@ -347,6 +375,8 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             <FormItem>
               <FormControl>
                 <PesertaContainer
+                  folder={folderCuid}
+                  pesertaXlsxCuid={"pesertaXlsxCuid"}
                   fieldName={field.name}
                   value={field.value}
                   // onChange={field.onChange}
@@ -362,10 +392,12 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
 
         <div className="flex flex-row gap-4 w-full mt-12">
           <Button
-            className="w-5/6 h-12 bg-blue-600 hover:bg-blue-700"
+            className={cn("w-5/6 h-12 bg-blue-600 hover:bg-blue-700")}
+            disabled={isSubmitting}
             type="submit"
           >
             Submit
+            {isSubmitting && <span className="ml-2">submitting...</span>}
           </Button>
           <Button
             type="button"

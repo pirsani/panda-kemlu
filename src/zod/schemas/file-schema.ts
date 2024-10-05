@@ -12,14 +12,16 @@ interface fileSchemaOptions {
   maxsize?: number;
   required?: boolean;
   allowedTypes?: string[];
+  message?: string;
 }
 export const fileSchema = ({
   maxsize = 100 * 1024 * 1024,
   required = true,
   allowedTypes = ["application/pdf"],
+  message = "Silakan pilih file",
 }: fileSchemaOptions = {}) => {
   const baseSchema = z
-    .instanceof(File, { message: "Silakan pilih file" })
+    .instanceof(File, { message: message })
     .refine((file) => file.size > 0, "file tidak boleh kosong")
     .refine(
       (file) => file.size < maxsize,

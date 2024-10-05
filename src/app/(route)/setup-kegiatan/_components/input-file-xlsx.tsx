@@ -33,6 +33,9 @@ const InputFileXlsx = ({
       } catch (error) {
         console.error("Error:", error);
       }
+    } else {
+      console.log("File is empty");
+      onChange({ rows: [], emptyValues: [], missingColumns: [] });
     }
   };
 

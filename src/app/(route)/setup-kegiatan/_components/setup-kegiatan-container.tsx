@@ -8,7 +8,6 @@ const SetupKegiatanContainer = () => {
   //const editId = null;
   return (
     <div>
-      <h1 className="mb-6">Alur Proses &gt; 0 Setup Kegiatan </h1>
       <FormKegiatan editId={editId} />
     </div>
   );

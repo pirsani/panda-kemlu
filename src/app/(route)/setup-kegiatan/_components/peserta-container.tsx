@@ -6,11 +6,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { emptyAllowed } from "@/constants/excel/peserta";
 import { ParseExcelResult } from "@/utils/excel/parse-excel";
 import { splitEmptyValues } from "@/utils/excel/split-empty-values";
+import { createId } from "@paralleldrive/cuid2";
 import Link from "next/link";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import InputFileXlsx from "./input-file-xlsx";
 import TabelPeserta from "./tabel-peserta";
@@ -18,23 +21,43 @@ import TabelPeserta from "./tabel-peserta";
 interface PesertaContainerProps {
   // Define the props for PesertaContainer
   fieldName: string;
+  pesertaXlsxCuid: string;
+  folder: string; // cuid untuk referensi folder penyimpanan file
   value?: File | null;
 }
-const PesertaContainer = ({ fieldName, value }: PesertaContainerProps) => {
+const PesertaContainer = ({
+  fieldName,
+  pesertaXlsxCuid,
+  folder,
+  value,
+}: PesertaContainerProps) => {
+  const { setValue, getValues, watch } = useFormContext();
   const [data, setData] = useState<Record<string, any>[]>([]);
   const emptyAllowed = ["Eselon", "ID", "Lainny"]; // kolom yang boleh kosong
   const [emptyValues, setEmptyValues] = useState<Record<number, string[]>>([]);
   const [missingColumns, setMissingColumns] = useState<string[]>([]);
 
-  const handleOnChange = (parseExcelResult: ParseExcelResult) => {
+  // Use a ref to store the folderCuid
+  const fileCuidRef = useRef(createId());
+  const fileCuid = fileCuidRef.current;
+  setValue(pesertaXlsxCuid, fileCuid);
+
+  const handleOnChange = async (parseExcelResult: ParseExcelResult) => {
     if (parseExcelResult.rows.length > 0) {
       setData(parseExcelResult.rows);
       setEmptyValues(parseExcelResult.emptyValues);
       setMissingColumns(parseExcelResult.missingColumns);
       //console.log(data);
+      const filename = await exportPesertaXlsx(
+        folder,
+        fileCuid,
+        parseExcelResult
+      );
     } else {
       console.log("Data is empty");
       setData([]);
+      setEmptyValues([]);
+      setMissingColumns([]);
     }
   };
 
@@ -95,7 +118,7 @@ const WarningOnEmpty = ({
   missingColumns: string[];
   emptyValues: Record<number, string[]>;
 }) => {
-  const result = splitEmptyValues(emptyValues, ["Eselon", "ID", "Lainny"]);
+  const result = splitEmptyValues(emptyValues, emptyAllowed);
   const { shouldNotEmpty, allowEmpty } = result;
   const rows = Object.entries(shouldNotEmpty);
   const hasMissingColumns = missingColumns.length > 0;
@@ -146,5 +169,48 @@ const WarningOnEmpty = ({
     </div>
   );
 };
+
+export async function exportPesertaXlsx(
+  folderCuid: string,
+  fileCuid: string,
+  parseResult: ParseExcelResult
+) {
+  const result = splitEmptyValues(parseResult.emptyValues, emptyAllowed);
+  const { shouldNotEmpty, allowEmpty } = result;
+  const hasMissingColumns = parseResult.missingColumns.length > 0;
+  const rowsWithEmptyValues = Object.entries(shouldNotEmpty);
+  const hasEmptyValues = rowsWithEmptyValues.length > 0;
+  if (hasMissingColumns || hasEmptyValues) {
+    return null;
+  }
+
+  const data = parseResult.rows;
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Peserta");
+  const buf = XLSX.write(wb, { bookType: "xlsx", type: "buffer" });
+  // return buf;
+  const newExcel = new Blob([buf], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+
+  // uploade file to server
+  const formData = new FormData();
+  const filename = fileCuid;
+  formData.append("file", newExcel, "peserta.xlsx");
+  formData.append("filename", filename);
+  formData.append("folder", folderCuid);
+  const response = await fetch("/api/upload", {
+    method: "POST",
+    body: formData,
+  });
+
+  if (response.ok) {
+    toast.info("File Peserta uploaded");
+    return filename;
+  } else {
+    toast.error("Failed to upload Peserta file");
+  }
+}
 
 export default PesertaContainer;

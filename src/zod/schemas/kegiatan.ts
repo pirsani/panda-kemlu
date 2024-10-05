@@ -11,20 +11,31 @@ const isValidDateString = (value: string): boolean => {
   return isValid(parsedDate);
 };
 
-const tanggalSchema = z
-  .string()
-  .min(10, {
-    message: "please complete the date",
-  })
-  .max(10, {
-    message: "please use valid date format",
-  })
-  .refine(isValidDateString, {
-    message: "Invalid, use format as yyyy-mm-dd.",
-  })
-  .transform((value) => new Date(value));
+interface TanggalSchemaOptions {
+  message?: string;
+  field?: string;
+}
+const tanggalSchema = ({
+  message = "",
+  field = "Tanggal",
+}: TanggalSchemaOptions) => {
+  const tanggalSchema = z
+    .string({ message: `${field} harus diisi` })
+    .min(10, {
+      message: `format ${field} harus yyyy-mm-dd`,
+    })
+    .max(10, {
+      message: `format ${field} harus yyyy-mm-dd`,
+    })
+    .refine(isValidDateString, {
+      message: `format  ${field} harus yyyy-mm-dd`,
+    })
+    .transform((value) => new Date(value));
+  return tanggalSchema;
+};
 
 export const baseKegiatanSchema = z.object({
+  cuid: z.string({ required_error: "CUID harus diisi" }),
   nama: z
     .string()
     .min(10, {
@@ -33,23 +44,47 @@ export const baseKegiatanSchema = z.object({
     .max(500, {
       message: "Nama kegiatan maksimal 500 karakter",
     }),
-  tanggalMulai: tanggalSchema,
-  tanggalSelesai: tanggalSchema,
+  tanggalMulai: tanggalSchema({ field: "Tanggal Mulai" }),
+  tanggalSelesai: tanggalSchema({ field: "Tanggal Selesai" }),
   lokasi: LokasiEnum, // Use the Zod enum schema for lokasi
   provinsi: z.string(),
-  dokumenNodinMemoSk: fileSchema({ required: true }),
-  dokumenJadwal: fileSchema({ required: true }),
+  dokumenNodinMemoSk: fileSchema({
+    required: true,
+    message: "Dokumen Nodin/Memo/SK harus diupload",
+  }),
+  dokumenNodinMemoSkCuid: z.string(),
+  dokumenJadwal: fileSchema({
+    required: true,
+    message: "Dokumen jadwal harus diupload",
+  }),
+  dokumenJadwalCuid: z.string(),
   dokumenSuratTugas: z.union([
-    fileSchema({ required: true }),
+    fileSchema({
+      required: true,
+      message: "Dokumen Surat Tugas harus diupload",
+    }),
     z
-      .array(fileSchema({ required: true }))
-      .nonempty({ message: "Surat Tugas harus diisi" }),
+      .array(
+        fileSchema({
+          required: true,
+          message: "Dokumen Surat Tugas harus diupload",
+        })
+      )
+      .nonempty({ message: "Dokumen Surat Tugas harus diupload" }),
+  ]),
+  dokumenSuratTugasCuid: z.union([
+    z.string(),
+    z.array(z.string()).nonempty({ message: "Surat Tugas harus diisi" }),
   ]),
   pesertaXlsx: fileSchema({
     required: true,
+    message: "File Excel daftar peserta harus diupload",
     allowedTypes: [
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     ],
+  }),
+  pesertaXlsxCuid: z.string({
+    required_error: "file Excel daftar peserta harus diisi",
   }),
 });
 
@@ -61,6 +96,13 @@ export const kegiatanSchema = baseKegiatanSchema.refine(
     path: ["tanggalMulai"], // This will point the error to the tanggalMulai field
   }
 );
+
+export const kegiatanSchemaWithoutFile = baseKegiatanSchema.omit({
+  dokumenNodinMemoSk: true,
+  dokumenJadwal: true,
+  dokumenSuratTugas: true,
+  pesertaXlsx: true,
+});
 
 // Extend the refined schema for edit mode
 export const kegiatanSchemaEditMode = baseKegiatanSchema

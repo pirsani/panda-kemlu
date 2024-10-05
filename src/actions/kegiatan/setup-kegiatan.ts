@@ -1,16 +1,26 @@
 "use server";
 import { ActionResponse } from "@/actions/response";
-import { columns as extractFromColumns } from "@/constants/excel/peserta";
+import { BASE_PATH_UPLOAD } from "@/app/api/upload/config";
+import {
+  emptyAllowed,
+  columns as extractFromColumns,
+} from "@/constants/excel/peserta";
 import { dbHonorarium, Prisma } from "@/lib/db-honorarium";
 import parseExcel, { ParseExcelResult } from "@/utils/excel/parse-excel";
 import parseExcelOnServer from "@/utils/excel/parse-excel-on-server";
 import { splitEmptyValues } from "@/utils/excel/split-empty-values";
-import kegiatanSchema, { Kegiatan as ZKegiatan } from "@/zod/schemas/kegiatan";
+import kegiatanSchema, {
+  kegiatanSchemaWithoutFile,
+  Kegiatan as ZKegiatan,
+} from "@/zod/schemas/kegiatan";
 import { Kegiatan } from "@prisma-honorarium/client";
 import { format } from "date-fns";
+import fs from "fs";
+import path from "path";
 import { Logger } from "tslog";
 import { never, ZodError } from "zod";
 import { getSessionPengguna } from "../pengguna";
+import { getPrismaErrorResponse } from "../prisma-error-response";
 // Create a Logger instance with custom settings
 const logger = new Logger({
   hideLogPositionForProduction: true,
@@ -49,8 +59,13 @@ export const setupKegiatan = async (
     // parse the form data
     dataparsed = prepareDataFromClient(formData);
   } catch (error) {
-    logger.info("formData", formData);
-    logger.error("[Error parsing form data]", error);
+    logger.info("[prepareDataFromClient]:", formData);
+    if (error instanceof ZodError) {
+      logger.error("[ZodError]", error.errors);
+    } else {
+      logger.error("Error parsing form data:", error);
+    }
+
     return {
       success: false,
       error: "E-KEG-01",
@@ -58,10 +73,38 @@ export const setupKegiatan = async (
     };
   }
 
+  const cuid = dataparsed.cuid; // this is the cuid of the kegiatan yang akan digunakan untuk referensi file yang telah diupload
+
   // step 2: parse the xlsx file
   try {
-    // parse xlsx file
-    dataPesertaDariExcel = await parseDataPesertaDariExcel(dataparsed);
+    // parse xlsx file yang berisi data peserta yang telah diupload oleh user
+    // cuidFolder dan cuidFile akan digunakan untuk menyimpan file di server
+    // get file from file in folder with cuid
+    const pesertaXlsxCuid = dataparsed.pesertaXlsxCuid;
+
+    // add the file extension
+    const filePesertaXlsx = `${pesertaXlsxCuid}.xlsx`;
+    const excelFilePath = path.join(
+      BASE_PATH_UPLOAD,
+      "temp",
+      cuid,
+      filePesertaXlsx
+    );
+
+    // check if the file exists
+    logger.info("excelFilePath", filePesertaXlsx);
+    if (!fs.existsSync(excelFilePath)) {
+      return {
+        success: false,
+        error: "E-KEG-02",
+        message: "File peserta tidak ditemukan",
+      };
+    }
+
+    // read file as File
+    const pesertaXlsx = fs.readFileSync(excelFilePath);
+
+    dataPesertaDariExcel = await parseDataPesertaDariExcel(pesertaXlsx);
   } catch (error) {
     console.error("Error parsing xlsx file:", error);
     return {
@@ -101,12 +144,12 @@ export const setupKegiatan = async (
       data: result,
     };
   } catch (error) {
-    console.error("Error saving kegiatan:", error);
-    return {
-      success: false,
-      error: "Error saving kegiatan",
-      message: "Error saving kegiatan",
-    };
+    return getPrismaErrorResponse(error as Error);
+    // return {
+    //   success: false,
+    //   error: "Error saving kegiatan",
+    //   message: "Error saving kegiatan",
+    // };
   }
 };
 
@@ -140,7 +183,8 @@ const prepareDataFromClient = (formData: FormData) => {
       "yyyy-MM-dd"
     );
 
-    const dataparsed = kegiatanSchema.parse(formDataObj);
+    // karena file sudah diupload, maka kita hanya perlu mengambil nama file saja
+    const dataparsed = kegiatanSchemaWithoutFile.parse(formDataObj);
     return dataparsed;
   } catch (error) {
     if (error instanceof ZodError) {
@@ -153,20 +197,17 @@ const prepareDataFromClient = (formData: FormData) => {
   }
 };
 
-async function parseDataPesertaDariExcel(dataparsed: ZKegiatan) {
+async function parseDataPesertaDariExcel(pesertaXlsx: Buffer) {
   try {
-    const dataPesertaDariExcel = await parseExcelOnServer(
-      dataparsed.pesertaXlsx as File,
-      {
-        extractFromColumns: extractFromColumns,
-      }
-    );
+    const dataPesertaDariExcel = await parseExcelOnServer(pesertaXlsx, {
+      extractFromColumns: extractFromColumns,
+    });
 
     // seharusnya g pernah sampe sini jika pengecekan di client sudah benar dan tidak di bypass
     // check it there is any empty column that is not allowed
     const splitEmptyValuesResult = splitEmptyValues(
       dataPesertaDariExcel.emptyValues,
-      ["Eselon", "ID", "Lainny"]
+      emptyAllowed
     );
 
     const { allowEmpty, shouldNotEmpty } = splitEmptyValuesResult;
@@ -200,13 +241,14 @@ async function createKegiatan(
 ) {
   return prisma.kegiatan.create({
     data: {
+      id: dataparsed.cuid,
       status: "setup-kegiatan",
       nama: dataparsed.nama,
       tanggalMulai: dataparsed.tanggalMulai,
       tanggalSelesai: dataparsed.tanggalSelesai,
       lokasi: dataparsed.lokasi,
-      dokumenNodinMemoSk: dataparsed.dokumenNodinMemoSk?.name!,
-      dokumenJadwal: dataparsed.dokumenJadwal?.name!,
+      dokumenNodinMemoSk: dataparsed.dokumenNodinMemoSkCuid,
+      dokumenJadwal: dataparsed.dokumenJadwalCuid,
       satkerId: satkerId,
       unitKerjaId: unitKerjaId,
       createdBy: "admin",
@@ -293,5 +335,13 @@ async function insertDokumenSuratTugas(
     }
   }
 }
+
+const saveDokumenSetupKegiatan = async (
+  nodin: File,
+  jadwal: File,
+  surtug: File[]
+) => {
+  // Save the file to disk
+};
 
 export default setupKegiatan;

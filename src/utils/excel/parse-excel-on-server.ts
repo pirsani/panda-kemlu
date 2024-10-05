@@ -25,13 +25,9 @@ export interface ParseExcelResult {
  * @throws {Error} If the provided input is not a file or if allowed columns are not provided or empty.
  */
 const parseExcelOnServer = async (
-  file: File,
+  file: Buffer | File,
   options: ParseExcelOptions
 ): Promise<ParseExcelResult> => {
-  if (!(file instanceof File)) {
-    throw new Error("The provided input is not a file.");
-  }
-
   if (!options.extractFromColumns || options.extractFromColumns.length === 0) {
     throw new Error("Allowed columns must be provided and cannot be empty.");
   }
@@ -39,10 +35,17 @@ const parseExcelOnServer = async (
   const missingColumns: string[] = [];
   const emptyValues: Record<number, string[]> = {};
 
-  try {
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+  let buffer: Buffer;
 
+  if (file instanceof Buffer) {
+    buffer = file;
+  } else {
+    const arrayBuffer = await file.arrayBuffer();
+    buffer = Buffer.from(arrayBuffer);
+  }
+
+  try {
+    // Detect the file type
     const fileType = await fileTypeFromBuffer(buffer);
     if (!fileType) {
       throw new Error("Unable to detect file type.");
