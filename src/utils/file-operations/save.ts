@@ -1,6 +1,6 @@
 import { createHash } from "crypto";
 import { fileTypeFromBuffer } from "file-type";
-import { promises as fs } from "fs";
+import fs from "fs";
 import path from "path";
 
 const fallbackPath = path.join(process.cwd(), "BASE_PATH_UPLOAD");
@@ -58,19 +58,19 @@ const saveFile = async ({
     throw new Error("The provided input is not a file.");
   }
 
+  // Fix the directory handling
   if (!directory) {
     directory = BASE_PATH_UPLOAD;
   } else {
+    // Ensure the directory does not repeat the base path
     directory = path.join(BASE_PATH_UPLOAD, directory);
   }
 
   // Ensure the directory exists
   const dirPath = path.resolve(directory);
-  try {
-    await fs.access(dirPath);
-  } catch (error) {
-    // Directory does not exist, create it
-    await fs.mkdir(dirPath, { recursive: true });
+  if (!fs.existsSync(dirPath)) {
+    console.log("Creating directory:", dirPath);
+    fs.mkdirSync(dirPath, { recursive: true });
   }
 
   // Save the file
@@ -83,14 +83,20 @@ const saveFile = async ({
   }
 
   const filePath = path.join(dirPath, fileName);
-  await fs.writeFile(filePath, Buffer.from(buffer));
+  await fs.promises.writeFile(filePath, Buffer.from(buffer));
+  //await fs.writeFile(filePath, buffer);
+
   // Calculate the hash of the file using SHA-256
   const hashSum = createHash("sha256");
   hashSum.update(Buffer.from(buffer));
   const fileHash = hashSum.digest("hex");
 
   // Calculate the relative path from the base path
-  const relativePath = path.relative(BASE_PATH_UPLOAD, filePath);
+  const basePathUpload = path.resolve(BASE_PATH_UPLOAD);
+  const relativePath = path.relative(basePathUpload, filePath);
+  console.log("basePathUpload:", basePathUpload);
+  console.log("filePath:", filePath);
+  console.log("relativePath:", relativePath);
 
   return { filePath, relativePath, fileType, fileHash };
 };

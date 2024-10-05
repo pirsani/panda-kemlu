@@ -66,7 +66,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
       lokasi: LOKASI.DALAM_KOTA, // Default value for lokasi atau nantinya bisa diisi dari data yang sudah ada klo mode edit
       provinsi: "31", // Default value for provinsi atau nantinya bisa diisi dari data yang sudah ada klo mode edit
       dokumenSuratTugas: undefined,
-      dokumenSuratTugasCuid: createId(),
+      dokumenSuratTugasCuid: [],
       dokumenJadwal: undefined,
       dokumenJadwalCuid: createId(),
       dokumenNodinMemoSk: undefined,
@@ -88,6 +88,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
   // Watch the value of DokumenJadwalCuid
   const dokumenJadwalCuid = form.watch("dokumenJadwalCuid");
   const dokumenNodinMemoSkCuid = form.watch("dokumenNodinMemoSkCuid");
+  const dokumenSuratTugasCuid = form.watch("dokumenSuratTugasCuid");
 
   // Use a ref to store the folderCuid
   const folderCuidRef = useRef(createId());
@@ -313,6 +314,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
               >
                 <FormMultiFileUpload
                   name={field.name}
+                  cuids={"dokumenSuratTugasCuid"}
                   folder={folderCuid}
                   text="Pilih dokumen Surat Tugas"
                   onFileChange={handleMultiFileChange}
@@ -329,7 +331,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
           name="lokasi"
           render={({ field }) => (
             <FormItem>
-              <FormLabel htmlFor={field.name}>
+              <FormLabel>
                 Lokasi
                 <RequiredLabel />
               </FormLabel>

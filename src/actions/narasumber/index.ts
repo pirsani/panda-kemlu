@@ -16,6 +16,7 @@ import { ZodError } from "zod";
 
 import { createId } from "@paralleldrive/cuid2";
 import { Logger } from "tslog";
+import { getSessionPengguna } from "../pengguna";
 // Create a Logger instance with custom settings
 const logger = new Logger({
   hideLogPositionForProduction: true,
@@ -24,9 +25,20 @@ const logger = new Logger({
 export const simpanNarasumber = async (
   formData: FormData
 ): Promise<ActionResponse<Narasumber>> => {
-  // step 1: parse the form data
-  const obj = formDataToObject(formData);
-  logger.info("[parsedForm]", obj);
+  const sessionPengguna = await getSessionPengguna();
+  if (
+    !sessionPengguna ||
+    !sessionPengguna?.data ||
+    !sessionPengguna?.data?.id
+  ) {
+    return {
+      success: false,
+      error: "Unauthorized",
+      message: "User is not authenticated",
+    };
+  }
+
+  const pengguna = sessionPengguna.data.id;
 
   const userId = await getUserId();
   if (!userId) {
@@ -36,23 +48,31 @@ export const simpanNarasumber = async (
       message: "User is not authenticated",
     };
   }
-
   const permitted = await hasPermission(userId, "narasumber:create");
   logger.info("[permitted]", permitted);
 
-  try {
-    const data = narasumberSchema.parse(obj);
+  // ini bikin error ntr harus dicek lagi
+  //const obj = formDataToObject(formData);
 
-    const file = data.dokumenPeryataanRekeningBerbeda;
+  const formDataObj: any = {};
+  formData.forEach((value, key) => {
+    formDataObj[key] = value;
+  });
+  //console.log("formDataObj", formDataObj);
+
+  let dataparsed;
+  try {
+    dataparsed = narasumberSchema.parse(formDataObj);
+    const file = dataparsed.dokumenPeryataanRekeningBerbeda;
     let uniqueFilename: string | null = null;
-    const saveto = join("dokumen-pernyataan-rekening-berbeda", data.id);
+    const saveto = join("dokumen-pernyataan-rekening-berbeda", dataparsed.id);
+
     if (file) {
-      // Save the file to disk
       // Extract the file extension
       const fileExtension = extname(file.name);
       // Generate a unique filename using nanoid
-      uniqueFilename = `${nanoid()}${fileExtension}`;
-
+      uniqueFilename = `${createId()}${fileExtension}`;
+      console.log("uniqueFilename", uniqueFilename);
       const { filePath, relativePath, fileHash, fileType } = await saveFile({
         file,
         fileName: uniqueFilename,
@@ -65,40 +85,35 @@ export const simpanNarasumber = async (
         relativePath,
         fileHash,
         fileType.mime,
-        "admin"
+        pengguna
       );
       logger.info("File saved to database:", savedFile);
-
-      // log saved file to database
     }
 
-    delete data.dokumenPeryataanRekeningBerbeda;
-    const objNarasumber = data as Narasumber;
+    delete dataparsed.dokumenPeryataanRekeningBerbeda;
+    const objNarasumber = dataparsed as Narasumber;
     if (uniqueFilename) {
       objNarasumber.dokumenPeryataanRekeningBerbeda = uniqueFilename;
     }
 
-    const byUser = "admin";
-    const saved = await saveDataToDatabase(objNarasumber, byUser);
+    const saved = await saveDataToDatabase(objNarasumber, pengguna);
     revalidatePath("/data-referensi/narasumber");
-
     return {
       success: true,
       data: saved,
     };
   } catch (error) {
-    if (error instanceof ZodError) {
-      logger.error("Validation failed:", error.errors);
-    } else {
-      logger.error("Unexpected error:", error);
-    }
-    const e = error as Error;
+    console.error("Error parsing form data:", error);
     return {
       success: false,
-      error: "Error saving data to database",
-      message: e.message,
+      error: "Error parsing form data",
+      message: "Error parsing form data",
     };
   }
+  return {
+    success: false,
+    error: "Not implemented",
+  };
 };
 
 export const updateNarasumber = async (

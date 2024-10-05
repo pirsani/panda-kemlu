@@ -1,30 +1,48 @@
 import fs from "fs";
 import { NextRequest, NextResponse } from "next/server";
 import path, { extname } from "path";
-import { BASE_PATH_UPLOAD } from "./config";
+
+import { logUploadedFile } from "@/actions/file";
+import saveFile from "@/utils/file-operations/save";
+import { Logger } from "tslog";
+// Create a Logger instance with custom settings
+const logger = new Logger({
+  hideLogPositionForProduction: true,
+});
 
 export async function POST(req: NextRequest) {
   try {
     const data = await req.formData();
 
     const filename = data.get("filename") as string;
+
     const file = data.get("file") as File;
+    const originalFilename = file.name;
+    const sanitized = originalFilename.replace(/[^a-z0-9.]/gi, "_");
     const folderIdentifier = data.get("folder") as string;
     const fileExtension = extname(file.name);
     const uniqueFilename = `${filename}${fileExtension}`;
 
-    // Create the /files folder if it doesn't exist
-    const filesFolder = path.join(BASE_PATH_UPLOAD, "temp", folderIdentifier);
-    if (!fs.existsSync(filesFolder)) {
-      fs.mkdirSync(filesFolder, { recursive: true });
-    }
+    // base path will be mange on save.ts
+    const filesFolder = path.join("temp", folderIdentifier);
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const { filePath, relativePath, fileHash, fileType } = await saveFile({
+      file,
+      fileName: uniqueFilename,
+      directory: filesFolder,
+    });
 
-    // Write the file to the /files folder
-    const filePath = path.join(filesFolder, uniqueFilename);
-    fs.writeFileSync(filePath, buffer);
+    // log upladed file
+    //logger.info("File saved at:", filePath);
+    const savedFile = await logUploadedFile(
+      uniqueFilename,
+      file.name,
+      relativePath,
+      fileHash,
+      fileType.mime,
+      "admin"
+    );
+    //logger.info("File saved to database:", savedFile);
 
     return NextResponse.json({ message: "Upload complete" });
   } catch (error) {

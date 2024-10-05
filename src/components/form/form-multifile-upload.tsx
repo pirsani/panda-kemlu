@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { createId } from "@paralleldrive/cuid2";
 import axios from "axios";
 import { Check, CircleX, Eye, List, Minimize2 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
@@ -11,6 +11,7 @@ import { Progress } from "./progress";
 
 interface FormMultiFileUploadProps {
   name: string;
+  cuids?: string;
   folder?: string;
   onFileChange?: (files: File[] | null) => void;
   className?: string;
@@ -29,6 +30,7 @@ interface FileMap {
 
 export const FormMultiFileUpload = ({
   name,
+  cuids,
   folder = "",
   onFileChange,
   className,
@@ -43,8 +45,6 @@ export const FormMultiFileUpload = ({
   // Watch the field value to display previously saved files
   //const currentFiles = (watch(name) as File[] | undefined) || [];
   const currentFiles = Object.values(files).map((fileObj) => fileObj.file);
-
-  const [percentCompleted, setPercentCompleted] = useState<number[]>([]);
 
   // Function to reset the input value
   const resetInput = () => {
@@ -71,7 +71,9 @@ export const FormMultiFileUpload = ({
 
       // Upload each new file immediately
       for (const newFile of newFiles) {
-        const fileIdentifier = newFile.name + newFile.size;
+        // sanitize the file name
+        const filename = newFile.name.replace(/[^a-z0-9.]/gi, "_");
+        const fileIdentifier = filename + newFile.size;
         if (!files[fileIdentifier]) {
           const cuid = createId();
           setFiles((prevFiles) => ({
@@ -135,24 +137,17 @@ export const FormMultiFileUpload = ({
     trigger(name);
   };
 
-  // // Function to handle file deletion
-  // const handleDeleteFile = (index: number) => {
-  //   if (currentFiles) {
-  //     const updatedFiles = currentFiles.filter((_, i) => i !== index);
-  //     setValue(name, updatedFiles);
-  //     onFileChange && onFileChange(updatedFiles);
-  //   }
-  //   console.log("trigger", index);
-  //   trigger(name);
-  // };
-
   const handleDeleteFile = (index: number) => {
     if (currentFiles) {
       const fileToDelete = currentFiles[index];
-      const fileHash = fileToDelete.name + fileToDelete.size;
+      //const fileHash = fileToDelete.name + fileToDelete.size;
+
+      const filename = fileToDelete.name.replace(/[^a-z0-9.]/gi, "_");
+      const fileIdentifier = filename + fileToDelete.size;
+
       setFiles((prevFiles) => {
         const newFiles = { ...prevFiles };
-        delete newFiles[fileHash];
+        delete newFiles[fileIdentifier];
         return newFiles;
       });
       const updatedFiles = currentFiles.filter((_, i) => i !== index);
@@ -164,7 +159,7 @@ export const FormMultiFileUpload = ({
       axios
         .delete("/api/upload/delete", {
           data: {
-            filename: files[fileHash].filename + "." + ext,
+            filename: files[fileIdentifier].filename + "." + ext,
             folder: folder,
           },
         })
@@ -180,6 +175,18 @@ export const FormMultiFileUpload = ({
     console.log("trigger", index);
     trigger(name);
   };
+
+  useEffect(() => {
+    if (cuids) {
+      // loop through the files and set the cuids from filenames
+      const listOffiles = Object.values(files);
+      const filenames = listOffiles.map((file) => {
+        return file.filename;
+      });
+      console.log("cuids", cuids, filenames);
+      setValue(cuids, filenames);
+    }
+  }, [files]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -230,41 +237,46 @@ export const FormMultiFileUpload = ({
 
       {showFiles && currentFiles && currentFiles.length > 0 && (
         <div className="flex flex-col gap-0 w-full bg-gray-100 border border-gray-300 rounded p-1 w-full text-sm">
-          {currentFiles.map((file, index) => (
-            <div
-              key={index}
-              className="flex flex-row gap-1 items-center pl-2 rounded-sm hover:bg-slate-300 odd:bg-slate-200"
-            >
-              <div className="flex flex-col w-full">
-                <div className="flex-row flex">
-                  {files[file.name + file.size]?.progress >= 100 && (
-                    <Check size={16} className="text-green-600 mx-2" />
-                  )}
-                  <span className="flex-1 truncate ">{file.name}</span>
-                </div>
-                <Progress
-                  value={files[file.name + file.size]?.progress || 0}
-                  className={cn(
-                    "w-full h-[3px] rounded-sm ",
-                    files[file.name + file.size]?.progress >= 100
-                      ? "hidden"
-                      : "bg-blue-700"
-                  )}
-                  indicatorClassName="bg-slate-400"
-                />
-              </div>
-
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => handleDeleteFile(index)}
-                className="rounded-full p-1"
+          {currentFiles.map((file, index) => {
+            //sanitize the file name
+            const filename = file.name.replace(/[^a-z0-9.]/gi, "_");
+            const fileIdentifier = filename + file.size;
+            return (
+              <div
+                key={index}
+                className="flex flex-row gap-1 items-center pl-2 rounded-sm hover:bg-slate-300 odd:bg-slate-200"
               >
-                <CircleX size={24} className="text-red-600" />
-              </Button>
-            </div>
-          ))}
+                <div className="flex flex-col w-full">
+                  <div className="flex-row flex">
+                    {files[fileIdentifier]?.progress >= 100 && (
+                      <Check size={16} className="text-green-600 mx-2" />
+                    )}
+                    <span className="flex-1 truncate ">{file.name}</span>
+                  </div>
+                  <Progress
+                    value={files[fileIdentifier]?.progress || 0}
+                    className={cn(
+                      "w-full h-[3px] rounded-sm ",
+                      files[fileIdentifier]?.progress >= 100
+                        ? "hidden"
+                        : "bg-blue-700"
+                    )}
+                    indicatorClassName="bg-slate-400"
+                  />
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleDeleteFile(index)}
+                  className="rounded-full p-1"
+                >
+                  <CircleX size={24} className="text-red-600" />
+                </Button>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

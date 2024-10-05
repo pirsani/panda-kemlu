@@ -49,13 +49,15 @@ const TambahNarasumber = () => {
       if (dokumenPeryataanRekeningBerbeda) {
         formData.append(
           "dokumenPeryataanRekeningBerbeda",
-          dokumenPeryataanRekeningBerbeda as File
+          dokumenPeryataanRekeningBerbeda
         );
       } else {
         console.warn("No file provided for 'dokumenPeryataanRekeningBerbeda'.");
       }
 
       // Call API to save the data
+      console.log("Saving narasumber data:", data);
+      console.log("Saving narasumber formData:", formData);
       const simpan = await simpanNarasumber(formData);
 
       // Handle API response

@@ -60,6 +60,7 @@ export const ajukanUhDalamNegeri = async (
         fileName: "rampungan.pdf",
       });
     }
+    console.log("Files saved successfully");
   } catch (error) {
     console.error("Error saving files:", error);
     throw new Error("Error saving files");

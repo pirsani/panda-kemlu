@@ -45,7 +45,7 @@ const SaveAndLogUploadedFile = async (
   // Save the file to disk
 };
 
-const logUploadedFile = async (
+export const logUploadedFile = async (
   id: string,
   filename: string,
   filePath: string,
