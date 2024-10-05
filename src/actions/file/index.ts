@@ -54,9 +54,18 @@ export const logUploadedFile = async (
   createdBy: string
 ) => {
   // Save the file path to the database
-  const uploadedFile = await dbHonorarium.uploadedFile.create({
-    data: {
+  const uploadedFile = await dbHonorarium.uploadedFile.upsert({
+    where: { id },
+    create: {
       id,
+      originalFilename: filename,
+      filePath,
+      hash: fileHash,
+      mimeType,
+      createdBy,
+      createdAt: new Date(),
+    },
+    update: {
       originalFilename: filename,
       filePath,
       hash: fileHash,

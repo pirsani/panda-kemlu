@@ -11,6 +11,7 @@ import { Progress } from "./progress";
 
 interface FormMultiFileUploadProps {
   name: string;
+  filePrefix?: string;
   cuids?: string;
   folder?: string;
   onFileChange?: (files: File[] | null) => void;
@@ -30,6 +31,7 @@ interface FileMap {
 
 export const FormMultiFileUpload = ({
   name,
+  filePrefix = "",
   cuids,
   folder = "",
   onFileChange,
@@ -75,7 +77,8 @@ export const FormMultiFileUpload = ({
         const filename = newFile.name.replace(/[^a-z0-9.]/gi, "_");
         const fileIdentifier = filename + newFile.size;
         if (!files[fileIdentifier]) {
-          const cuid = createId();
+          const ext = getFileExtension(newFile.name);
+          const cuid = filePrefix + createId() + "." + ext;
           setFiles((prevFiles) => ({
             ...prevFiles,
             [fileIdentifier]: {

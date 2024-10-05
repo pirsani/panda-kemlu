@@ -7,6 +7,7 @@ import {
   DokumenUhDalamNegeriSchema,
 } from "@/zod/schemas/dokumen-uh-dalam-negeri";
 import { Kegiatan } from "@prisma-honorarium/client";
+import path from "path";
 
 // upload file to temp folder
 // update kegiatan status
@@ -34,30 +35,36 @@ export const ajukanUhDalamNegeri = async (
     }; // change to message
   }
 
+  const fileFolder = path.join(dataparsed.kegiatanId, "uh-dalam-negeri");
+
   try {
     // save file to temp folder
     if (dataparsed.laporanKegiatan) {
-      saveFile({
+      const { filePath, relativePath, fileHash, fileType } = await saveFile({
         file: dataparsed.laporanKegiatan,
         fileName: "laporan-kegiatan.pdf",
+        directory: fileFolder,
       });
     }
     if (dataparsed.daftarHadir) {
-      saveFile({
+      const { filePath, relativePath, fileHash, fileType } = await saveFile({
         file: dataparsed.daftarHadir,
         fileName: "daftar-hadir.pdf",
+        directory: fileFolder,
       });
     }
     if (dataparsed.dokumentasi) {
-      saveFile({
+      const { filePath, relativePath, fileHash, fileType } = await saveFile({
         file: dataparsed.dokumentasi,
         fileName: "dokumentasi.pdf",
+        directory: fileFolder,
       });
     }
     if (dataparsed.rampungan) {
-      saveFile({
+      const { filePath, relativePath, fileHash, fileType } = await saveFile({
         file: dataparsed.rampungan,
         fileName: "rampungan.pdf",
+        directory: fileFolder,
       });
     }
     console.log("Files saved successfully");

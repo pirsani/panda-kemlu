@@ -16,6 +16,7 @@ import kegiatanSchema, {
 import { Kegiatan } from "@prisma-honorarium/client";
 import { format } from "date-fns";
 import fs from "fs";
+import { startsWith } from "lodash";
 import path from "path";
 import { Logger } from "tslog";
 import { never, ZodError } from "zod";
@@ -35,7 +36,7 @@ export const setupKegiatan = async (
   // get satkerId and unitKerjaId from the user
   const pengguna = await getSessionPengguna();
   logger.info("Pengguna", pengguna);
-  if (!pengguna.success) {
+  if (!pengguna.success || !pengguna.data || !pengguna.data.id) {
     return {
       success: false,
       error: "E-UAuth-01",
@@ -53,6 +54,7 @@ export const setupKegiatan = async (
 
   const satkerId = pengguna.data.satkerId;
   const unitKerjaId = pengguna.data.unitKerjaId;
+  const penggunaId = pengguna.data.id;
 
   // step 1: parse the form data
   try {
@@ -117,31 +119,76 @@ export const setupKegiatan = async (
   // step 3: save the data to the database
   // data ready to be saved
   try {
-    const result = await dbHonorarium.$transaction(async (prisma) => {
+    const kegiatan = await dbHonorarium.$transaction(async (prisma) => {
       // Create the main kegiatan entry
       const kegiatanBaru = await createKegiatan(
         prisma,
         dataparsed,
         satkerId,
-        unitKerjaId
+        unitKerjaId,
+        penggunaId
       );
       // insert peserta dari excel
       const peserta = await insertPesertaDariExcel(
         prisma,
         kegiatanBaru.id,
-        dataPesertaDariExcel.rows
+        dataPesertaDariExcel.rows,
+        penggunaId
       );
       // Handle the documents for surat tugas
       const suratTugas = await insertDokumenSuratTugas(
         prisma,
         kegiatanBaru.id,
-        dataparsed
+        dataparsed,
+        penggunaId
       );
       return kegiatanBaru;
     });
+
+    // move the file to the final folder
+    const year = kegiatan.tanggalMulai.getFullYear();
+    const finalFolder = path.join(year.toString(), kegiatan.id);
+    await moveFolderToFinalLocation(cuid, finalFolder);
+    // update database uploaded file
+    // Fetch the uploaded file record
+    const uploadedFiles = await dbHonorarium.uploadedFile.findMany({
+      where: {
+        filePath: {
+          contains: `temp/${cuid}`,
+        },
+      },
+    });
+
+    if (uploadedFiles.length > 0) {
+      const year = new Date().getFullYear();
+
+      await Promise.all(
+        uploadedFiles.map(async (file) => {
+          const newFilePath = file.filePath.replace(
+            `temp/${cuid}`,
+            `${year}/${kegiatan.id}`
+          );
+
+          // Update the filepath in the database
+          await dbHonorarium.uploadedFile.update({
+            where: {
+              id: file.id,
+            },
+            data: {
+              filePath: newFilePath,
+            },
+          });
+
+          console.log(`Filepath updated to: ${newFilePath}`);
+        })
+      );
+    } else {
+      console.log(`No file found with filepath containing: temp/${cuid}`);
+    }
+
     return {
       success: true,
-      data: result,
+      data: kegiatan,
     };
   } catch (error) {
     return getPrismaErrorResponse(error as Error);
@@ -150,6 +197,23 @@ export const setupKegiatan = async (
     //   error: "Error saving kegiatan",
     //   message: "Error saving kegiatan",
     // };
+  }
+};
+
+const moveFolderToFinalLocation = async (
+  fromCuid: string,
+  toKegiatanId: string
+) => {
+  // move the folder to the final location
+  const tempFolder = path.join(BASE_PATH_UPLOAD, "temp", fromCuid);
+  const finalFolder = path.join(BASE_PATH_UPLOAD, toKegiatanId);
+  try {
+    // Ensure the final folder exists
+    fs.mkdirSync(finalFolder, { recursive: true });
+    fs.renameSync(tempFolder, finalFolder);
+  } catch (error) {
+    console.error("Error moving folder:", error);
+    throw new Error("Error moving folder");
   }
 };
 
@@ -237,7 +301,8 @@ async function createKegiatan(
   prisma: Prisma.TransactionClient,
   dataparsed: ZKegiatan,
   satkerId: string,
-  unitKerjaId: string
+  unitKerjaId: string,
+  penggunaId: string
 ) {
   return prisma.kegiatan.create({
     data: {
@@ -251,7 +316,7 @@ async function createKegiatan(
       dokumenJadwal: dataparsed.dokumenJadwalCuid,
       satkerId: satkerId,
       unitKerjaId: unitKerjaId,
-      createdBy: "admin",
+      createdBy: penggunaId,
       provinsiId: dataparsed.provinsi,
     },
   });
@@ -260,7 +325,8 @@ async function createKegiatan(
 async function insertPesertaDariExcel(
   prisma: Prisma.TransactionClient,
   kegiatanBaruId: string,
-  pesertaKegiatan: Record<string, any>[]
+  pesertaKegiatan: Record<string, any>[],
+  penggunaId: string
 ) {
   const pesertaBaru = await Promise.all(
     pesertaKegiatan.map(async (peserta) => {
@@ -283,7 +349,7 @@ async function insertPesertaDariExcel(
           bank: peserta["Bank"],
           nomorRekening: peserta["Nomor Rekening"],
           namaRekening: peserta["Nama Rekening"],
-          createdBy: "admin",
+          createdBy: penggunaId,
           jumlahHari: 0, // Default to 0 HARDCODED
         },
       });
@@ -295,19 +361,35 @@ async function insertPesertaDariExcel(
 async function insertDokumenSuratTugas(
   prisma: Prisma.TransactionClient,
   kegiatanBaruId: string,
-  dataparsed: ZKegiatan
+  dataparsed: ZKegiatan,
+  penggunaId: string
 ) {
-  if (dataparsed.dokumenSuratTugas) {
-    if (Array.isArray(dataparsed.dokumenSuratTugas)) {
+  console.log(
+    "dataparsed.dokumenSuratTugasCuid",
+    dataparsed.dokumenSuratTugasCuid
+  );
+  if (dataparsed.dokumenSuratTugasCuid) {
+    if (typeof dataparsed.dokumenSuratTugasCuid === "string") {
+      try {
+        dataparsed.dokumenSuratTugasCuid = JSON.parse(
+          dataparsed.dokumenSuratTugasCuid
+        );
+      } catch (error) {
+        console.error("Failed to parse dokumenSuratTugasCuid as JSON:", error);
+      }
+    }
+
+    if (Array.isArray(dataparsed.dokumenSuratTugasCuid)) {
+      console.log("dataparsed.dokumenSuratTugasCuid is an array");
       await Promise.all(
-        dataparsed.dokumenSuratTugas.map((dokumen) => {
-          if (dokumen && dokumen.name) {
+        dataparsed.dokumenSuratTugasCuid.map((dokumen) => {
+          if (dokumen) {
             return prisma.dokumenSuratTugas.create({
               data: {
-                nama: dokumen.name,
-                dokumen: dokumen.name,
+                nama: dokumen,
+                dokumen: dokumen,
                 kegiatanId: kegiatanBaruId,
-                createdBy: "admin",
+                createdBy: penggunaId,
               },
             });
           } else {
@@ -317,13 +399,14 @@ async function insertDokumenSuratTugas(
         })
       );
     } else {
-      if (dataparsed.dokumenSuratTugas.name) {
+      console.log("dataparsed.dokumenSuratTugasCuid is not an array");
+      if (dataparsed.dokumenSuratTugasCuid) {
         await prisma.dokumenSuratTugas.create({
           data: {
-            nama: dataparsed.dokumenSuratTugas.name,
-            dokumen: dataparsed.dokumenSuratTugas.name,
+            nama: dataparsed.dokumenSuratTugasCuid,
+            dokumen: dataparsed.dokumenSuratTugasCuid,
             kegiatanId: kegiatanBaruId,
-            createdBy: "admin",
+            createdBy: penggunaId,
           },
         });
       } else {
@@ -335,13 +418,5 @@ async function insertDokumenSuratTugas(
     }
   }
 }
-
-const saveDokumenSetupKegiatan = async (
-  nodin: File,
-  jadwal: File,
-  surtug: File[]
-) => {
-  // Save the file to disk
-};
 
 export default setupKegiatan;

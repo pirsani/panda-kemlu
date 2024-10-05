@@ -68,9 +68,9 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
       dokumenSuratTugas: undefined,
       dokumenSuratTugasCuid: [],
       dokumenJadwal: undefined,
-      dokumenJadwalCuid: createId(),
+      dokumenJadwalCuid: "jadwal" + createId() + ".pdf",
       dokumenNodinMemoSk: undefined,
-      dokumenNodinMemoSkCuid: createId(),
+      dokumenNodinMemoSkCuid: "nodin" + createId() + ".pdf",
     },
     //reValidateMode: "onChange",
   });
@@ -313,6 +313,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
                 }}
               >
                 <FormMultiFileUpload
+                  filePrefix="surtug"
                   name={field.name}
                   cuids={"dokumenSuratTugasCuid"}
                   folder={folderCuid}

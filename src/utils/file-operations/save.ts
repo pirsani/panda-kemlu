@@ -42,7 +42,7 @@ saveFile({ file, fileName: "example.txt", directory })
 */
 
 interface SaveFileOptions {
-  file: File;
+  file: File | Buffer;
   fileName: string;
   directory?: string;
   allowedMimeTypes?: string[];
@@ -54,8 +54,16 @@ const saveFile = async ({
   allowedMimeTypes = ["application/pdf", "image/jpeg", "image/png"],
 }: SaveFileOptions) => {
   // Check if the input is a file
-  if (!(file instanceof File)) {
-    throw new Error("The provided input is not a file.");
+
+  let buffer: ArrayBuffer | Buffer;
+
+  // Handle both File and Buffer types
+  if (file instanceof File) {
+    buffer = await file.arrayBuffer(); // Convert File to ArrayBuffer
+  } else if (file instanceof Buffer) {
+    buffer = file; // Use Buffer directly
+  } else {
+    throw new Error("The provided input is neither a valid File nor Buffer.");
   }
 
   // Fix the directory handling
@@ -73,22 +81,22 @@ const saveFile = async ({
     fs.mkdirSync(dirPath, { recursive: true });
   }
 
-  // Save the file
-  const buffer = await file.arrayBuffer();
+  // Convert ArrayBuffer to Buffer if necessary
+  const fileBuffer = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer);
 
   // Check if the file type is allowed
-  const fileType = await fileTypeFromBuffer(buffer);
+  const fileType = await fileTypeFromBuffer(fileBuffer);
   if (!fileType || !allowedMimeTypes.includes(fileType.mime)) {
     throw new Error("Invalid file type.");
   }
 
   const filePath = path.join(dirPath, fileName);
-  await fs.promises.writeFile(filePath, Buffer.from(buffer));
+  await fs.promises.writeFile(filePath, Buffer.from(fileBuffer));
   //await fs.writeFile(filePath, buffer);
 
   // Calculate the hash of the file using SHA-256
   const hashSum = createHash("sha256");
-  hashSum.update(Buffer.from(buffer));
+  hashSum.update(Buffer.from(fileBuffer));
   const fileHash = hashSum.digest("hex");
 
   // Calculate the relative path from the base path

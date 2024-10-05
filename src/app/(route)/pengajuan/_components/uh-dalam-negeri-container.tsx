@@ -26,6 +26,7 @@ import {
   SubmitHandler,
   useForm,
 } from "react-hook-form";
+import { toast } from "sonner";
 
 type FormValues<T> = T extends true
   ? DokumenUhDalamNegeriEditMode
@@ -71,6 +72,11 @@ const UhDalamNegeriContainer = ({
     formData.append("rampungan", data.rampungan as File);
 
     const ajukan = await ajukanUhDalamNegeri(formData);
+    if (ajukan.success) {
+      toast.success("Pengajuan berhasil");
+    } else {
+      toast.error(`Pengajuan gagal ${ajukan.error} ${ajukan.message}`);
+    }
     console.log("[response]", ajukan);
   };
 
