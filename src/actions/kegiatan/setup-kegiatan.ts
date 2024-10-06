@@ -116,8 +116,16 @@ export const setupKegiatan = async (
         dataPesertaDariExcel.rows,
         penggunaId
       );
+
       // Handle the documents for surat tugas
-      const suratTugas = await insertDokumenSuratTugas(
+      // const suratTugas = await insertDokumenSuratTugas(
+      //   prisma,
+      //   kegiatanBaru.id,
+      //   kegiatan,
+      //   penggunaId
+      // );
+
+      const insertedDokumenKegiatan = await insertDokumenKegiatan(
         prisma,
         kegiatanBaru.id,
         kegiatan,
@@ -364,6 +372,135 @@ async function insertDokumenSuratTugas(
         );
       }
     }
+  }
+}
+
+async function insertDokumenKegiatan(
+  prisma: Prisma.TransactionClient,
+  kegiatanBaruId: string,
+  dataparsed: ZKegiatan,
+  penggunaId: string
+) {
+  console.log(
+    "dataparsed.dokumenSuratTugasCuid",
+    dataparsed.dokumenSuratTugasCuid
+  );
+
+  interface DokumenKegiatan {
+    nama: string;
+    dokumen: string;
+    jenisDokumenId: string;
+    kegiatanId: string;
+    createdBy: string;
+  }
+
+  let dokumenKegiatan: DokumenKegiatan[] = [];
+
+  try {
+    if (dataparsed.dokumenSuratTugasCuid) {
+      if (typeof dataparsed.dokumenSuratTugasCuid === "string") {
+        try {
+          dataparsed.dokumenSuratTugasCuid = JSON.parse(
+            dataparsed.dokumenSuratTugasCuid
+          );
+        } catch (error) {
+          console.error(
+            "Failed to parse dokumenSuratTugasCuid as JSON:",
+            error
+          );
+        }
+      }
+
+      if (Array.isArray(dataparsed.dokumenSuratTugasCuid)) {
+        console.log("dataparsed.dokumenSuratTugasCuid is an array");
+        const daftarDokumenSuratTugas = dataparsed.dokumenSuratTugasCuid.map(
+          (dokumen) => {
+            return {
+              nama: dokumen,
+              dokumen: dokumen,
+              jenisDokumenId: "surat-tugas",
+              kegiatanId: kegiatanBaruId,
+              createdBy: penggunaId,
+            };
+          }
+        );
+        await prisma.dokumenKegiatan.createMany({
+          data: daftarDokumenSuratTugas,
+        });
+        dokumenKegiatan = [...dokumenKegiatan, ...daftarDokumenSuratTugas];
+      } else {
+        console.log("dataparsed.dokumenSuratTugasCuid is not an array");
+        if (dataparsed.dokumenSuratTugasCuid) {
+          await prisma.dokumenKegiatan.create({
+            data: {
+              nama: dataparsed.dokumenSuratTugasCuid,
+              dokumen: dataparsed.dokumenSuratTugasCuid,
+              kegiatanId: kegiatanBaruId,
+              createdBy: penggunaId,
+            },
+          });
+        } else {
+          // Handle the case where dokumenSuratTugas.name is undefined
+          console.error(
+            "[SHOULD NEVER BE HERE] dokumenSuratTugas.name is undefined"
+          );
+        }
+      }
+    }
+
+    if (dataparsed.dokumenJadwalCuid) {
+      const newDok = {
+        nama: "Jadwal Kegiatan",
+        dokumen: dataparsed.dokumenJadwalCuid,
+        jenisDokumenId: "jadwal-kegiatan",
+        kegiatanId: kegiatanBaruId,
+        createdBy: penggunaId,
+      };
+      const dok = await prisma.dokumenKegiatan.create({
+        data: newDok,
+      });
+      dokumenKegiatan.push(newDok);
+    }
+
+    if (dataparsed.dokumenNodinMemoSkCuid) {
+      const newDok = {
+        nama: "Nodin/Memo/Surat Keputusan",
+        dokumen: dataparsed.dokumenNodinMemoSkCuid,
+        jenisDokumenId: "nota-dinas-memorandum-sk",
+        kegiatanId: kegiatanBaruId,
+        createdBy: penggunaId,
+      };
+      await prisma.dokumenKegiatan.create({
+        data: newDok,
+      });
+      dokumenKegiatan.push(newDok);
+    }
+
+    if (
+      dataparsed.lokasi === "LUAR_NEGERI" &&
+      dataparsed.dokumenSuratSetnegSptjmCuid
+    ) {
+      const newDok = {
+        nama: "Surat Setneg/SPTJM",
+        dokumen: dataparsed.dokumenSuratSetnegSptjmCuid,
+        jenisDokumenId: "surat-setneg-sptjm",
+        kegiatanId: kegiatanBaruId,
+        createdBy: penggunaId,
+      };
+      await prisma.dokumenKegiatan.create({
+        data: newDok,
+      });
+      dokumenKegiatan.push(newDok);
+    }
+
+    return {
+      success: true,
+      data: dokumenKegiatan,
+    };
+  } catch (error) {
+    // return getPrismaErrorResponse(error as Error);
+    console.error("Error saving dokumen kegiatan", error);
+    throw error;
   }
 }
 
