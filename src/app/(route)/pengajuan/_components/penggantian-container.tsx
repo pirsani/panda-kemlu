@@ -1,6 +1,6 @@
 const PenggantianContainer = () => {
   return (
-    <div>
+    <div className="hidden">
       <h1>Penggantian Container</h1>
     </div>
   );

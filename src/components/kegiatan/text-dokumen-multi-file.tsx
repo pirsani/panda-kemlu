@@ -1,10 +1,12 @@
+import { DokumenKegiatan } from "@prisma-honorarium/client";
 import { Eye, List } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../ui/button";
+import ListItemDokumenWithPreviewButton from "./list-item-dokumen-with-preview-button";
 
 interface TextDokumenMultiFileProps {
   label: string;
-  dokumen: string[];
+  dokumen: DokumenKegiatan[];
 }
 const TextDokumenMultiFile = ({
   label,
@@ -34,24 +36,10 @@ const TextDokumenMultiFile = ({
 
       <div>
         {listOpened && dokumen.length > 0 && (
-          <div className="flex flex-col gap-1 w-full bg-gray-100 border border-gray-300 rounded px-2 py-1 w-full">
+          <div className="flex flex-col mt-1 gap-1 w-full bg-gray-100 border border-gray-300 rounded px-2 py-1 w-full">
             {dokumen.map((file, index) => {
               return (
-                <div
-                  key={index}
-                  className="flex flex-row gap-1 items-center p-1 hover:bg-gray-300"
-                >
-                  <span className="flex-1 truncate">{file}</span>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    //onClick={() => handleDeleteFile(index)}
-                    className="rounded-full p-1"
-                  >
-                    <Eye size={24} className="text-gray-500" />
-                  </Button>
-                </div>
+                <ListItemDokumenWithPreviewButton key={index} dokumen={file} />
               );
             })}
           </div>

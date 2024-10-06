@@ -466,7 +466,7 @@ async function insertDokumenKegiatan(
       const newDok = {
         nama: "Nodin/Memo/Surat Keputusan",
         dokumen: dataparsed.dokumenNodinMemoSkCuid,
-        jenisDokumenId: "nota-dinas-memorandum-sk",
+        jenisDokumenId: "nodin-memo-sk",
         kegiatanId: kegiatanBaruId,
         createdBy: penggunaId,
       };

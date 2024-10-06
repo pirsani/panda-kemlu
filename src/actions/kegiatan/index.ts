@@ -3,7 +3,12 @@
 import { dbHonorarium } from "@/lib/db-honorarium";
 import { Organisasi } from "@prisma-honorarium/client";
 
-import { Itinerary, Kegiatan, Provinsi } from "@prisma-honorarium/client";
+import {
+  DokumenKegiatan,
+  Itinerary,
+  Kegiatan,
+  Provinsi,
+} from "@prisma-honorarium/client";
 import { getTahunAnggranPilihan } from "../pengguna/preference";
 
 export interface KegiatanWithSatker extends Kegiatan {
@@ -24,16 +29,20 @@ export const getKegiatan = async (
 };
 
 export interface KegiatanWithDetail extends Kegiatan {
-  itinerary: Itinerary[];
-  provinsi: Provinsi;
+  itinerary: Itinerary[] | null;
+  provinsi: Provinsi | null;
+  dokumenKegiatan: DokumenKegiatan[] | null;
 }
 
-export const getKegiatanById = async (id: string) => {
+export const getKegiatanById = async (
+  id: string
+): Promise<KegiatanWithDetail | null> => {
   const kegiatan = await dbHonorarium.kegiatan.findUnique({
     where: { id },
     include: {
       itinerary: true,
       provinsi: true,
+      dokumenKegiatan: true,
     },
   });
 

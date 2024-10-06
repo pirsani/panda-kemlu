@@ -1,5 +1,5 @@
 "use client";
-import { getKegiatanById } from "@/actions/kegiatan";
+import { getKegiatanById, KegiatanWithDetail } from "@/actions/kegiatan";
 import FloatingComponent from "@/components/floating-component";
 import PreviewKegiatan from "@/components/kegiatan";
 import PdfPreviewContainer from "@/components/pdf-preview-container";
@@ -26,7 +26,7 @@ const SelectKegiatan = dynamic(
 
 const PengajuanContainer = () => {
   const [kegiatanId, setKegiatanId] = useState<string | null>(null);
-  const [kegiatan, setKegiatan] = useState<Kegiatan | null>(null);
+  const [kegiatan, setKegiatan] = useState<KegiatanWithDetail | null>(null);
   const [riwayatProses, setRiwayatProses] = useState<RiwayatProses[]>([]);
   const [jenisPengajuan, setJenisPengajuan] = useState<JenisPengajuan | null>(
     null
@@ -44,7 +44,9 @@ const PengajuanContainer = () => {
     setKegiatanId(value); // after this set, it will trigger re-render PreviewKegiatan
   };
 
-  const handleSuccessPengajuanRampungan = (kegiatanUpdated: Kegiatan) => {
+  const handleSuccessPengajuanRampungan = (
+    kegiatanUpdated: KegiatanWithDetail
+  ) => {
     setKegiatan((kegiatan) => ({
       ...kegiatan,
       ...kegiatanUpdated,
@@ -73,55 +75,56 @@ const PengajuanContainer = () => {
   }, []);
 
   return (
-    <div className="relative flex flex-col w-full gap-6 pb-20">
-      <div className="w-full sm:w-1/2 flex flex-col gap-2 ">
-        <SelectKegiatan
-          inputId="kegiatan"
-          onChange={handleKegiatanChange}
-          className="w-full"
-        />
-        <div className="flex flex-row gap-2 w-full border-gray-300 border rounded-md p-2 shadow-lg">
-          <PreviewKegiatan kegiatan={kegiatan} className="w-full" />
+    <>
+      <div className="relative flex flex-col w-full lg:w-1/2 gap-6 pb-20 bg-gray-100 rounded-lg py-4 lg:px-4">
+        <div className="w-full flex flex-col gap-2 ">
+          <SelectKegiatan
+            inputId="kegiatan"
+            onChange={handleKegiatanChange}
+            className="w-full"
+          />
+          <div className="flex flex-row gap-2 w-full border-gray-300 border rounded-md p-2 shadow-lg">
+            <PreviewKegiatan kegiatan={kegiatan} className="w-full" />
+          </div>
         </div>
-      </div>
-      <div className="w-full sm:w-1/2 flex flex-col gap-2 ">
-        <ButtonsPengajuan
-          jenisPengajuan={jenisPengajuan}
-          handleSelection={handleSelection}
-          kegiatan={kegiatan}
-          riwayatProses={riwayatProses}
-        />
+        <div className="w-full flex flex-col gap-2 ">
+          <ButtonsPengajuan
+            jenisPengajuan={jenisPengajuan}
+            handleSelection={handleSelection}
+            kegiatan={kegiatan}
+            riwayatProses={riwayatProses}
+          />
 
-        <span>{jenisPengajuan}</span>
+          <span>{jenisPengajuan}</span>
 
-        <DisplayFormPengajuanGenerateRampungan
-          jenisPengajuan={jenisPengajuan}
-          kegiatan={kegiatan}
-          handleSuccess={handleSuccessPengajuanRampungan}
-        />
+          <DisplayFormPengajuanGenerateRampungan
+            jenisPengajuan={jenisPengajuan}
+            kegiatan={kegiatan}
+            handleSuccess={handleSuccessPengajuanRampungan}
+          />
 
-        {jenisPengajuan == "HONORARIUM" && kegiatan && (
-          <HonorariumContainer kegiatan={kegiatan} />
-        )}
+          {jenisPengajuan == "HONORARIUM" && kegiatan && (
+            <HonorariumContainer kegiatan={kegiatan} />
+          )}
 
-        {/* 
+          {/* 
         TODO: jika sudah diajukan maka tampilkan form pengajuan view only
         tidak bisa update dokumen sampai pengajuan di minta untuk revisi dengan status revisi di kolom statusUhDalamNegeri
          */}
-        {jenisPengajuan == "UH_DALAM_NEGERI" && kegiatan && (
-          <UhDalamNegeriContainer kegiatanId={kegiatan.id} />
-        )}
-        {jenisPengajuan == "UH_LUAR_NEGERI" && <UhLuarNegeriContainer />}
-        {jenisPengajuan == "PENGGANTIAN_REINBURSEMENT" && (
-          <PenggantianContainer />
-        )}
-        {jenisPengajuan == "PEMBAYARAN_PIHAK_KETIGA" && <PihakKe3Container />}
+          {jenisPengajuan == "UH_DALAM_NEGERI" && kegiatan && (
+            <UhDalamNegeriContainer kegiatanId={kegiatan.id} />
+          )}
+          {jenisPengajuan == "UH_LUAR_NEGERI" && <UhLuarNegeriContainer />}
+          {jenisPengajuan == "PENGGANTIAN_REINBURSEMENT" && (
+            <PenggantianContainer />
+          )}
+          {jenisPengajuan == "PEMBAYARAN_PIHAK_KETIGA" && <PihakKe3Container />}
+        </div>
       </div>
-
       <FloatingComponent hide={isPreviewHidden} onHide={handleOnHide}>
         <PdfPreviewContainer className="border-2 h-full border-gray-500" />
       </FloatingComponent>
-    </div>
+    </>
   );
 };
 

@@ -1,5 +1,5 @@
 "use client";
-import { getKegiatanById } from "@/actions/kegiatan";
+import { getKegiatanById, KegiatanWithDetail } from "@/actions/kegiatan";
 import { Kegiatan, LOKASI } from "@prisma-honorarium/client";
 //import { Kegiatan } from "@/zod/schemas/kegiatan";
 import { cn } from "@/lib/utils";
@@ -9,7 +9,7 @@ import TextDokumenMultiFile from "./text-dokumen-multi-file";
 import TextDokumenWithPreviewButton from "./text-dokumen-with-preview-button";
 
 interface PreviewKegiatanProps {
-  kegiatan?: Kegiatan | null;
+  kegiatan?: KegiatanWithDetail | null;
   className?: string;
 }
 const PreviewKegiatan = ({ kegiatan, className }: PreviewKegiatanProps) => {
@@ -23,6 +23,19 @@ const PreviewKegiatan = ({ kegiatan, className }: PreviewKegiatanProps) => {
       </div>
     );
   }
+
+  const dokumenKegiatan = kegiatan.dokumenKegiatan;
+  const dokumenSuratTugas = dokumenKegiatan?.filter(
+    (dokumen) => dokumen.jenisDokumenId === "surat-tugas"
+  );
+
+  const dokumenNodinMemoSk = dokumenKegiatan?.find(
+    (dokumen) => dokumen.jenisDokumenId === "nodin-memo-sk"
+  );
+
+  const dokumenJadwal = dokumenKegiatan?.find(
+    (dokumen) => dokumen.jenisDokumenId === "jadwal-kegiatan"
+  );
 
   return (
     <div className={cn("rounded-sm", className)}>
@@ -52,68 +65,17 @@ const PreviewKegiatan = ({ kegiatan, className }: PreviewKegiatanProps) => {
 
           <TextDokumenWithPreviewButton
             label="Dokumen Nodin/Memo/SK"
-            dokumen={kegiatan.dokumenNodinMemoSk}
+            dokumen={dokumenNodinMemoSk}
           />
 
           <TextDokumenWithPreviewButton
             label="Dokumen Jadwal Kegiatan"
-            dokumen={kegiatan.dokumenJadwal}
+            dokumen={dokumenJadwal}
           />
 
           <TextDokumenMultiFile
             label="Dokumen Surat Tugas (multiple files)"
-            dokumen={[
-              "file1.pdf",
-              "file2.pdf",
-              "file3.pdf",
-              "file4.pdf",
-              "file5.pdf",
-              "file6.pdf",
-              "file7.pdf",
-              "file8.pdf",
-              "file9.pdf",
-              "file10.pdf",
-              "file11.pdf",
-              "file12.pdf",
-              "file13.pdf",
-              "file14.pdf",
-              "file15.pdf",
-              "file16.pdf",
-              "file17.pdf",
-              "file18.pdf",
-              "file19.pdf",
-              "file20.pdf",
-              "file21.pdf",
-              "file22.pdf",
-              "file23.pdf",
-              "file24.pdf",
-              "file25.pdf",
-              "file26.pdf",
-              "file27.pdf",
-              "file28.pdf",
-              "file29.pdf",
-              "file30.pdf",
-              "file31.pdf",
-              "file32.pdf",
-              "file33.pdf",
-              "file34.pdf",
-              "file35.pdf",
-              "file36.pdf",
-              "file37.pdf",
-              "file38.pdf",
-              "file39.pdf",
-              "file40.pdf",
-              "file41.pdf",
-              "file42.pdf",
-              "file43.pdf",
-              "file44.pdf",
-              "file45.pdf",
-              "file46.pdf",
-              "file47.pdf",
-              "file48.pdf",
-              "file49.pdf",
-              "file50.pdf",
-            ]}
+            dokumen={dokumenSuratTugas || []}
           />
 
           <div className="flex flex-col">

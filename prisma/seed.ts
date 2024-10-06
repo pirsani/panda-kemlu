@@ -262,6 +262,9 @@ const deleteExisting = async (): Promise<void> => {
     await dbHonorarium.riwayatProses.deleteMany({});
     await dbHonorarium.dokumenSuratTugas.deleteMany({});
     await dbHonorarium.pesertaKegiatan.deleteMany({});
+    await dbHonorarium.itinerary.deleteMany({});
+    await dbHonorarium.dokumenKegiatan.deleteMany({});
+    await dbHonorarium.uploadedFile.deleteMany({});
     await dbHonorarium.kegiatan.deleteMany({});
     await dbHonorarium.pejabatPerbendaharaan.deleteMany({});
     await dbHonorarium.jenisJabatanPerbendaharaan.deleteMany({});
@@ -300,13 +303,58 @@ async function main() {
   await seedProvinsi();
   await seedKota();
 
-  const routes = await dbHonorarium.jadwal.findMany({});
-  console.log(routes);
+  // const routes = await dbHonorarium.jadwal.findMany({});
+  // console.log(routes);
+
+  const unitDiPusdiklat = await dbHonorarium.organisasi.createMany({
+    data: [
+      {
+        nama: "Bidang Perencanaan, Pengembangan, dan Evaluasi",
+        singkatan: "PPE",
+        isSatkerAnggaran: false,
+        eselon: 3,
+        createdBy: "init",
+        indukOrganisasiId: initialUnitKerja[10].id,
+      },
+      {
+        nama: "Bidang Pendidikan dan Pelatihan Nondiplomatik",
+        singkatan: "Diklat Nondiplomatik",
+        isSatkerAnggaran: false,
+        eselon: 3,
+        createdBy: "init",
+        indukOrganisasiId: initialUnitKerja[10].id,
+      },
+      {
+        nama: "Bidang Pendidikan dan Pelatihan Teknis",
+        singkatan: "Diklat Teknis",
+        isSatkerAnggaran: false,
+        eselon: 3,
+        createdBy: "init",
+        indukOrganisasiId: initialUnitKerja[10].id,
+      },
+      {
+        nama: "Bidang Kerja Sama Pendidikan dan Pelatihan",
+        singkatan: "KS Diklat",
+        isSatkerAnggaran: false,
+        eselon: 3,
+        createdBy: "init",
+        indukOrganisasiId: initialUnitKerja[10].id,
+      },
+      {
+        nama: "Bagian Tata Usaha",
+        singkatan: "TU",
+        isSatkerAnggaran: false,
+        eselon: 3,
+        createdBy: "init",
+        indukOrganisasiId: initialUnitKerja[10].id,
+      },
+    ],
+  });
 
   const dokumenKegiatan = await dbHonorarium.jenisDokumenKegiatan.createMany({
     data: [
       {
-        id: "nota-dinas-memorandum-sk",
+        id: "nodin-memo-sk",
         nama: "nota-dinas-memorandum-sk",
         createdBy: "init",
         deskripsi: "Nota Dinas/Memorandum/ SK Tim",

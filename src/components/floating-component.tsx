@@ -18,7 +18,7 @@ interface ResizableDraggableProps {
 
 const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
   children,
-  hide = false,
+  hide = true,
   onHide = () => {},
 }) => {
   const [position, setPosition] = useState({ x: 100, y: 100 });
@@ -42,6 +42,7 @@ const ResizableDraggable: React.FC<ResizableDraggableProps> = ({
   useEffect(() => {
     setIsClient(true);
     handleNormalSize(); // Start in normal size mode
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle Drag Start

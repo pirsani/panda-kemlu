@@ -38,6 +38,11 @@ export const pengajuanGenerateRampungan = async (kegiatanId: string) => {
     data: {
       statusRampungan: "pengajuan",
     },
+    include: {
+      itinerary: true,
+      provinsi: true,
+      dokumenKegiatan: true,
+    },
   });
   console.log("[createRiwayatProses]", updateStatusRampungan);
 

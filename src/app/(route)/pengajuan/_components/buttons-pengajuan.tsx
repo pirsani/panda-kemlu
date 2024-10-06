@@ -123,6 +123,7 @@ const ButtonsPengajuan = ({
           variant="outline"
           onClick={() => handleOnClick("PENGGANTIAN_REINBURSEMENT")}
           className={cn(
+            "hidden",
             "hover:bg-blue-400 hover:text-white gap-2",
             jenisPengajuan == "PENGGANTIAN_REINBURSEMENT" &&
               "bg-blue-500 text-white"
@@ -137,6 +138,7 @@ const ButtonsPengajuan = ({
           variant="outline"
           onClick={() => handleOnClick("PEMBAYARAN_PIHAK_KETIGA")}
           className={cn(
+            "hidden",
             "hover:bg-blue-400 hover:text-white gap-2",
             jenisPengajuan == "PEMBAYARAN_PIHAK_KETIGA" &&
               "bg-blue-500 text-white"

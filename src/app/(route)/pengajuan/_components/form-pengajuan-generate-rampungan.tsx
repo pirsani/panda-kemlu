@@ -1,3 +1,4 @@
+import { KegiatanWithDetail } from "@/actions/kegiatan";
 import { pengajuanGenerateRampungan } from "@/actions/kegiatan/proses";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -18,7 +19,7 @@ type FormData = z.infer<typeof schema>;
 interface FormPengajuanGenerateRampunganProps {
   kegiatanId: string | null;
   className?: string;
-  handleSuccess?: (kegiatan: Kegiatan) => void;
+  handleSuccess?: (kegiatan: KegiatanWithDetail) => void;
 }
 const FormPengajuanGenerateRampungan = ({
   className,

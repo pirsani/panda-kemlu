@@ -1,6 +1,6 @@
 const PihakKe3Container = () => {
   return (
-    <div>
+    <div className="hidden">
       <h1>Pihak Ke-3</h1>
     </div>
   );

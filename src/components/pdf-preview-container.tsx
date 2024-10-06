@@ -2,6 +2,7 @@
 
 import PdfPreview from "@/components/pdf-preview";
 import useFileStore from "@/hooks/use-file-store";
+import { useEffect } from "react";
 
 interface PdfPreviewContainerProps {
   className?: string;
@@ -9,7 +10,11 @@ interface PdfPreviewContainerProps {
 
 const PdfPreviewContainer = ({ className }: PdfPreviewContainerProps) => {
   const fileUrl = useFileStore((state) => state.fileUrl);
+  const { setFileUrl } = useFileStore();
 
+  useEffect(() => {
+    setFileUrl(null);
+  }, []);
   return <PdfPreview fileUrl={fileUrl} className={className} />;
 };
 

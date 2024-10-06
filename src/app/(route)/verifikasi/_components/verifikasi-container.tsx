@@ -1,5 +1,5 @@
 "use client";
-import { getKegiatanById } from "@/actions/kegiatan";
+import { getKegiatanById, KegiatanWithDetail } from "@/actions/kegiatan";
 import FloatingComponent from "@/components/floating-component";
 import PreviewKegiatan from "@/components/kegiatan";
 import PdfPreviewContainer from "@/components/pdf-preview-container";
@@ -16,7 +16,7 @@ const SelectKegiatan = dynamic(
 
 const VerifikasiContainer = () => {
   const [kegiatanId, setKegiatanId] = useState<string | null>(null);
-  const [kegiatan, setKegiatan] = useState<Kegiatan | null>(null);
+  const [kegiatan, setKegiatan] = useState<KegiatanWithDetail | null>(null);
   const { fileUrl, isPreviewHidden } = useFileStore();
 
   const handleKegiatanChange = (value: string | null) => {
@@ -40,23 +40,29 @@ const VerifikasiContainer = () => {
     useFileStore.setState({ isPreviewHidden: true });
   };
 
+  useEffect(() => {
+    useFileStore.setState({ isPreviewHidden: true });
+  }, []);
+
   return (
-    <div className="relative flex flex-row w-full gap-6 pb-20">
-      <div className="w-full sm:w-1/2 flex flex-col gap-2 ">
-        <SelectKegiatan
-          inputId="kegiatan"
-          onChange={handleKegiatanChange}
-          className="w-full"
-        />
-        <div className="flex flex-row gap-2 w-full border-gray-300 border rounded-md p-2 shadow-lg">
-          <PreviewKegiatan kegiatan={kegiatan} className="w-full" />
+    <>
+      <div className="relative flex flex-col w-full lg:w-1/2 gap-6 pb-20 bg-gray-100 rounded-lg py-4 lg:px-4">
+        <div className="w-full flex flex-col gap-2 ">
+          <SelectKegiatan
+            inputId="kegiatan"
+            onChange={handleKegiatanChange}
+            className="w-full"
+          />
+          <div className="flex flex-row gap-2 w-full border-gray-300 border rounded-md p-2 shadow-lg">
+            <PreviewKegiatan kegiatan={kegiatan} className="w-full" />
+          </div>
+          <VerfikasiSelectionContainer kegiatan={kegiatan} />
         </div>
-        <VerfikasiSelectionContainer kegiatan={kegiatan} />
       </div>
       <FloatingComponent hide={isPreviewHidden} onHide={handleOnHide}>
         <PdfPreviewContainer className="border-2 h-full border-gray-500" />
       </FloatingComponent>
-    </div>
+    </>
   );
 };
 

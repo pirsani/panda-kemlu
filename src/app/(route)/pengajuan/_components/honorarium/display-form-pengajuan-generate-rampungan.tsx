@@ -1,11 +1,12 @@
+import { KegiatanWithDetail } from "@/actions/kegiatan";
 import { JenisPengajuan } from "@/types";
 import { Kegiatan } from "@prisma-honorarium/client";
 import FormPengajuanGenerateRampungan from "../form-pengajuan-generate-rampungan";
 
 interface DisplayFormPengajuanGenerateRampunganProps {
   jenisPengajuan?: JenisPengajuan | null;
-  kegiatan: Kegiatan | null;
-  handleSuccess: (kegiatan: Kegiatan) => void; // harusnya update ke atas
+  kegiatan: KegiatanWithDetail | null;
+  handleSuccess: (kegiatan: KegiatanWithDetail) => void; // harusnya update ke atas
 }
 
 export const DisplayFormPengajuanGenerateRampungan = ({
