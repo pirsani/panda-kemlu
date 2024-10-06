@@ -28,27 +28,32 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import ItineraryContainer from "./itinerary-container";
 import PesertaContainer from "./peserta-container";
 //import SelectSbmProvinsi from "./select-sbm-provinsi";
-import setupKegiatan from "@/actions/kegiatan/setup-kegiatan";
+import setupKegiatan, {
+  setupKegiatanWithoutFile,
+} from "@/actions/kegiatan/setup-kegiatan";
 import CummulativeErrors from "@/components/form/cummulative-error";
 import FormFileImmediateUpload from "@/components/form/form-file-immediate-upload";
 import {
   default as Required,
   default as RequiredLabel,
 } from "@/components/form/required";
-import SelectLokasi from "@/components/form/select-lokasi";
+
 import { cn } from "@/lib/utils";
 import { createId } from "@paralleldrive/cuid2";
 import { LOKASI } from "@prisma-honorarium/client";
 import { toast } from "sonner";
 
 //import Select, { SingleValue } from "react-select";
-
+// fix Warning: Extra attributes from the server: aria-activedescendant
+// Dynamically import Select to avoid SSR
 const SelectSbmProvinsi = dynamic(() => import("./select-sbm-provinsi"), {
   ssr: false,
   loading: () => <p>Loading provinsi...</p>,
 });
-// fix Warning: Extra attributes from the server: aria-activedescendant
-// Dynamically import Select to avoid SSR
+const SelectLokasi = dynamic(() => import("@/components/form/select-lokasi"), {
+  ssr: false,
+  loading: () => <p>Loading provinsi...</p>,
+});
 
 type FormValues<T> = T extends true ? KegiatanEditMode : Kegiatan;
 
@@ -71,6 +76,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
       dokumenJadwalCuid: "jadwal" + createId() + ".pdf",
       dokumenNodinMemoSk: undefined,
       dokumenNodinMemoSkCuid: "nodin" + createId() + ".pdf",
+      dokumenSuratSetnegSptjmCuid: undefined,
     },
     //reValidateMode: "onChange",
   });
@@ -88,6 +94,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
   // Watch the value of DokumenJadwalCuid
   const dokumenJadwalCuid = form.watch("dokumenJadwalCuid");
   const dokumenNodinMemoSkCuid = form.watch("dokumenNodinMemoSkCuid");
+  const dokumenSuratSetnegSptjmCuid = form.watch("dokumenSuratSetnegSptjmCuid");
   const dokumenSuratTugasCuid = form.watch("dokumenSuratTugasCuid");
 
   // Use a ref to store the folderCuid
@@ -102,6 +109,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
       dokumenNodinMemoSk,
       dokumenJadwal,
       dokumenSuratTugas,
+      dokumenSuratSetnegSptjm,
       pesertaXlsx,
       ...dataWithoutFile
     } = data;
@@ -133,6 +141,9 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
       //formData.append("dokumenSuratTugas", dokumenSuratTugas as File);
     }
 
+    // const kegiatanBaruWithoutFile = await setupKegiatanWithoutFile(
+    //   dataWithoutFile
+    // );
     const kegiatanBaru = await setupKegiatan(formData);
     if (kegiatanBaru.success) {
       toast.success("Kegiatan berhasil disimpan");
@@ -173,6 +184,9 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
   // Update selectedLokasi state when lokasi changes
   useEffect(() => {
     console.log(lokasi);
+    if (lokasi === LOKASI.LUAR_NEGERI) {
+      setValue("dokumenSuratSetnegSptjmCuid", "sptjm" + createId() + ".pdf");
+    }
   }, [lokasi]);
 
   const displayAllErrors = false;
@@ -347,7 +361,33 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
             </FormItem>
           )}
         />
-        {lokasi == LOKASI.LUAR_NEGERI && <ItineraryContainer />}
+        {lokasi == LOKASI.LUAR_NEGERI && (
+          <>
+            <FormField
+              control={form.control}
+              name="dokumenSuratSetnegSptjm"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Dokumen Surat Setneg/SPTJM
+                    <RequiredLabel />
+                  </FormLabel>
+                  <FormControl>
+                    <FormFileImmediateUpload
+                      cuid={dokumenSuratSetnegSptjmCuid}
+                      folder={folderCuid}
+                      name={field.name}
+                      onFileChange={handleFileChange}
+                      className="bg-white"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <ItineraryContainer />
+          </>
+        )}
         {lokasi != LOKASI.LUAR_NEGERI && (
           <FormField
             control={form.control}

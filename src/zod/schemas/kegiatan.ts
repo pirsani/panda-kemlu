@@ -58,6 +58,11 @@ export const baseKegiatanSchema = z.object({
     message: "Dokumen jadwal harus diupload",
   }),
   dokumenJadwalCuid: z.string(),
+  dokumenSuratSetnegSptjm: fileSchema({
+    required: false,
+    message: "Dokumen jadwal harus diupload",
+  }),
+  dokumenSuratSetnegSptjmCuid: z.string().optional(),
   dokumenSuratTugas: z.union([
     fileSchema({
       required: true,
@@ -86,16 +91,40 @@ export const baseKegiatanSchema = z.object({
   pesertaXlsxCuid: z.string({
     required_error: "file Excel daftar peserta harus diisi",
   }),
+  isValidItinerary: z.boolean().optional(),
 });
 
 // Apply the refine method to add custom validation
-export const kegiatanSchema = baseKegiatanSchema.refine(
-  (data) => data.tanggalMulai <= data.tanggalSelesai,
-  {
+export const kegiatanSchema = baseKegiatanSchema
+  .refine((data) => data.tanggalMulai <= data.tanggalSelesai, {
     message: "Tanggal Mulai harus kurang dari atau sama dengan Tanggal Selesai",
     path: ["tanggalMulai"], // This will point the error to the tanggalMulai field
-  }
-);
+  })
+  .refine(
+    (data) => {
+      if (data.lokasi === "LUAR_NEGERI") {
+        return data.dokumenSuratSetnegSptjmCuid && data.dokumenSuratSetnegSptjm;
+      }
+      return true;
+    },
+    {
+      message:
+        "Dokumen Surat Setneg/SPTJM harus diisi jika lokasi kegiatan luar negeri",
+      path: ["dokumenSuratSetnegSptjm", "dokumenSuratSetnegSptjmCuid"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.lokasi === "LUAR_NEGERI") {
+        return data.isValidItinerary === true;
+      }
+      return true;
+    },
+    {
+      message: "Invalid itinerary. Periksa kembali itinerary kegiatan",
+      path: ["isValidItinerary"],
+    }
+  );
 
 export const kegiatanSchemaWithoutFile = baseKegiatanSchema.omit({
   dokumenNodinMemoSk: true,

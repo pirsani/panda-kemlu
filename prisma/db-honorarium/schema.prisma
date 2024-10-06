@@ -549,15 +549,19 @@ model UhLuarNegeri {
 }
 
 model Itinerary {
-  id                String          @id @default(cuid())
-  sbmUhLuarNegeriId String          @map("sbm_uh_luar_negeri_id")
-  lokasi            SbmUhLuarNegeri @relation(fields: [sbmUhLuarNegeriId], references: [id])
+  id                String           @id @default(cuid())
+  sbmUhLuarNegeriId String?          @map("sbm_uh_luar_negeri_id")
+  lokasi            SbmUhLuarNegeri? @relation(fields: [sbmUhLuarNegeriId], references: [id])
+  dariLokasiId      String
+  dariLokasi        Negara           @relation(fields: [dariLokasiId], references: [id], name: "dari_lokasi")
+  keLokasiId        String
+  keLokasi          Negara           @relation(fields: [keLokasiId], references: [id], name: "ke_lokasi")
   tanggalMulai      DateTime
   tanggalSelesai    DateTime
-  kegiatanId        String          @map("kegiatan_id")
-  kegiatan          Kegiatan        @relation(fields: [kegiatanId], references: [id])
-  createdAt         DateTime?       @default(now()) @map("created_at")
-  updatedAt         DateTime?       @updatedAt @map("updated_at")
+  kegiatanId        String           @map("kegiatan_id")
+  kegiatan          Kegiatan         @relation(fields: [kegiatanId], references: [id])
+  createdAt         DateTime?        @default(now()) @map("created_at")
+  updatedAt         DateTime?        @updatedAt @map("updated_at")
 
   @@map("itinerary")
 }
@@ -757,8 +761,10 @@ model Negara {
   createdAt                 DateTime                    @default(now()) @map("created_at")
   updatedBy                 String?                     @map("updated_by")
   updatedAt                 DateTime?                   @updatedAt @map("updated_at")
-  SbmUhLuarNegeri           SbmUhLuarNegeri[]
-  SbmTiketPesawatLuarNegeri SbmTiketPesawatLuarNegeri[]
+  sbmUhLuarNegeri           SbmUhLuarNegeri[]
+  sbmTiketPesawatLuarNegeri SbmTiketPesawatLuarNegeri[]
+  dariLokasi                Itinerary[]                 @relation("dari_lokasi")
+  keLokasi                  Itinerary[]                 @relation("ke_lokasi")
 
   @@map("negara")
 }
@@ -850,6 +856,9 @@ model PejabatPerbendaharaan {
 
 model UploadedFile {
   id               String   @id @default(cuid())
+  rereferensiId    String?  @map("rereferensi_id")
+  rereferensiTable String?  @map("rereferensi_table")
+  keterangan       String?
   originalFilename String   @map("original_filename")
   filePath         String   @map("file_path")
   mimeType         String?  @map("mime_type")

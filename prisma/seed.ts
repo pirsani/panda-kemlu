@@ -306,33 +306,36 @@ async function main() {
   const dokumenKegiatan = await dbHonorarium.jenisDokumenKegiatan.createMany({
     data: [
       {
+        id: "nota-dinas-memorandum-sk",
         nama: "nota-dinas-memorandum-sk",
         createdBy: "init",
         deskripsi: "Nota Dinas/Memorandum/ SK Tim",
+        untukLokasiDi: "0;1;2;",
       },
       {
+        id: "jadwal-kegiatan",
         nama: "jadwal-kegiatan",
         createdBy: "init",
         deskripsi: "Jadwal Kegiatan",
+        untukLokasiDi: "0;1;2;",
       },
       {
-        nama: "surat-setneg-sptjm",
-        createdBy: "init",
-        deskripsi: "Surat Setneg/SPTJM",
-      },
-      {
+        id: "surat-tugas",
         nama: "surat-tugas",
         createdBy: "init",
         deskripsi: "Surat Tugas",
+        untukLokasiDi: "0;1;2;",
         isMultiple: true,
       },
       {
+        id: "surat-setneg-sptjm",
         nama: "surat-setneg-sptjm",
         createdBy: "init",
         deskripsi: "Surat Setneg/SPTJM",
         untukLokasiDi: "2;",
       },
       {
+        id: "laporan-kegiatan",
         nama: "laporan-kegiatan",
         createdBy: "init",
         deskripsi: "Laporan Kegiatan",
@@ -340,6 +343,7 @@ async function main() {
         untukLokasiDi: "0;1;2;",
       },
       {
+        id: "dafar-hadir",
         nama: "dafar-hadir",
         createdBy: "init",
         deskripsi: "Daftar Hadir",
@@ -347,6 +351,7 @@ async function main() {
         untukLokasiDi: "0;1;2;",
       },
       {
+        id: "dokumentasi-kegiatan",
         nama: "dokumentasi-kegiatan",
         createdBy: "init",
         deskripsi: "Dokumentasi Kegiatan",
@@ -354,6 +359,7 @@ async function main() {
         untukLokasiDi: "0;1;2;",
       },
       {
+        id: "rampungan-terstempel",
         nama: "rampungan-terstempel",
         createdBy: "init",
         deskripsi: "Rampungan yang distempel",
@@ -361,6 +367,7 @@ async function main() {
         untukLokasiDi: "0;1;2;",
       },
       {
+        id: "paspor",
         nama: "paspor",
         createdBy: "init",
         deskripsi: "Paspor (ID, exit permit, stempel imigrasi)",
@@ -368,6 +375,7 @@ async function main() {
         untukLokasiDi: "2;",
       },
       {
+        id: "tiket",
         nama: "tiket",
         createdBy: "init",
         deskripsi: "Tiket atau boarding pass",

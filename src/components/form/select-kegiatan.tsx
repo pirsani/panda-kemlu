@@ -1,5 +1,6 @@
 "use client";
 import { getOptionsKegiatan } from "@/actions/kegiatan";
+import useTahunAnggaranStore from "@/hooks/use-tahun-anggaran-store";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import Select, { SingleValue } from "react-select";
@@ -24,6 +25,7 @@ const SelectKegiatan = ({
 }: SelectKegiatanProps) => {
   const [options, setOptions] = useState<Option[]>([]);
   const [selectedOption, setSelectedOption] = useState<Option | null>(null);
+  const { tahunAnggaran } = useTahunAnggaranStore();
 
   useEffect(() => {
     const fetchOptions = async () => {
@@ -37,7 +39,7 @@ const SelectKegiatan = ({
       }
     };
     fetchOptions();
-  }, []);
+  }, [tahunAnggaran]);
 
   useEffect(() => {
     if (value !== undefined) {

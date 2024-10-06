@@ -21,6 +21,7 @@ import {
   Delete,
   Eye,
   Pencil,
+  Printer,
   Save,
   Trash,
   Trash2,
@@ -41,6 +42,7 @@ interface TabelGenericWithoutInlineEditProps<T> {
   frozenColumnCount?: number;
   isEditing?: boolean;
   editableRowId?: string | null;
+  hidePagination?: boolean;
 }
 
 export const TabelGenericWithoutInlineEdit = <T,>({
@@ -49,6 +51,7 @@ export const TabelGenericWithoutInlineEdit = <T,>({
   frozenColumnCount = 1,
   isEditing = false,
   editableRowId = null,
+  hidePagination = false,
 }: TabelGenericWithoutInlineEditProps<T>) => {
   const [data, setData] = useState(initialData); // Assuming `initialData` is your table data
   //const [isEditing, setIsEditing] = useState(initialIsEditing);
@@ -280,7 +283,7 @@ export const TabelGenericWithoutInlineEdit = <T,>({
           </tbody>
         </table>
       </div>
-      <PaginationControls table={table} />
+      {!hidePagination && <PaginationControls table={table} />}
     </div>
   );
 };
@@ -415,6 +418,111 @@ export const KolomPilihanAksi = <T,>(
                   onClick={handleOnClickView}
                 >
                   <Eye size={20} />
+                </Button>
+              );
+            default:
+              return null;
+          }
+        })}
+      </div>
+    </>
+  );
+};
+
+export const KolomPilihanAksi2 = <T,>(
+  info: CellContext<T, unknown>,
+  aksi: Array<"edit" | "delete" | "view" | "print" | "other">,
+  isEditing?: boolean,
+  options?: {
+    onEdit?: (row: Row<T>) => void;
+    onDelete?: (row: T) => void;
+    onView?: (row: T) => void;
+    onPrint?: (row: T) => void;
+    other?: (row: T) => void;
+  }
+) => {
+  const { onEdit, onDelete, onView, onPrint, other } = options || {};
+
+  const handleClickPrint = () => {
+    onPrint && onPrint(info.row.original);
+  };
+
+  const handleClickOther = () => {
+    other && other(info.row.original);
+  };
+
+  const handleOnClickEdit = () => {
+    //console.log("Edit clicked");
+    onEdit && onEdit(info.row);
+  };
+
+  const handleOnClickDelete = () => {
+    //console.log("Delete clicked");
+    onDelete && onDelete(info.row.original);
+  };
+
+  const handleOnClickView = () => {
+    //console.log("View clicked");
+    onView && onView(info.row.original);
+  };
+  return (
+    <>
+      <div className="flex gap-2">
+        {aksi.map((item) => {
+          switch (item) {
+            case "edit":
+              return (
+                <Button
+                  key={item}
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleOnClickEdit}
+                >
+                  <Pencil size={20} />
+                </Button>
+              );
+            case "delete":
+              return (
+                <Button
+                  key={item}
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleOnClickDelete}
+                >
+                  <Trash2 size={20} />
+                </Button>
+              );
+            case "view":
+              return (
+                <Button
+                  key={item}
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleOnClickView}
+                >
+                  <Eye size={20} />
+                </Button>
+              );
+            case "print":
+              return (
+                <Button
+                  key={item}
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleClickPrint}
+                >
+                  <Printer size={20} />
+                </Button>
+              );
+            case "other":
+              return (
+                <Button
+                  key={item}
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleClickOther}
+                >
+                  <ArrowDownUp size={20} />
                 </Button>
               );
             default:

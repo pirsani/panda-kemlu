@@ -27,6 +27,15 @@ const logger = new Logger({
   hideLogPositionForProduction: true,
 });
 
+export const setupKegiatanWithoutFile = async (kegiatan: ZKegiatan) => {
+  console.log("kegiatan", kegiatan);
+  console.log("kegiatan.tanggalMulai", kegiatan.tanggalMulai.getFullYear());
+  return {
+    success: true,
+    data: kegiatan,
+  };
+};
+
 export const setupKegiatan = async (
   formData: FormData
 ): Promise<ActionResponse<Kegiatan>> => {
