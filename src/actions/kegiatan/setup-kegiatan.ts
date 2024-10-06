@@ -9,11 +9,12 @@ import { dbHonorarium, Prisma } from "@/lib/db-honorarium";
 import parseExcel, { ParseExcelResult } from "@/utils/excel/parse-excel";
 import parseExcelOnServer from "@/utils/excel/parse-excel-on-server";
 import { splitEmptyValues } from "@/utils/excel/split-empty-values";
+import { Itinerary as ZItinerary } from "@/zod/schemas/itinerary";
 import kegiatanSchema, {
   kegiatanSchemaWithoutFile,
   Kegiatan as ZKegiatan,
 } from "@/zod/schemas/kegiatan";
-import { Kegiatan } from "@prisma-honorarium/client";
+import { Itinerary, Kegiatan } from "@prisma-honorarium/client";
 import { format } from "date-fns";
 import fs from "fs";
 import { startsWith } from "lodash";
@@ -27,21 +28,9 @@ const logger = new Logger({
   hideLogPositionForProduction: true,
 });
 
-export const setupKegiatanWithoutFile = async (kegiatan: ZKegiatan) => {
-  console.log("kegiatan", kegiatan);
-  console.log("kegiatan.tanggalMulai", kegiatan.tanggalMulai.getFullYear());
-  return {
-    success: true,
-    data: kegiatan,
-  };
-};
-
 export const setupKegiatan = async (
-  formData: FormData
+  kegiatan: ZKegiatan
 ): Promise<ActionResponse<Kegiatan>> => {
-  let dataparsed: ZKegiatan;
-  let dataPesertaDariExcel: ParseExcelResult;
-
   // get satkerId and unitKerjaId from the user
   const pengguna = await getSessionPengguna();
   logger.info("Pengguna", pengguna);
@@ -65,33 +54,16 @@ export const setupKegiatan = async (
   const unitKerjaId = pengguna.data.unitKerjaId;
   const penggunaId = pengguna.data.id;
 
-  // step 1: parse the form data
-  try {
-    // parse the form data
-    dataparsed = prepareDataFromClient(formData);
-  } catch (error) {
-    logger.info("[prepareDataFromClient]:", formData);
-    if (error instanceof ZodError) {
-      logger.error("[ZodError]", error.errors);
-    } else {
-      logger.error("Error parsing form data:", error);
-    }
+  const cuid = kegiatan.cuid; // this is the cuid of the kegiatan yang akan digunakan untuk referensi file yang telah diupload
 
-    return {
-      success: false,
-      error: "E-KEG-01",
-      message: "Error parsing form data",
-    };
-  }
-
-  const cuid = dataparsed.cuid; // this is the cuid of the kegiatan yang akan digunakan untuk referensi file yang telah diupload
-
+  // step 1: get the data from the excel file
+  let dataPesertaDariExcel: ParseExcelResult;
   // step 2: parse the xlsx file
   try {
     // parse xlsx file yang berisi data peserta yang telah diupload oleh user
     // cuidFolder dan cuidFile akan digunakan untuk menyimpan file di server
     // get file from file in folder with cuid
-    const pesertaXlsxCuid = dataparsed.pesertaXlsxCuid;
+    const pesertaXlsxCuid = kegiatan.pesertaXlsxCuid;
 
     // add the file extension
     const filePesertaXlsx = `${pesertaXlsxCuid}.xlsx`;
@@ -128,11 +100,11 @@ export const setupKegiatan = async (
   // step 3: save the data to the database
   // data ready to be saved
   try {
-    const kegiatan = await dbHonorarium.$transaction(async (prisma) => {
+    const kegiatanBaru = await dbHonorarium.$transaction(async (prisma) => {
       // Create the main kegiatan entry
       const kegiatanBaru = await createKegiatan(
         prisma,
-        dataparsed,
+        kegiatan,
         satkerId,
         unitKerjaId,
         penggunaId
@@ -148,15 +120,26 @@ export const setupKegiatan = async (
       const suratTugas = await insertDokumenSuratTugas(
         prisma,
         kegiatanBaru.id,
-        dataparsed,
+        kegiatan,
         penggunaId
       );
+
+      // if kegiatan.lokasi === "LUAR_NEGERI" then insert itinerary
+      if (kegiatan.lokasi === "LUAR_NEGERI" && kegiatan.itinerary) {
+        const insertedItinerary = await insertItinerary(
+          prisma,
+          kegiatan.itinerary as ZItinerary[],
+          kegiatanBaru.id,
+          penggunaId
+        );
+      }
+
       return kegiatanBaru;
     });
 
     // move the file to the final folder
     const year = kegiatan.tanggalMulai.getFullYear();
-    const finalFolder = path.join(year.toString(), kegiatan.id);
+    const finalFolder = path.join(year.toString(), kegiatanBaru.id);
     await moveFolderToFinalLocation(cuid, finalFolder);
     // update database uploaded file
     // Fetch the uploaded file record
@@ -175,7 +158,7 @@ export const setupKegiatan = async (
         uploadedFiles.map(async (file) => {
           const newFilePath = file.filePath.replace(
             `temp/${cuid}`,
-            `${year}/${kegiatan.id}`
+            `${year}/${kegiatanBaru.id}`
           );
 
           // Update the filepath in the database
@@ -197,7 +180,7 @@ export const setupKegiatan = async (
 
     return {
       success: true,
-      data: kegiatan,
+      data: kegiatanBaru,
     };
   } catch (error) {
     return getPrismaErrorResponse(error as Error);
@@ -223,50 +206,6 @@ const moveFolderToFinalLocation = async (
   } catch (error) {
     console.error("Error moving folder:", error);
     throw new Error("Error moving folder");
-  }
-};
-
-//==============================================================
-//==============================================================
-
-const prepareDataFromClient = (formData: FormData) => {
-  try {
-    const formDataObj: any = {};
-    // Convert FormData to an object for Zod validation
-    formData.forEach((value, key) => {
-      if (formDataObj[key]) {
-        if (Array.isArray(formDataObj[key])) {
-          formDataObj[key].push(value);
-        } else {
-          formDataObj[key] = [formDataObj[key], value];
-        }
-      } else {
-        formDataObj[key] = value;
-      }
-    });
-
-    // reformat the provinsi dan tanggal karen ketika dikirim dari client berbentuk string
-    // formDataObj["provinsi"] = parseInt(formDataObj["provinsi"]);
-    formDataObj["tanggalMulai"] = format(
-      new Date(formDataObj["tanggalMulai"]),
-      "yyyy-MM-dd"
-    );
-    formDataObj["tanggalSelesai"] = format(
-      new Date(formDataObj["tanggalSelesai"]),
-      "yyyy-MM-dd"
-    );
-
-    // karena file sudah diupload, maka kita hanya perlu mengambil nama file saja
-    const dataparsed = kegiatanSchemaWithoutFile.parse(formDataObj);
-    return dataparsed;
-  } catch (error) {
-    if (error instanceof ZodError) {
-      logger.error("[ZodErrors]", error.errors);
-      error.errors.forEach((err) => {
-        logger.error("[ZodError]", err.message, "at path", err.path);
-      });
-    }
-    throw error;
   }
 };
 
@@ -427,5 +366,28 @@ async function insertDokumenSuratTugas(
     }
   }
 }
+
+const insertItinerary = async (
+  prisma: Prisma.TransactionClient,
+  itinerary: ZItinerary[],
+  kegiatanBaruId: string,
+  penggunaId: string
+) => {
+  // iterate over the itinerary and modify the data to conform to the database schema
+  const itineraryBaru = itinerary.map((itinerary) => {
+    delete itinerary.dariLokasi;
+    delete itinerary.keLokasi;
+    return {
+      ...itinerary,
+      kegiatanId: kegiatanBaruId,
+      createdBy: penggunaId,
+    };
+  });
+
+  const insertedItinerary = await prisma.itinerary.createMany({
+    data: itineraryBaru,
+  });
+  return insertedItinerary;
+};
 
 export default setupKegiatan;

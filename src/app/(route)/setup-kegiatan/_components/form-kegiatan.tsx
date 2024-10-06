@@ -39,6 +39,7 @@ import {
 } from "@/components/form/required";
 
 import { cn } from "@/lib/utils";
+import { Itinerary } from "@/zod/schemas/itinerary";
 import { createId } from "@paralleldrive/cuid2";
 import { LOKASI } from "@prisma-honorarium/client";
 import { toast } from "sonner";
@@ -83,6 +84,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
 
   const {
     setValue,
+    getValues,
     reset,
     resetField,
     handleSubmit,
@@ -113,38 +115,8 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
       pesertaXlsx,
       ...dataWithoutFile
     } = data;
-    // create a new FormData object
-    const formData = new FormData();
-    // append the data to the form data
-    // formData.append("data", JSON.stringify(dataWithoutFile));
-    // dataWithoutFile
-    for (const [key, value] of Object.entries(dataWithoutFile)) {
-      if (value instanceof Date) {
-        formData.append(key, value.toISOString());
-      } else if (typeof value === "string") {
-        formData.append(key, value);
-      } else {
-        formData.append(key, JSON.stringify(value));
-      }
-    }
-    // append the files to the form data
-    // formData.append("dokumenNodinMemoSk", dokumenNodinMemoSk as File);
-    // formData.append("dokumenJadwal", dokumenJadwal as File);
-    formData.append("pesertaXlsx", pesertaXlsx as File);
 
-    // append the files to the form data
-    if (Array.isArray(dokumenSuratTugas)) {
-      dokumenSuratTugas.forEach((file) => {
-        //formData.append("dokumenSuratTugas", file as File);
-      });
-    } else {
-      //formData.append("dokumenSuratTugas", dokumenSuratTugas as File);
-    }
-
-    // const kegiatanBaruWithoutFile = await setupKegiatanWithoutFile(
-    //   dataWithoutFile
-    // );
-    const kegiatanBaru = await setupKegiatan(formData);
+    const kegiatanBaru = await setupKegiatan(dataWithoutFile);
     if (kegiatanBaru.success) {
       toast.success("Kegiatan berhasil disimpan");
       //reset(); // reset the form
@@ -178,6 +150,16 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
     console.log("dokumenSuratTugas", fileArray);
   };
 
+  const handleItineraryChange = (data: Itinerary[]) => {
+    console.log("Itinerary data", data);
+    if (getValues("isValidItinerary") === true) {
+      setValue("itinerary", data);
+    } else {
+      setValue("itinerary", []);
+    }
+    trigger("itinerary");
+  };
+
   // Watch the lokasi field to update the state
   const lokasi = watch("lokasi");
 
@@ -198,263 +180,265 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
   ];
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-2 w-full"
-      >
-        <FormField
-          control={form.control}
-          name="nama"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Nama Kegiatan <RequiredLabel />
-              </FormLabel>
-              <FormControl>
-                <Input placeholder="nama kegiatan" {...field} tabIndex={0} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="flex flex-row w-full gap-2">
+    <FormProvider {...form}>
+      <Form {...form}>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col gap-2 w-full"
+        >
           <FormField
             control={form.control}
-            name="tanggalMulai"
+            name="nama"
             render={({ field }) => (
               <FormItem>
-                <FormLabel htmlFor="tanggalMulai">
-                  Tanggal Mulai
-                  <RequiredLabel />
+                <FormLabel>
+                  Nama Kegiatan <RequiredLabel />
                 </FormLabel>
                 <FormControl>
-                  <BasicDatePicker
-                    name={field.name}
-                    error={errors.tanggalMulai}
-                    className="md:w-full"
-                    calendarOptions={{
-                      fromDate: new Date(new Date().getFullYear(), 0, 1),
-                      toDate: new Date(new Date().getFullYear(), 11, 31),
-                    }}
-                  />
+                  <Input placeholder="nama kegiatan" {...field} tabIndex={0} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="tanggalSelesai"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel htmlFor="tanggalSelesai">
-                  Tanggal Selesai
-                  <RequiredLabel />
-                </FormLabel>
-                <FormControl>
-                  <BasicDatePicker
-                    name={field.name}
-                    error={errors.tanggalSelesai}
-                    className="md:w-full"
-                    calendarOptions={{
-                      fromDate: new Date(new Date().getFullYear(), 0, 1),
-                      toDate: new Date(new Date().getFullYear(), 11, 31),
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        <FormField
-          control={form.control}
-          name="dokumenNodinMemoSk"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel htmlFor="dokumenNodinMemoSk">
-                Upload Nota Dinas/Memorandum/SK Tim
-                <RequiredLabel />
-              </FormLabel>
-              <FormControl>
-                <FormFileImmediateUpload
-                  cuid={dokumenNodinMemoSkCuid}
-                  folder={folderCuid}
-                  name={field.name}
-                  onFileChange={handleFileChange}
-                  className="bg-white"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="dokumenJadwal"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel htmlFor="dokumenJadwal">
-                Dokumen Jadwal kegiatan
-                <RequiredLabel />
-              </FormLabel>
-              <FormControl>
-                <FormFileImmediateUpload
-                  cuid={dokumenJadwalCuid}
-                  folder={folderCuid}
-                  name={field.name}
-                  onFileChange={handleFileChange}
-                  className="bg-white"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="dokumenSuratTugas"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel htmlFor={field.name}>
-                Surat Tugas (multiple files)
-                <RequiredLabel />
-              </FormLabel>
-              <FormControl
-                onBlur={() => {
-                  trigger(field.name);
-                }}
-              >
-                <FormMultiFileUpload
-                  filePrefix="surtug"
-                  name={field.name}
-                  cuids={"dokumenSuratTugasCuid"}
-                  folder={folderCuid}
-                  text="Pilih dokumen Surat Tugas"
-                  onFileChange={handleMultiFileChange}
-                  className="bg-white w-full"
-                  classNameEyeButton=""
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="lokasi"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Lokasi
-                <RequiredLabel />
-              </FormLabel>
-              <FormControl>
-                <SelectLokasi
-                  value={field.value}
-                  fieldName={field.name}
-                  onChange={field.onChange}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {lokasi == LOKASI.LUAR_NEGERI && (
-          <>
+          <div className="flex flex-row w-full gap-2">
             <FormField
               control={form.control}
-              name="dokumenSuratSetnegSptjm"
+              name="tanggalMulai"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    Dokumen Surat Setneg/SPTJM
+                  <FormLabel htmlFor="tanggalMulai">
+                    Tanggal Mulai
                     <RequiredLabel />
                   </FormLabel>
                   <FormControl>
-                    <FormFileImmediateUpload
-                      cuid={dokumenSuratSetnegSptjmCuid}
-                      folder={folderCuid}
+                    <BasicDatePicker
                       name={field.name}
-                      onFileChange={handleFileChange}
-                      className="bg-white"
+                      error={errors.tanggalMulai}
+                      className="md:w-full"
+                      calendarOptions={{
+                        fromDate: new Date(new Date().getFullYear(), 0, 1),
+                        toDate: new Date(new Date().getFullYear(), 11, 31),
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <ItineraryContainer />
-          </>
-        )}
-        {lokasi != LOKASI.LUAR_NEGERI && (
+            <FormField
+              control={form.control}
+              name="tanggalSelesai"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="tanggalSelesai">
+                    Tanggal Selesai
+                    <RequiredLabel />
+                  </FormLabel>
+                  <FormControl>
+                    <BasicDatePicker
+                      name={field.name}
+                      error={errors.tanggalSelesai}
+                      className="md:w-full"
+                      calendarOptions={{
+                        fromDate: new Date(new Date().getFullYear(), 0, 1),
+                        toDate: new Date(new Date().getFullYear(), 11, 31),
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <FormField
             control={form.control}
-            name="provinsi"
+            name="dokumenNodinMemoSk"
             render={({ field }) => (
               <FormItem>
-                <FormLabel htmlFor={field.name}>
-                  Provinsi
+                <FormLabel htmlFor="dokumenNodinMemoSk">
+                  Upload Nota Dinas/Memorandum/SK Tim
                   <RequiredLabel />
                 </FormLabel>
                 <FormControl>
-                  <SelectSbmProvinsi
-                    fullKey={field.name}
-                    onChange={field.onChange}
-                    value={field.value}
+                  <FormFileImmediateUpload
+                    cuid={dokumenNodinMemoSkCuid}
+                    folder={folderCuid}
+                    name={field.name}
+                    onFileChange={handleFileChange}
+                    className="bg-white"
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-        )}
-
-        <FormField
-          control={form.control}
-          name="pesertaXlsx"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <PesertaContainer
-                  folder={folderCuid}
-                  pesertaXlsxCuid={"pesertaXlsxCuid"}
-                  fieldName={field.name}
-                  value={field.value}
-                  // onChange={field.onChange}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+          <FormField
+            control={form.control}
+            name="dokumenJadwal"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel htmlFor="dokumenJadwal">
+                  Dokumen Jadwal kegiatan
+                  <RequiredLabel />
+                </FormLabel>
+                <FormControl>
+                  <FormFileImmediateUpload
+                    cuid={dokumenJadwalCuid}
+                    folder={folderCuid}
+                    name={field.name}
+                    onFileChange={handleFileChange}
+                    className="bg-white"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="dokumenSuratTugas"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel htmlFor={field.name}>
+                  Surat Tugas (multiple files)
+                  <RequiredLabel />
+                </FormLabel>
+                <FormControl
+                  onBlur={() => {
+                    trigger(field.name);
+                  }}
+                >
+                  <FormMultiFileUpload
+                    filePrefix="surtug"
+                    name={field.name}
+                    cuids={"dokumenSuratTugasCuid"}
+                    folder={folderCuid}
+                    text="Pilih dokumen Surat Tugas"
+                    onFileChange={handleMultiFileChange}
+                    className="bg-white w-full"
+                    classNameEyeButton=""
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="lokasi"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Lokasi
+                  <RequiredLabel />
+                </FormLabel>
+                <FormControl>
+                  <SelectLokasi
+                    value={field.value}
+                    fieldName={field.name}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {lokasi == LOKASI.LUAR_NEGERI && (
+            <>
+              <FormField
+                control={form.control}
+                name="dokumenSuratSetnegSptjm"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Dokumen Surat Setneg/SPTJM
+                      <RequiredLabel />
+                    </FormLabel>
+                    <FormControl>
+                      <FormFileImmediateUpload
+                        cuid={dokumenSuratSetnegSptjmCuid}
+                        folder={folderCuid}
+                        name={field.name}
+                        onFileChange={handleFileChange}
+                        className="bg-white"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <ItineraryContainer onItineraryChange={handleItineraryChange} />
+            </>
           )}
-        />
-        {/* <PesertaContainer fieldName="pesertaXls" /> */}
+          {lokasi != LOKASI.LUAR_NEGERI && (
+            <FormField
+              control={form.control}
+              name="provinsi"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor={field.name}>
+                    Provinsi
+                    <RequiredLabel />
+                  </FormLabel>
+                  <FormControl>
+                    <SelectSbmProvinsi
+                      fullKey={field.name}
+                      onChange={field.onChange}
+                      value={field.value}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
-        <CummulativeErrors errors={errors} />
+          <FormField
+            control={form.control}
+            name="pesertaXlsx"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <PesertaContainer
+                    folder={folderCuid}
+                    pesertaXlsxCuid={"pesertaXlsxCuid"}
+                    fieldName={field.name}
+                    value={field.value}
+                    // onChange={field.onChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {/* <PesertaContainer fieldName="pesertaXls" /> */}
 
-        <div className="flex flex-row gap-4 w-full mt-12">
-          <Button
-            className={cn("w-5/6 h-12 bg-blue-600 hover:bg-blue-700")}
-            disabled={isSubmitting}
-            type="submit"
-          >
-            Submit
-            {isSubmitting && <span className="ml-2">submitting...</span>}
-          </Button>
-          <Button
-            type="button"
-            variant={"outline"}
-            className="w-1/6 h-12"
-            onClick={() => {
-              reset();
-            }}
-          >
-            Cancel
-          </Button>
-        </div>
-      </form>
-    </Form>
+          <CummulativeErrors errors={errors} />
+
+          <div className="flex flex-row gap-4 w-full mt-12">
+            <Button
+              className={cn("w-5/6 h-12 bg-blue-600 hover:bg-blue-700")}
+              disabled={isSubmitting}
+              type="submit"
+            >
+              Submit
+              {isSubmitting && <span className="ml-2">submitting...</span>}
+            </Button>
+            <Button
+              type="button"
+              variant={"outline"}
+              className="w-1/6 h-12"
+              onClick={() => {
+                reset();
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </FormProvider>
   );
 };
 

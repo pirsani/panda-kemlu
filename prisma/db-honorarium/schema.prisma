@@ -560,7 +560,9 @@ model Itinerary {
   tanggalSelesai    DateTime
   kegiatanId        String           @map("kegiatan_id")
   kegiatan          Kegiatan         @relation(fields: [kegiatanId], references: [id])
+  createdBy         String           @map("created_by")
   createdAt         DateTime?        @default(now()) @map("created_at")
+  updatedBy         String?          @map("updated_by")
   updatedAt         DateTime?        @updatedAt @map("updated_at")
 
   @@map("itinerary")

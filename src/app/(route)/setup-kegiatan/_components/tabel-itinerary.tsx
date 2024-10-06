@@ -4,6 +4,7 @@ import {
   TabelGenericWithoutInlineEdit,
 } from "@/components/tabel-generic-without-inline-edit";
 import { Button } from "@/components/ui/button";
+import { Itinerary } from "@/zod/schemas/itinerary";
 import {
   ColumnDef,
   createColumnHelper,
@@ -38,8 +39,13 @@ export interface Itinerary {
 interface TabelItineraryProps {
   data: Itinerary[];
   onDelete?: (row: Itinerary) => void;
+  onDataChange?: (isValid: boolean) => void;
 }
-const TabelItinerary = ({ data, onDelete = () => {} }: TabelItineraryProps) => {
+const TabelItinerary = ({
+  data,
+  onDelete = () => {},
+  onDataChange = () => {},
+}: TabelItineraryProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editableRowId, setEditableRowIndex] = useState<string | null>(null);
   const [validation, setValidation] = useState<ValidationResult>({
@@ -92,7 +98,9 @@ const TabelItinerary = ({ data, onDelete = () => {} }: TabelItineraryProps) => {
   ];
 
   useEffect(() => {
-    setValidation(validateItineraryChain(data));
+    const validationResult = validateItineraryChain(data);
+    setValidation(validationResult);
+    onDataChange(validationResult.isValid);
   }, [data]);
 
   return (

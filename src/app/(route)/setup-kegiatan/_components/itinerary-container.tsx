@@ -1,11 +1,24 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import DialogFormItinerary from "./dialog-form-itinerary";
 import FormItinerary from "./form-itinerary";
 import TabelItinerary, { Itinerary } from "./tabel-itinerary";
 
-const ItineraryContainer = () => {
+interface ItineraryContainerProps {
+  onItineraryChange?: (data: Itinerary[]) => void;
+}
+const ItineraryContainer = ({
+  onItineraryChange = () => {},
+}: ItineraryContainerProps) => {
+  const {
+    setValue,
+    register,
+    control,
+    watch,
+    formState: { errors },
+  } = useFormContext();
   const [data, setData] = useState<Itinerary[]>([]);
   const handleFormSubmit = (data: Itinerary) => {
     toast.info(
@@ -17,11 +30,25 @@ const ItineraryContainer = () => {
   const handleDelete = (row: Itinerary) => {
     setData((prev) => prev.filter((r) => r !== row));
   };
+
+  const handleOnDataChange = (isValid: boolean) => {
+    setValue("isValidItinerary", isValid);
+    console.log("isValidItinerary", isValid);
+    if (isValid) {
+      console.log("handleOnDataChange data", data);
+      onItineraryChange(data);
+    }
+  };
+
   return (
     <div className="w-full flex-grow flex flex-col">
       <DialogFormItinerary handleFormSubmit={handleFormSubmit} />
       <div className="flex-grow overflow-auto">
-        <TabelItinerary data={data} onDelete={handleDelete} />
+        <TabelItinerary
+          data={data}
+          onDelete={handleDelete}
+          onDataChange={handleOnDataChange}
+        />
       </div>
     </div>
   );

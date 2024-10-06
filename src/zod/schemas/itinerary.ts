@@ -9,43 +9,48 @@ const isValidDateString = (value: string): boolean => {
 
 interface TanggalSchemaOptions {
   message?: string;
-  field?: string;
+  fieldLabel?: string;
 }
 
 const tanggalSchema = ({
   message = "",
-  field = "Tanggal",
+  fieldLabel = "Tanggal",
 }: TanggalSchemaOptions) => {
-  const tanggalSchema = z
-    .string({ message: `${field} harus diisi` })
+  return z
+    .string({ message: `${fieldLabel} harus diisi` })
     .min(10, {
-      message: `format ${field} harus yyyy-mm-dd`,
+      message: `format ${fieldLabel} harus yyyy-mm-dd`,
     })
     .max(10, {
-      message: `format ${field} harus yyyy-mm-dd`,
+      message: `format ${fieldLabel} harus yyyy-mm-dd`,
     })
     .refine(isValidDateString, {
-      message: `format  ${field} harus yyyy-mm-dd`,
+      message: `format ${fieldLabel} harus yyyy-mm-dd`,
     })
-    .transform((value) => new Date(value));
-  return tanggalSchema;
+    .transform((value) => parseISO(value)); // Ensure string is parsed to Date
 };
 
+// Define the base itinerary schema
 export const baseItinerarySchema = z.object({
-  tanggalMulai: tanggalSchema({ field: "Tanggal Mulai" }),
-  tanggalSelesai: tanggalSchema({ field: "Tanggal Selesai" }),
+  tanggalMulai: tanggalSchema({ fieldLabel: "Tanggal Mulai" }),
+  tanggalSelesai: tanggalSchema({ fieldLabel: "Tanggal Selesai" }),
   dariLokasiId: z.string(),
   dariLokasi: z.string().optional().nullable(),
   keLokasiId: z.string(),
   keLokasi: z.string().optional().nullable(),
 });
 
+// Ensure tanggalMulai is less than or equal to tanggalSelesai
 export const itinerarySchema = baseItinerarySchema.refine(
-  (data) => data.tanggalMulai <= data.tanggalSelesai,
+  (data) => data.tanggalMulai.getTime() <= data.tanggalSelesai.getTime(),
   {
     message: "Tanggal Mulai harus kurang dari atau sama dengan Tanggal Selesai",
-    path: ["tanggalMulai"], // This will point the error to the tanggalMulai field
+    path: ["tanggalMulai"], // Point the error to tanggalMulai field
   }
 );
 
+// Type inference
 export type Itinerary = z.infer<typeof itinerarySchema>;
+
+// Define an array of itineraries (optional)
+export const itineraryArraySchema = z.array(itinerarySchema).optional();

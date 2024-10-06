@@ -1,6 +1,7 @@
 import { isValid, parseISO } from "date-fns";
 import { z } from "zod";
 import { fileSchema } from "./file-schema";
+import { itineraryArraySchema, itinerarySchema } from "./itinerary";
 
 // Define the enum values as a Zod enum
 const LokasiEnum = z.enum(["DALAM_KOTA", "LUAR_KOTA", "LUAR_NEGERI"]);
@@ -91,7 +92,8 @@ export const baseKegiatanSchema = z.object({
   pesertaXlsxCuid: z.string({
     required_error: "file Excel daftar peserta harus diisi",
   }),
-  isValidItinerary: z.boolean().optional(),
+  isValidItinerary: z.boolean({ message: "invalid itinerary" }).optional(),
+  itinerary: z.array(z.any()).optional(),
 });
 
 // Apply the refine method to add custom validation
