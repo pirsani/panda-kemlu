@@ -25,6 +25,7 @@ const ButtonEye = ({ url }: ButtonEyeProps) => {
   if (url === "") return null;
   return (
     <Button
+      type="button"
       variant={"outline"}
       className={cn(
         "border-blue-500 h-11 w-11 p-0 hover:bg-blue-300",
