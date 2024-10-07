@@ -3,7 +3,7 @@ export const mapsCuidToJenisDokumen = {
   dokumenNodinMemoSkCuid: "nodin-memo-sk",
   dokumenSuratSetnegSptjmCuid: "surat-setneg-sptjm",
   laporanKegiatanCuid: "laporan-kegiatan",
-  daftarHadirCuid: "dafar-hadir",
+  daftarHadirCuid: "daftar-hadir",
   dokumentasiKegiatanCuid: "dokumentasi-kegiatan",
   rampunganTerstempelCuid: "rampungan-terstempel",
   suratPersetujuanJaldisSetnegCuid: "surat-persetujuan-jaldis-setneg",

@@ -3,6 +3,12 @@ import { dbHonorarium } from "@/lib/db-honorarium";
 import { promises as fs } from "fs";
 import { NextResponse } from "next/server";
 import path from "path";
+import { Logger } from "tslog";
+
+const logger = new Logger({
+  name: "download-dokumen-kegiatan",
+  hideLogPositionForProduction: true,
+});
 
 export async function downloadDokumenKegiatan(req: Request, slug: string[]) {
   // slug[0] is the document type, slug[1] is the kegiatanId
@@ -14,8 +20,10 @@ export async function downloadDokumenKegiatan(req: Request, slug: string[]) {
   try {
     const dokumenId = slug[1];
     //const kegiatan = await getKegiatanById(kegiatanId);
-    const uploadedFile = await getUploadedFile(dokumenId);
-    const filePath = uploadedFile?.filePath;
+    const dokumenKegiatan = await getDokumenKegiatan(dokumenId);
+    logger.info(dokumenKegiatan);
+
+    const filePath = dokumenKegiatan?.filePath;
     if (!filePath) {
       return new NextResponse("File not found", { status: 404 });
     }
@@ -27,8 +35,8 @@ export async function downloadDokumenKegiatan(req: Request, slug: string[]) {
     return new NextResponse(file, {
       status: 200,
       headers: {
-        "Content-Type": uploadedFile?.mimeType || "application/octet-stream",
-        "Content-Disposition": `attachment; filename=${uploadedFile.originalFilename}`, // inline or attachment
+        "Content-Type": dokumenKegiatan?.mimeType || "application/octet-stream",
+        "Content-Disposition": `attachment; filename=${dokumenKegiatan.originalFilename}`, // inline or attachment
       },
     });
   } catch (error) {
@@ -37,12 +45,21 @@ export async function downloadDokumenKegiatan(req: Request, slug: string[]) {
 }
 
 export async function getUploadedFile(id: string) {
-  const dokumen = await dbHonorarium.uploadedFile.findUnique({
+  const dokumen = await dbHonorarium.dokumenKegiatan.findUnique({
     where: {
       id,
     },
   });
   return dokumen;
+}
+
+export async function getDokumenKegiatan(dokumen: string) {
+  const dokumenKegiatan = await dbHonorarium.dokumenKegiatan.findFirst({
+    where: {
+      dokumen: dokumen,
+    },
+  });
+  return dokumenKegiatan;
 }
 
 export default downloadDokumenKegiatan;

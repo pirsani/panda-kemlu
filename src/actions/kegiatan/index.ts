@@ -42,7 +42,11 @@ export const getKegiatanById = async (
     include: {
       itinerary: true,
       provinsi: true,
-      dokumenKegiatan: true,
+      dokumenKegiatan: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
     },
   });
 

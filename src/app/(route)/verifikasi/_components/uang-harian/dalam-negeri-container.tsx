@@ -1,10 +1,12 @@
+import { KegiatanWithDetail } from "@/actions/kegiatan";
 import getPesertaKegiatanDalamNegeri from "@/actions/kegiatan/peserta/dalam-negeri";
 import { Kegiatan, PesertaKegiatan } from "@prisma-honorarium/client";
 import { useEffect, useState } from "react";
 import { PesertaKegiatanTable } from "../../uang-harian/peserta-kegiatan-table-dalam-negeri";
+import VerifikasiDataDukungUangHarianDalamNegeri from "./data-dukung-dalam-negeri";
 
 interface UangHarianDalamNegeriContainerProps {
-  kegiatan: Kegiatan | null;
+  kegiatan: KegiatanWithDetail | null;
 }
 const UangHarianDalamNegeriContainer = ({
   kegiatan,
@@ -27,7 +29,9 @@ const UangHarianDalamNegeriContainer = ({
 
   return (
     <div>
-      <h1>Uang Harian Dalam Negeri Container</h1>
+      <VerifikasiDataDukungUangHarianDalamNegeri
+        dokumenKegiatan={kegiatan?.dokumenKegiatan}
+      />
       {peserta && <PesertaKegiatanTable data={peserta} />}
     </div>
   );

@@ -4,6 +4,7 @@ import { dbHonorarium } from "@/lib/db-honorarium";
 import { JENIS_PENGAJUAN, Kegiatan } from "@prisma-honorarium/client";
 import { revalidatePath } from "next/cache";
 import { Logger } from "tslog";
+import { KegiatanWithDetail } from ".";
 import { ActionResponse } from "../response";
 // Create a Logger instance with custom settings
 const logger = new Logger({
@@ -75,7 +76,7 @@ export type StatusRampungan =
 export const updateStatusRampungan = async (
   kegiatanId: string,
   statusRampunganBaru: StatusRampungan
-): Promise<ActionResponse<Kegiatan>> => {
+): Promise<ActionResponse<KegiatanWithDetail>> => {
   // TODO check permission disini untuk update status rampungan
   // allowed status: pengajuan, terverifikasi, revisi, ditolak, selesai
 
@@ -87,6 +88,11 @@ export const updateStatusRampungan = async (
       },
       data: {
         statusRampungan: statusRampunganBaru,
+      },
+      include: {
+        itinerary: true,
+        provinsi: true,
+        dokumenKegiatan: true,
       },
     });
   } catch (error) {
@@ -124,7 +130,7 @@ export type Status =
 export const updateStatusUhLuarNegeri = async (
   kegiatanId: string,
   statusUhLuarNegeriBaru: Status
-): Promise<ActionResponse<Kegiatan>> => {
+): Promise<ActionResponse<KegiatanWithDetail>> => {
   try {
     const updatedKegiatan = await dbHonorarium.kegiatan.update({
       where: {
@@ -132,6 +138,11 @@ export const updateStatusUhLuarNegeri = async (
       },
       data: {
         statusUhLuarNegeri: statusUhLuarNegeriBaru,
+      },
+      include: {
+        itinerary: true,
+        provinsi: true,
+        dokumenKegiatan: true,
       },
     });
     console.log("[updatedKegiatan]", updatedKegiatan);

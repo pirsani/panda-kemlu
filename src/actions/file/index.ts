@@ -1,9 +1,11 @@
+import { BASE_PATH_UPLOAD } from "@/app/api/upload/config";
 import { dbHonorarium } from "@/lib/db-honorarium";
 import saveFile from "@/utils/file-operations/save";
 import { createId } from "@paralleldrive/cuid2";
 import fse from "fs-extra";
 import path, { extname } from "path";
 import { Logger } from "tslog";
+import { getJenisDokumenFromKey, mapsCuidToJenisDokumen } from "./utils";
 // Create a Logger instance with custom settings
 const logger = new Logger({
   hideLogPositionForProduction: true,
@@ -78,6 +80,87 @@ export const logUploadedFile = async (
   return uploadedFile;
 };
 
+async function saveDokumenKegiatanToFinalFolder(
+  obj: Record<string, string>,
+  kegiatanId: string
+) {
+  let logUploadedFile: LogUploadedFile[] = [];
+  try {
+    const kegiatan = await dbHonorarium.kegiatan.findUnique({
+      where: { id: kegiatanId },
+    });
+
+    if (!kegiatan) {
+      throw new Error("Kegiatan tidak ditemukan");
+    }
+
+    const kegiatanYear = new Date(kegiatan?.tanggalMulai)
+      .getFullYear()
+      .toString();
+
+    // Check if file is uploaded by iterating over the entries and then move to final folder
+    const finalPath = path.posix.join(
+      BASE_PATH_UPLOAD,
+      kegiatanYear,
+      kegiatanId,
+      "uh-luar-negeri"
+    );
+
+    const tempPath = path.posix.join(BASE_PATH_UPLOAD, "temp", kegiatanId);
+
+    // this will not wait for the async operation to finish
+    Object.entries(obj).forEach(async ([key, value]) => {
+      // do not use async here, it will not wait for the operation to finish
+    });
+
+    // we dont use  Object.entries(dokumenUhLuarNegeri).forEach(async ([key, value])
+    // because it will not wait for the async operation to finish
+    for (const [key, value] of Object.entries(obj)) {
+      await (async () => {
+        const jenisDokumen = getJenisDokumenFromKey(
+          key as keyof typeof mapsCuidToJenisDokumen
+        );
+        if (!jenisDokumen) {
+          logger.error(value, "Jenis dokumen tidak ditemukan, skip key", key);
+          return;
+        }
+
+        // logger.info(key, value);
+        // logger.info("jenisDokumen", jenisDokumen);
+        const finalPathFile = path.posix.join(finalPath, value);
+        const tempPathFile = path.posix.join(tempPath, value);
+        const resolvedPathFile = path.resolve(finalPathFile);
+        const resolvedTempPathFile = path.resolve(tempPathFile);
+        // check if temp file exists
+        const fileExists = await fse.pathExists(resolvedTempPathFile);
+        if (!fileExists) {
+          logger.error(
+            "File not found in temp folder, skipping moving file to final folder"
+          );
+          return;
+        }
+
+        await moveFileToFinalFolder(resolvedTempPathFile, resolvedPathFile);
+
+        logger.info("File exists in temp folder, moving to final folder");
+        logger.info("collecting log file to be updated in database");
+        logUploadedFile.push({
+          dokumen: value,
+          kegiatanId: kegiatanId,
+          jenisDokumenId: jenisDokumen,
+          filePath: path.posix.relative(BASE_PATH_UPLOAD, finalPathFile),
+        });
+      })();
+    }
+
+    return logUploadedFile;
+  } catch (error) {
+    logger.error("Error moving file:", error);
+    //throw new Error("Error parsing form data");
+    throw error;
+  }
+}
+
 export async function moveFileToFinalFolder(
   tempPath: string,
   finalPath: string
@@ -88,20 +171,36 @@ export async function moveFileToFinalFolder(
   logger.info("finalDir", finalDir);
   logger.info("finalPath", finalPath);
 
-  await fse.ensureDir(finalDir);
-  // Check if the destination path is a directory
-  const isDirectory =
-    (await fse.pathExists(finalPath)) &&
-    (await fse.stat(finalPath)).isDirectory();
+  try {
+    await fse.ensureDir(finalDir);
+    // Check if the destination path is a directory
+    const isDirectory =
+      (await fse.pathExists(finalPath)) &&
+      (await fse.stat(finalPath)).isDirectory();
 
-  if (isDirectory) {
-    throw new Error(`Cannot overwrite directory '${finalPath}' with a file`);
+    if (isDirectory) {
+      throw new Error(`Cannot overwrite directory '${finalPath}' with a file`);
+    }
+
+    // Move the file inside temp folder to final folder
+    await fse.move(tempPath, finalPath, {
+      overwrite: true,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      if ((error as NodeJS.ErrnoException).code === "EPERM") {
+        console.error("Permission error moving folder:", error);
+      } else if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+        console.error("Folder not found:", error);
+      } else {
+        console.error("Error moving folder:", error);
+      }
+      console.error("Error stack:", error.stack);
+    } else {
+      console.error("Unknown error:", error);
+    }
+    throw new Error("Error moving folder");
   }
-
-  // Move the file inside temp folder to final folder
-  await fse.move(tempPath, finalPath, {
-    overwrite: true,
-  });
 }
 
 export interface LogUploadedFile {
@@ -148,6 +247,8 @@ export async function copyLogUploadedFileToDokumenKegiatan(
             dokumen: uploadedFile.id,
             kegiatanId,
             nama: uploadedFile.originalFilename,
+            mimeType: uploadedFile.mimeType,
+            hash: uploadedFile.hash,
             jenisDokumenId,
             filePath,
             createdBy: penggunaId,

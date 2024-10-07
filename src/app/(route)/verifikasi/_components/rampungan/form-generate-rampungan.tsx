@@ -1,11 +1,12 @@
 "use client";
+import { KegiatanWithDetail } from "@/actions/kegiatan";
 import { updateStatusRampungan } from "@/actions/kegiatan/proses";
 import { Button } from "@/components/ui/button";
 import { Kegiatan } from "@prisma-honorarium/client";
 
 interface FormGenerateRampunganProps {
   kegiatanId: string;
-  handleSelesai?: (kegiatan: Kegiatan) => void;
+  handleSelesai?: (kegiatan: KegiatanWithDetail) => void;
   handleGenerate?: () => void;
 }
 const FormGenerateRampungan = ({

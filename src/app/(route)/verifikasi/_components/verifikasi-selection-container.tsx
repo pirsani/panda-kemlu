@@ -1,3 +1,4 @@
+import { KegiatanWithDetail } from "@/actions/kegiatan";
 import DaftarJadwal from "@/components/kegiatan/honorarium/daftar-jadwal";
 import { JenisPengajuan } from "@/types";
 import { Kegiatan } from "@prisma-honorarium/client";
@@ -7,13 +8,15 @@ import FormGenerateRampungan from "./rampungan/form-generate-rampungan";
 import UangHarianDalamNegeriContainer from "./uang-harian/dalam-negeri-container";
 
 interface VerfikasiSelectionContainerProps {
-  kegiatan: Kegiatan | null;
+  kegiatan: KegiatanWithDetail | null;
 }
 
 const VerfikasiSelectionContainer = ({
   kegiatan: initialKegiatan,
 }: VerfikasiSelectionContainerProps) => {
-  const [kegiatan, setKegiatan] = useState<Kegiatan | null>(initialKegiatan);
+  const [kegiatan, setKegiatan] = useState<KegiatanWithDetail | null>(
+    initialKegiatan
+  );
   const [jenisPengajuan, setJenisPengajuan] = useState<JenisPengajuan | null>(
     null
   );
@@ -21,7 +24,7 @@ const VerfikasiSelectionContainer = ({
     setJenisPengajuan(jenis);
   };
 
-  const handleSelesaiRampungan = (kegiatanUpdated: Kegiatan) => {
+  const handleSelesaiRampungan = (kegiatanUpdated: KegiatanWithDetail) => {
     setKegiatan((kegiatan) => ({
       ...kegiatan,
       ...kegiatanUpdated,

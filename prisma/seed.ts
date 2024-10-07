@@ -399,8 +399,8 @@ async function main() {
         untukLokasiDi: "0;1;2;",
       },
       {
-        id: "dafar-hadir",
-        nama: "dafar-hadir",
+        id: "daftar-hadir",
+        nama: "daftar-hadir",
         createdBy: "init",
         deskripsi: "Daftar Hadir",
         untukLangkahKe: 1,

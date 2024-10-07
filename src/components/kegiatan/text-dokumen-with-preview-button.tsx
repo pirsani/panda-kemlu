@@ -15,10 +15,15 @@ const TextDokumenWithPreviewButton = ({
 }: TextDokumenWithPreviewButtonProps) => {
   //const fileUrl = useFileStore((state) => state.fileUrl);
 
-  if (!dokumen) {
-    return <div className="text-gray-700">{label}</div>;
-  }
-  const url = `/download/dokumen-kegiatan/${dokumen.dokumen}`;
+  // if (!dokumen) {
+  //   return <div className="text-gray-700">{label}</div>;
+  // }
+  const url = dokumen?.dokumen
+    ? `/download/dokumen-kegiatan/${dokumen?.dokumen}`
+    : null;
+
+  const originalFilename =
+    dokumen?.nama || dokumen?.dokumen || "Belum ada dokumen";
 
   const setUrl = () => {
     useFileStore.setState({ fileUrl: url });
@@ -26,10 +31,10 @@ const TextDokumenWithPreviewButton = ({
 
   return (
     <div className="flex flex-col">
-      <span className="text-gray-700">{label}</span>
+      <span className="font-semibold text-sm">{label}</span>
       <div className="flex flex-row">
         <span className=" bg-gray-100 border border-gray-300 rounded p-2 w-full">
-          {dokumen.dokumen}
+          {originalFilename}
         </span>
         <ButtonEye url={url} />
         {/* <Button
