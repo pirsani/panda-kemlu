@@ -3,6 +3,7 @@ import ajukanUhLuarNegeri from "@/actions/kegiatan/uang-harian/luar-negeri";
 import ButtonEye from "@/components/button-eye-open-document";
 import FormFileImmediateUpload from "@/components/form/form-file-immediate-upload";
 import FormFileUpload from "@/components/form/form-file-upload";
+import LoadingIndicator from "@/components/loading";
 import PdfPreview from "@/components/pdf-preview";
 import PdfPreviewContainer from "@/components/pdf-preview-container";
 import { Button } from "@/components/ui/button";
@@ -18,13 +19,14 @@ import useFileStore from "@/hooks/use-file-store";
 import {
   DokumenUhLuarNegeri,
   DokumenUhLuarNegeriEditMode,
-  DokumenUhLuarNegeriSchema,
-  DokumenUhLuarNegeriSchemaEditMode,
+  dokumenUhLuarNegeriSchema,
+  dokumenUhLuarNegeriSchemaEditMode,
   DokumenUhLuarNegeriWithoutFile,
-  DokumenUhLuarNegeriWithoutFileSchema,
+  dokumenUhLuarNegeriWithoutFileSchema,
 } from "@/zod/schemas/dokumen-uh-luar-negeri";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createId } from "@paralleldrive/cuid2";
+import { Loader } from "lucide-react";
 import { useRef, useState } from "react";
 import {
   ControllerRenderProps,
@@ -50,7 +52,7 @@ const UhLuarNegeriContainer = ({
   type FormMode = typeof isEditMode;
   const form = useForm<FormValues<FormMode>>({
     resolver: zodResolver(
-      isEditMode ? DokumenUhLuarNegeriSchemaEditMode : DokumenUhLuarNegeriSchema
+      isEditMode ? dokumenUhLuarNegeriSchemaEditMode : dokumenUhLuarNegeriSchema
     ),
     defaultValues: {
       laporanKegiatanCuid: "laporanKegiatan" + createId() + ".pdf",
@@ -67,7 +69,7 @@ const UhLuarNegeriContainer = ({
     register,
     setValue,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     watch,
   } = form;
 
@@ -96,13 +98,13 @@ const UhLuarNegeriContainer = ({
   const onSubmit: SubmitHandler<FormValues<FormMode>> = async (data) => {
     //send without file
     const dataparsedWithoutFile =
-      DokumenUhLuarNegeriWithoutFileSchema.parse(data);
+      dokumenUhLuarNegeriWithoutFileSchema.parse(data);
     console.log(dataparsedWithoutFile);
     const pengajuan = await ajukanUhLuarNegeri(dataparsedWithoutFile);
     if (pengajuan.success) {
       toast.success("Pengajuan berhasil");
     } else {
-      toast.error("Pengajuan gagal", pengajuan.error, pengajuan.message);
+      toast.error(`Pengajuan gagal ${pengajuan.error} ${pengajuan.message}`);
     }
   };
 
@@ -316,9 +318,10 @@ const UhLuarNegeriContainer = ({
           <Button
             className="w-full bg-blue-500 hover:bg-blue-600"
             type="button"
+            disabled={isSubmitting}
             onClick={handleSubmit(onSubmit)}
           >
-            Ajukan
+            Ajukan {isSubmitting && <Loader className="animate-spin mx-2" />}
           </Button>
         </div>
       </div>

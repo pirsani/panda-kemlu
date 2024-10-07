@@ -3,7 +3,12 @@ import { dbHonorarium } from "@/lib/db-honorarium";
 
 import { JENIS_PENGAJUAN, Kegiatan } from "@prisma-honorarium/client";
 import { revalidatePath } from "next/cache";
+import { Logger } from "tslog";
 import { ActionResponse } from "../response";
+// Create a Logger instance with custom settings
+const logger = new Logger({
+  hideLogPositionForProduction: true,
+});
 
 export const getStatusPengajuanGenerateRampungan = async (
   kegiatanId: string
@@ -98,4 +103,76 @@ export const updateStatusRampungan = async (
     success: true,
     data: updateStatusRampungan,
   };
+};
+
+// "setup",
+// "pengajuan",
+// "verifikasi",
+// "nominatif",
+// "pembayaran",
+// "selesai",
+export type Status =
+  | "pengajuan"
+  | "terverifikasi"
+  | "revisi"
+  | "nominatif"
+  | "pembayaran"
+  | "dibayar"
+  | "ditolak"
+  | "selesai";
+
+export const updateStatusUhLuarNegeri = async (
+  kegiatanId: string,
+  statusUhLuarNegeriBaru: Status
+): Promise<ActionResponse<Kegiatan>> => {
+  try {
+    const updatedKegiatan = await dbHonorarium.kegiatan.update({
+      where: {
+        id: kegiatanId,
+      },
+      data: {
+        statusUhLuarNegeri: statusUhLuarNegeriBaru,
+      },
+    });
+    console.log("[updatedKegiatan]", updatedKegiatan);
+    return {
+      success: true,
+      data: updatedKegiatan,
+    };
+  } catch (error) {
+    logger.error("Error updateStatusUhLuarNegeri", error);
+    return {
+      success: false,
+      error: "E-KUSLN01",
+      message: "Error update Status Uh Luar Negeri",
+    };
+  }
+};
+
+export const updateStatusUhDalamNegeri = async (
+  kegiatanId: string,
+  statusUhDalamNegeriBaru: Status
+): Promise<ActionResponse<Kegiatan>> => {
+  try {
+    const updatedKegiatan = await dbHonorarium.kegiatan.update({
+      where: {
+        id: kegiatanId,
+      },
+      data: {
+        statusUhDalamNegeri: statusUhDalamNegeriBaru,
+      },
+    });
+    console.log("[updatedKegiatan]", updatedKegiatan);
+    return {
+      success: true,
+      data: updatedKegiatan,
+    };
+  } catch (error) {
+    logger.error("Error updateStatusUhDalamNegeri", error);
+    return {
+      success: false,
+      error: "E-KUSLN01",
+      message: "Error update Status Uh Dalam Negeri",
+    };
+  }
 };

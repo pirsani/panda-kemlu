@@ -383,7 +383,7 @@ async function main() {
         untukLokasiDi: "2;",
       },
       {
-        id: "surat-persetujuan-jaldis",
+        id: "surat-persetujuan-jaldis-setneg",
         nama: "surat-persetujuan-jaldis-setneg",
         createdBy: "init",
         deskripsi:

@@ -1,5 +1,6 @@
 import ajukanUhDalamNegeri from "@/actions/kegiatan/uang-harian/dalam-negeri";
 import ButtonEye from "@/components/button-eye-open-document";
+import FormFileImmediateUpload from "@/components/form/form-file-immediate-upload";
 import FormFileUpload from "@/components/form/form-file-upload";
 import PdfPreview from "@/components/pdf-preview";
 import PdfPreviewContainer from "@/components/pdf-preview-container";
@@ -9,16 +10,19 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import useFileStore from "@/hooks/use-file-store";
 import {
   DokumenUhDalamNegeri,
   DokumenUhDalamNegeriEditMode,
-  DokumenUhDalamNegeriSchema,
-  DokumenUhDalamNegeriSchemaEditMode,
+  dokumenUhDalamNegeriSchema,
+  dokumenUhDalamNegeriSchemaEditMode,
+  dokumenUhDalamNegeriWithoutFileSchema,
 } from "@/zod/schemas/dokumen-uh-dalam-negeri";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createId } from "@paralleldrive/cuid2";
 import { useState } from "react";
 import {
   ControllerRenderProps,
@@ -46,11 +50,15 @@ const UhDalamNegeriContainer = ({
   const form = useForm<FormValues<FormMode>>({
     resolver: zodResolver(
       isEditMode
-        ? DokumenUhDalamNegeriSchemaEditMode
-        : DokumenUhDalamNegeriSchema
+        ? dokumenUhDalamNegeriSchemaEditMode
+        : dokumenUhDalamNegeriSchema
     ),
     defaultValues: {
       kegiatanId,
+      laporanKegiatanCuid: "laporanKegiatan" + createId() + ".pdf",
+      daftarHadirCuid: "daftarHadir" + createId() + ".pdf",
+      dokumentasiKegiatanCuid: "dokumentasi" + createId() + ".pdf",
+      rampunganTerstempelCuid: "rampungan" + createId() + ".pdf",
     },
   });
 
@@ -61,17 +69,18 @@ const UhDalamNegeriContainer = ({
     watch,
   } = form;
 
-  const onSubmit: SubmitHandler<FormValues<FormMode>> = async (data) => {
-    console.log(data, isEditMode);
-    // extraction of zod schema to be used in the action
-    const formData = new FormData();
-    formData.append("kegiatanId", data.kegiatanId.toString());
-    formData.append("laporanKegiatan", data.laporanKegiatan as File);
-    formData.append("daftarHadir", data.daftarHadir as File);
-    formData.append("dokumentasi", data.dokumentasi as File);
-    formData.append("rampungan", data.rampungan as File);
+  // Watch the form values
+  const laporanKegiatanCuid = watch("laporanKegiatanCuid");
+  const daftarHadirCuid = watch("daftarHadirCuid");
+  const dokumentasiKegiatanCuid = watch("dokumentasiKegiatanCuid");
+  const rampunganTerstempelCuid = watch("rampunganTerstempelCuid");
 
-    const ajukan = await ajukanUhDalamNegeri(formData);
+  const onSubmit: SubmitHandler<FormValues<FormMode>> = async (data) => {
+    // send without file because the file is already uploaded immediately on change selected file
+
+    const dataparsedWithoutFile =
+      dokumenUhDalamNegeriWithoutFileSchema.parse(data);
+    const ajukan = await ajukanUhDalamNegeri(dataparsedWithoutFile);
     if (ajukan.success) {
       toast.success("Pengajuan berhasil");
     } else {
@@ -125,13 +134,15 @@ const UhDalamNegeriContainer = ({
                 name="laporanKegiatan"
                 render={({ field }) => (
                   <FormItem>
-                    <label htmlFor="laporanKegiatan" className=" font-semibold">
+                    <FormLabel className=" font-semibold">
                       laporan Kegiatan
-                    </label>
+                    </FormLabel>
                     <div className="flex flex-row gap-2 items-center">
                       <FormControl>
-                        <FormFileUpload
+                        <FormFileImmediateUpload
+                          cuid={laporanKegiatanCuid}
                           name={field.name}
+                          folder={kegiatanId}
                           onFileChange={handleFileChange}
                           className="bg-white w-full border-2"
                         />
@@ -147,13 +158,15 @@ const UhDalamNegeriContainer = ({
                 name="daftarHadir"
                 render={({ field }) => (
                   <FormItem>
-                    <label htmlFor="daftarHadir" className=" font-semibold">
+                    <FormLabel className=" font-semibold">
                       Daftar Hadir
-                    </label>
+                    </FormLabel>
                     <div className="flex flex-row gap-2 items-center">
                       <FormControl>
-                        <FormFileUpload
+                        <FormFileImmediateUpload
+                          cuid={daftarHadirCuid}
                           name={field.name}
+                          folder={kegiatanId}
                           onFileChange={handleFileChange}
                           className="bg-white"
                         />
@@ -169,12 +182,12 @@ const UhDalamNegeriContainer = ({
                 name="dokumentasi"
                 render={({ field }) => (
                   <FormItem>
-                    <label htmlFor="dokumentasi" className="font-semibold">
-                      Dokumentasi
-                    </label>
+                    <FormLabel className="font-semibold">Dokumentasi</FormLabel>
                     <div className="flex flex-row gap-2 items-center">
                       <FormControl>
-                        <FormFileUpload
+                        <FormFileImmediateUpload
+                          cuid={dokumentasiKegiatanCuid}
+                          folder={kegiatanId}
                           name={field.name}
                           onFileChange={handleFileChange}
                           className="bg-white"
@@ -182,7 +195,6 @@ const UhDalamNegeriContainer = ({
                       </FormControl>
                       <ButtonEye url={fileUrls[field.name]} />
                     </div>
-
                     <FormMessage />
                   </FormItem>
                 )}
@@ -192,12 +204,14 @@ const UhDalamNegeriContainer = ({
                 name="rampungan"
                 render={({ field }) => (
                   <FormItem>
-                    <label htmlFor="rampungan" className=" font-semibold">
+                    <FormLabel className=" font-semibold">
                       Rampungan yang distempel
-                    </label>
+                    </FormLabel>
                     <div className="flex flex-row gap-2 items-center">
                       <FormControl>
-                        <FormFileUpload
+                        <FormFileImmediateUpload
+                          cuid={rampunganTerstempelCuid}
+                          folder={kegiatanId}
                           name={field.name}
                           onFileChange={handleFileChange}
                           className="bg-white"

@@ -1,18 +1,30 @@
 "use server";
+import {
+  copyLogUploadedFileToDokumenKegiatan,
+  LogUploadedFile,
+  moveFileToFinalFolder,
+} from "@/actions/file";
+import {
+  getJenisDokumenFromKey,
+  mapsCuidToJenisDokumen,
+} from "@/actions/file/utils";
 import { getSessionPenggunaForAction } from "@/actions/pengguna";
 import { getPrismaErrorResponse } from "@/actions/prisma-error-response";
 import { ActionResponse } from "@/actions/response";
 import { BASE_PATH_UPLOAD } from "@/app/api/upload/config";
-import { dbHonorarium } from "@/lib/db-honorarium";
+import { dbHonorarium, Prisma } from "@/lib/db-honorarium";
 import saveFile from "@/utils/file-operations/save";
 import {
   DokumenUhLuarNegeriWithoutFile,
-  DokumenUhLuarNegeriWithoutFileSchema,
+  dokumenUhLuarNegeriWithoutFileSchema,
 } from "@/zod/schemas/dokumen-uh-luar-negeri";
 import { Kegiatan } from "@prisma-honorarium/client";
 import fse from "fs-extra";
 import path from "path";
 import { Logger } from "tslog";
+import { ZodError } from "zod";
+import { updateStatusUhLuarNegeri } from "../proses";
+import { ErrorResponseSwitcher } from "./utils";
 
 // Create a Logger instance with custom settings
 const logger = new Logger({
@@ -32,40 +44,61 @@ export const ajukanUhLuarNegeri = async (
     return pengguna;
   }
 
-  let dataparsed;
-  interface LogUploadedFile {
-    dokumen: string;
-    kegiatanId: string;
-    jenisDokumenId: string;
-    filePath: string;
-  }
-  const logUploadedFile: LogUploadedFile[] = [];
+  let logUploadedFile: LogUploadedFile[] = [];
 
-  // try to move file to final folder
   try {
-    dataparsed =
-      DokumenUhLuarNegeriWithoutFileSchema.parse(dokumenUhLuarNegeri);
-    // console.log("dataparsed", dataparsed);
+    // step 1. try to move file to final folder
+    logUploadedFile = await saveFileToFinalFolder(dokumenUhLuarNegeri);
+    if (logUploadedFile.length === 0) {
+      return {
+        success: false,
+        error: "E-FLN01", // no file found in temp folder
+        message: "No File Found",
+      };
+    }
 
-    const kegiatanId = dataparsed.kegiatanId;
+    // step 2. update database entries
+    await copyLogUploadedFileToDokumenKegiatan(
+      logUploadedFile,
+      pengguna.data.penggunaId
+    );
+
+    // step 3. update kegiatan status Uh Luar Negeri
+    const kegiatanUpdated = await updateStatusUhLuarNegeri(
+      dokumenUhLuarNegeri.kegiatanId,
+      "pengajuan"
+    );
+
+    return kegiatanUpdated;
+  } catch (error) {
+    return ErrorResponseSwitcher(error);
+  }
+};
+
+async function saveFileToFinalFolder(
+  dokumenUhLuarNegeriWithoutFile: DokumenUhLuarNegeriWithoutFile
+) {
+  let logUploadedFile: LogUploadedFile[] = [];
+  try {
+    const dokumenUhLuarNegeri = dokumenUhLuarNegeriWithoutFileSchema.parse(
+      dokumenUhLuarNegeriWithoutFile
+    );
+
+    const kegiatanId = dokumenUhLuarNegeri.kegiatanId;
 
     const kegiatan = await dbHonorarium.kegiatan.findUnique({
       where: { id: kegiatanId },
     });
 
     if (!kegiatan) {
-      return {
-        success: false,
-        error: "Kegiatan tidak ditemukan",
-        message: "Kegiatan tidak ditemukan",
-      };
+      throw new Error("Kegiatan tidak ditemukan");
     }
 
     const kegiatanYear = new Date(kegiatan?.tanggalMulai)
       .getFullYear()
       .toString();
     // Type assertion to make TypeScript treat the property as optional
-    delete (dataparsed as { kegiatanId?: string }).kegiatanId;
+    delete (dokumenUhLuarNegeri as { kegiatanId?: string }).kegiatanId;
     // Check if file is uploaded by iterating over the entries and then move to final folder
     const finalPath = path.posix.join(
       BASE_PATH_UPLOAD,
@@ -77,16 +110,16 @@ export const ajukanUhLuarNegeri = async (
     const tempPath = path.posix.join(BASE_PATH_UPLOAD, "temp", kegiatanId);
 
     // this will not wait for the async operation to finish
-    Object.entries(dataparsed).forEach(async ([key, value]) => {
+    Object.entries(dokumenUhLuarNegeri).forEach(async ([key, value]) => {
       const jenisDokumen = getJenisDokumenFromKey(
         key as keyof typeof mapsCuidToJenisDokumen
       );
       console.log(key, value);
     });
 
-    // we dont use  Object.entries(dataparsed).forEach(async ([key, value])
+    // we dont use  Object.entries(dokumenUhLuarNegeri).forEach(async ([key, value])
     // because it will not wait for the async operation to finish
-    for (const [key, value] of Object.entries(dataparsed)) {
+    for (const [key, value] of Object.entries(dokumenUhLuarNegeri)) {
       await (async () => {
         const jenisDokumen = getJenisDokumenFromKey(
           key as keyof typeof mapsCuidToJenisDokumen
@@ -96,8 +129,8 @@ export const ajukanUhLuarNegeri = async (
           return;
         }
 
-        logger.info(key, value);
-        logger.info("jenisDokumen", jenisDokumen);
+        // logger.info(key, value);
+        // logger.info("jenisDokumen", jenisDokumen);
         const finalPathFile = path.posix.join(finalPath, value);
         const tempPathFile = path.posix.join(tempPath, value);
         const resolvedPathFile = path.resolve(finalPathFile);
@@ -111,8 +144,9 @@ export const ajukanUhLuarNegeri = async (
           return;
         }
 
+        await moveFileToFinalFolder(resolvedTempPathFile, resolvedPathFile);
+
         logger.info("File exists in temp folder, moving to final folder");
-        //await moveFileToFinalFolder(resolvedTempPathFile, resolvedPathFile);
         logger.info("collecting log file to be updated in database");
         logUploadedFile.push({
           dokumen: value,
@@ -122,134 +156,13 @@ export const ajukanUhLuarNegeri = async (
         });
       })();
     }
+
+    return logUploadedFile;
   } catch (error) {
-    console.error("Error moving file:", error);
+    logger.error("Error moving file:", error);
     //throw new Error("Error parsing form data");
-    return {
-      success: false,
-      error: "Error Moving File",
-      message: "Error Moving File",
-    }; // change to message
+    throw error;
   }
-
-  // update database entries
-  console.log("logUploadedFile", logUploadedFile);
-  logger.info("update database entries...");
-
-  // Use a for...of loop instead of forEach, which will handle async/await correctly by waiting for each promise to resolve before proceeding to the next iteration.
-  try {
-    const updateKegiatan = await dbHonorarium.$transaction(async (prisma) => {
-      for (const log of logUploadedFile) {
-        const { dokumen, kegiatanId, jenisDokumenId, filePath } = log;
-
-        // select from uploadedFile
-        const uploadedFile = await prisma.uploadedFile.findUnique({
-          where: { id: dokumen },
-        });
-
-        // insert into dokumenKegiatan
-        if (!uploadedFile) {
-          logger.error(
-            dokumen,
-            "Log file tidak ditemukan di tabel uploaded_file, skip file"
-          );
-          continue; // Skip to the next log if file is not found
-        }
-
-        await prisma.dokumenKegiatan.create({
-          data: {
-            dokumen: uploadedFile.id,
-            kegiatanId,
-            nama: uploadedFile.originalFilename,
-            jenisDokumenId,
-            filePath,
-            createdBy: pengguna.data.penggunaId,
-          },
-        });
-      }
-    });
-  } catch (error) {
-    logger.error("Error updating database entries", error);
-    return getPrismaErrorResponse(error as Error);
-  }
-
-  return {
-    success: true,
-    data: null,
-  };
-};
-
-const mapsCuidToJenisDokumen = {
-  dokumenSuratTugasCuid: "surat-tugas",
-  dokumenNodinMemoSkCuid: "nodin-memo-sk",
-  dokumenSuratSetnegSptjmCuid: "surat-setneg-sptjm",
-  laporanKegiatanCuid: "laporan-kegiatan",
-  daftarHadirCuid: "dafar-hadir",
-  dokumentasiKegiatanCuid: "dokumentasi-kegiatan",
-  rampunganTerstempelCuid: "rampungan-terstempel",
-  suratPersetujuanJaldisSetnegCuid: "surat-persetujuan-jaldis-setneg",
-  pasporCuid: "paspor",
-  tiketBoardingPassCuid: "tiket-boarding-pass",
-};
-
-function getJenisDokumenFromKey(
-  key: keyof typeof mapsCuidToJenisDokumen
-): string | undefined {
-  return mapsCuidToJenisDokumen[key];
-}
-
-async function moveFileToFinalFolder(
-  tempPath: string,
-  finalPath: string
-): Promise<void> {
-  // Ensure the final folder exists
-  await fse.ensureDir(finalPath);
-  // Move the file inside temp folder to final folder
-  await fse.move(tempPath, finalPath, {
-    overwrite: true,
-  });
-}
-
-async function copyRecordToDokumenKegiatan(
-  key: string,
-  value: string,
-  kegiatanId: string,
-  finalPath: string
-): Promise<void> {
-  const jenisDokumen = getJenisDokumenFromKey(
-    key as keyof typeof mapsCuidToJenisDokumen
-  );
-
-  if (!jenisDokumen) {
-    logger.error(value, "Jenis dokumen tidak ditemukan, skip file");
-    return;
-  }
-
-  const uploadedFile = await dbHonorarium.uploadedFile.findUnique({
-    where: {
-      id: value,
-    },
-  });
-
-  if (!uploadedFile) {
-    logger.error(
-      value,
-      "Log file tidak ditemukan di tabel uploaded_file, skip file"
-    );
-    return;
-  }
-
-  logger.info("copy record di tabel uploaded_file to dokumen_kegiatan");
-
-  // update database entries
-  // const updatedUploadedFile = await dbHonorarium.uploadedFile.update({
-  //   where: {
-  //     id: kegiatanId,
-  //   },
-  //   data: {
-  //     [key]: value,
-  //   },
-  // });
 }
 
 // const laporanKegiatan = getValueFromKey("laporanKegiatanCuid"); // Output: "laporan-kegiatan"

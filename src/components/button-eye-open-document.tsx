@@ -14,6 +14,7 @@ const ButtonEye = ({ url }: ButtonEyeProps) => {
   }));
 
   const setUrl = () => {
+    console.log("setUrl", url);
     if (url === "") return;
     useFileStore.setState({ fileUrl: url });
     showPreview();

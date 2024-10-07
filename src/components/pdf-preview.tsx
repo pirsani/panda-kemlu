@@ -47,7 +47,7 @@ export const PdfPreview = ({ fileUrl, className }: PdfPreviewProps) => {
   // Reset isLoading state when fileUrl changes
   useEffect(() => {
     if (!fileUrl) {
-      //handleError();
+      handleError();
       return;
     }
     if (isObjectUrl(fileUrl)) {

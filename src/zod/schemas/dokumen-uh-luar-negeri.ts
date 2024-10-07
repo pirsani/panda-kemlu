@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { fileSchema } from "./file-schema";
 
-export const DokumenUhLuarNegeriWithoutFileSchema = z.object({
+export const dokumenUhLuarNegeriWithoutFileSchema = z.object({
   kegiatanId: z.string({ required_error: "Tidak ada referensi kegiatan" }),
   laporanKegiatanCuid: z.string({
     required_error: "Dokumen laporan kegiatan harus diupload",
@@ -24,7 +24,7 @@ export const DokumenUhLuarNegeriWithoutFileSchema = z.object({
   }),
 });
 
-export const DokumenUhLuarNegeriFileSchema = z.object({
+export const dokumenUhLuarNegeriFileSchema = z.object({
   laporanKegiatan: fileSchema({ required: true }),
   daftarHadir: fileSchema({ required: true }),
   dokumentasi: fileSchema({ required: true }),
@@ -35,12 +35,12 @@ export const DokumenUhLuarNegeriFileSchema = z.object({
 });
 
 // Merging the schemas
-export const DokumenUhLuarNegeriSchema =
-  DokumenUhLuarNegeriWithoutFileSchema.merge(DokumenUhLuarNegeriFileSchema);
+export const dokumenUhLuarNegeriSchema =
+  dokumenUhLuarNegeriWithoutFileSchema.merge(dokumenUhLuarNegeriFileSchema);
 
 // Extend the refined schema for edit mode
-export const DokumenUhLuarNegeriSchemaEditMode =
-  DokumenUhLuarNegeriSchema.extend({
+export const dokumenUhLuarNegeriSchemaEditMode =
+  dokumenUhLuarNegeriSchema.extend({
     laporanKegiatan: fileSchema({ required: false }),
     daftarHadir: fileSchema({ required: false }),
     dokumentasi: fileSchema({ required: false }),
@@ -50,12 +50,12 @@ export const DokumenUhLuarNegeriSchemaEditMode =
     tiketBoardingPass: fileSchema({ required: false }),
   });
 export type DokumenUhLuarNegeriWithoutFile = z.infer<
-  typeof DokumenUhLuarNegeriWithoutFileSchema
+  typeof dokumenUhLuarNegeriWithoutFileSchema
 >;
 export type DokumenUhLuarNegeriFile = z.infer<
-  typeof DokumenUhLuarNegeriFileSchema
+  typeof dokumenUhLuarNegeriFileSchema
 >;
-export type DokumenUhLuarNegeri = z.infer<typeof DokumenUhLuarNegeriSchema>;
+export type DokumenUhLuarNegeri = z.infer<typeof dokumenUhLuarNegeriSchema>;
 export type DokumenUhLuarNegeriEditMode = z.infer<
-  typeof DokumenUhLuarNegeriSchemaEditMode
+  typeof dokumenUhLuarNegeriSchemaEditMode
 >;
