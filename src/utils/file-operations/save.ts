@@ -3,7 +3,10 @@ import { fileTypeFromBuffer } from "file-type";
 import fs from "fs";
 import path from "path";
 
-const fallbackPath = path.join(process.cwd(), "BASE_PATH_UPLOAD");
+// Convert the current working directory to a POSIX-compatible path
+const cwdPosix = process.cwd().replace(/\\/g, "/");
+
+const fallbackPath = path.posix.join(cwdPosix, "BASE_PATH_UPLOAD");
 export const BASE_PATH_UPLOAD = process.env.BASE_PATH_UPLOAD || fallbackPath;
 if (!process.env.BASE_PATH_UPLOAD) {
   console.warn(
@@ -71,7 +74,7 @@ const saveFile = async ({
     directory = BASE_PATH_UPLOAD;
   } else {
     // Ensure the directory does not repeat the base path
-    directory = path.join(BASE_PATH_UPLOAD, directory);
+    directory = path.posix.join(BASE_PATH_UPLOAD, directory);
   }
 
   // Ensure the directory exists
@@ -90,8 +93,10 @@ const saveFile = async ({
     throw new Error("Invalid file type.");
   }
 
-  const filePath = path.join(dirPath, fileName);
-  await fs.promises.writeFile(filePath, Buffer.from(fileBuffer));
+  //  const filePath = path.join(dirPath, fileName);
+  const filePath = path.posix.join(directory, fileName); // Use path.posix.join
+  const resolvedPath = path.join(dirPath, fileName);
+  await fs.promises.writeFile(resolvedPath, Buffer.from(fileBuffer));
   //await fs.writeFile(filePath, buffer);
 
   // Calculate the hash of the file using SHA-256
@@ -100,8 +105,10 @@ const saveFile = async ({
   const fileHash = hashSum.digest("hex");
 
   // Calculate the relative path from the base path
+  // Use path.posix to ensure consistent delimiters (forward slashes)
   const basePathUpload = path.resolve(BASE_PATH_UPLOAD);
-  const relativePath = path.relative(basePathUpload, filePath);
+  const relativePath = path.posix.relative(BASE_PATH_UPLOAD, filePath); // Use path.posix.relative
+  console.log("BASE_PATH_UPLOAD:", BASE_PATH_UPLOAD);
   console.log("basePathUpload:", basePathUpload);
   console.log("filePath:", filePath);
   console.log("relativePath:", relativePath);

@@ -11,24 +11,29 @@ export async function downloadDokumenKegiatan(req: Request, slug: string[]) {
     return new NextResponse("Invalid request", { status: 400 });
   }
 
-  const dokumenId = slug[1];
-  //const kegiatan = await getKegiatanById(kegiatanId);
-  const uploadedFile = await getUploadedFile(dokumenId);
-  const filePath = uploadedFile?.filePath;
-  if (!filePath) {
-    return new NextResponse("File not found", { status: 404 });
-  }
+  try {
+    const dokumenId = slug[1];
+    //const kegiatan = await getKegiatanById(kegiatanId);
+    const uploadedFile = await getUploadedFile(dokumenId);
+    const filePath = uploadedFile?.filePath;
+    if (!filePath) {
+      return new NextResponse("File not found", { status: 404 });
+    }
 
-  // read file from disk and send it to client
-  const fullPath = path.join(BASE_PATH_UPLOAD, filePath);
-  const file = await fs.readFile(fullPath);
-  return new NextResponse(file, {
-    status: 200,
-    headers: {
-      "Content-Type": uploadedFile?.mimeType || "application/octet-stream",
-      "Content-Disposition": `attachment; filename=${uploadedFile.originalFilename}`, // inline or attachment
-    },
-  });
+    // read file from disk and send it to client
+    const fullPath = path.posix.join(BASE_PATH_UPLOAD, filePath);
+    const fullPathResolvedPath = path.resolve(fullPath);
+    const file = await fs.readFile(fullPathResolvedPath);
+    return new NextResponse(file, {
+      status: 200,
+      headers: {
+        "Content-Type": uploadedFile?.mimeType || "application/octet-stream",
+        "Content-Disposition": `attachment; filename=${uploadedFile.originalFilename}`, // inline or attachment
+      },
+    });
+  } catch (error) {
+    return new NextResponse("Error downloading file", { status: 500 });
+  }
 }
 
 export async function getUploadedFile(id: string) {

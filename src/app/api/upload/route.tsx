@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     }
 
     // base path will be mange on save.ts
-    const filesFolder = path.join("temp", folderIdentifier);
+    const filesFolder = path.posix.join("temp", folderIdentifier);
 
     const allowedMimeTypes = [
       "application/pdf",

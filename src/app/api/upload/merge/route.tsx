@@ -1,7 +1,7 @@
 import fs from "fs";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
-import { BASE_PATH_UPLOAD_CHUNK } from "../config";
+import { BASE_PATH_UPLOAD, BASE_PATH_UPLOAD_CHUNK } from "../config";
 
 const mergeChunks = async (
   fromChunk: string,
@@ -10,7 +10,7 @@ const mergeChunks = async (
 ) => {
   let chunkPaths: Array<string> = [];
   for (let i = 0; i < totalChunks; i++) {
-    const filePath = path.join(
+    const filePath = path.posix.join(
       BASE_PATH_UPLOAD_CHUNK,
       "chunk",
       fromChunk + "-" + i
@@ -18,9 +18,9 @@ const mergeChunks = async (
     chunkPaths.push(filePath);
   }
 
-  const writeStream = fs.createWriteStream(
-    path.join(process.cwd(), "files", toFilename)
-  );
+  const pathStream = path.posix.join(BASE_PATH_UPLOAD, "merged", toFilename);
+  const pathStreamResolvedPath = path.resolve(pathStream);
+  const writeStream = fs.createWriteStream(pathStreamResolvedPath);
 
   writeStream.on("finish", () => {
     //console.log("merge chunks finish");
@@ -33,7 +33,8 @@ const mergeChunks = async (
     chunkPaths.forEach((chunkPath) => {
       const chunk = fs.readFileSync(chunkPath);
       writeStream.write(Buffer.from(chunk.toString(), "base64"));
-      fs.unlinkSync(chunkPath);
+      const resolvedPath = path.resolve(chunkPath);
+      fs.unlinkSync(resolvedPath);
     });
     writeStream.end();
     //console.log("merging");

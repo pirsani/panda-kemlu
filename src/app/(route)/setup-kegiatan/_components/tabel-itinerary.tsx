@@ -4,7 +4,6 @@ import {
   TabelGenericWithoutInlineEdit,
 } from "@/components/tabel-generic-without-inline-edit";
 import { Button } from "@/components/ui/button";
-import { Itinerary } from "@/zod/schemas/itinerary";
 import {
   ColumnDef,
   createColumnHelper,
@@ -101,6 +100,7 @@ const TabelItinerary = ({
     const validationResult = validateItineraryChain(data);
     setValidation(validationResult);
     onDataChange(validationResult.isValid);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   return (

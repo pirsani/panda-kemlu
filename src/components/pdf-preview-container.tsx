@@ -14,6 +14,7 @@ const PdfPreviewContainer = ({ className }: PdfPreviewContainerProps) => {
 
   useEffect(() => {
     setFileUrl(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return <PdfPreview fileUrl={fileUrl} className={className} />;
 };

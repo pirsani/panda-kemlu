@@ -1,6 +1,10 @@
 import path from "path";
 
-const fallbackPath = path.join(process.cwd(), "BASE_PATH_UPLOAD");
+// Convert the current working directory to a POSIX-compatible path
+const cwdPosix = process.cwd().replace(/\\/g, "/");
+
+const fallbackPath = path.posix.join(cwdPosix, "BASE_PATH_UPLOAD");
+
 export const BASE_PATH_UPLOAD = process.env.BASE_PATH_UPLOAD || fallbackPath;
 if (!process.env.BASE_PATH_UPLOAD) {
   console.warn(
@@ -8,7 +12,7 @@ if (!process.env.BASE_PATH_UPLOAD) {
   );
 }
 
-const fallbackPathChunk = path.join(process.cwd(), "BASE_PATH_UPLOAD_CHUNK");
+const fallbackPathChunk = path.posix.join(cwdPosix, "BASE_PATH_UPLOAD_CHUNK");
 export const BASE_PATH_UPLOAD_CHUNK =
   process.env.BASE_PATH_UPLOAD_CHUNK || fallbackPathChunk;
 if (!process.env.BASE_PATH_UPLOAD_CHUNK) {

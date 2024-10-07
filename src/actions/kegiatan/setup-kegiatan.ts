@@ -17,6 +17,7 @@ import kegiatanSchema, {
 import { Itinerary, Kegiatan } from "@prisma-honorarium/client";
 import { format } from "date-fns";
 import fs from "fs";
+import fse from "fs-extra";
 import { startsWith } from "lodash";
 import path from "path";
 import { Logger } from "tslog";
@@ -67,7 +68,7 @@ export const setupKegiatan = async (
 
     // add the file extension
     const filePesertaXlsx = `${pesertaXlsxCuid}.xlsx`;
-    const excelFilePath = path.join(
+    const excelFilePath = path.posix.join(
       BASE_PATH_UPLOAD,
       "temp",
       cuid,
@@ -76,7 +77,10 @@ export const setupKegiatan = async (
 
     // check if the file exists
     logger.info("excelFilePath", filePesertaXlsx);
-    if (!fs.existsSync(excelFilePath)) {
+
+    const filePesertaXlsxPathResolvedPath = path.resolve(excelFilePath);
+
+    if (!fs.existsSync(filePesertaXlsxPathResolvedPath)) {
       return {
         success: false,
         error: "E-KEG-02",
@@ -85,7 +89,7 @@ export const setupKegiatan = async (
     }
 
     // read file as File
-    const pesertaXlsx = fs.readFileSync(excelFilePath);
+    const pesertaXlsx = fs.readFileSync(filePesertaXlsxPathResolvedPath);
 
     dataPesertaDariExcel = await parseDataPesertaDariExcel(pesertaXlsx);
   } catch (error) {
@@ -147,8 +151,8 @@ export const setupKegiatan = async (
 
     // move the file to the final folder
     const year = kegiatan.tanggalMulai.getFullYear();
-    const finalFolder = path.join(year.toString(), kegiatanBaru.id);
-    await moveFolderToFinalLocation(cuid, finalFolder);
+    const kegiatanFolder = path.posix.join(year.toString(), kegiatanBaru.id);
+    await moveFolderToFinalLocation(cuid, kegiatanFolder);
     // update database uploaded file
     // Fetch the uploaded file record
     const uploadedFiles = await dbHonorarium.uploadedFile.findMany({
@@ -162,6 +166,7 @@ export const setupKegiatan = async (
     if (uploadedFiles.length > 0) {
       const year = new Date().getFullYear();
 
+      // make sure to save the path in posix style
       await Promise.all(
         uploadedFiles.map(async (file) => {
           const newFilePath = file.filePath.replace(
@@ -183,7 +188,9 @@ export const setupKegiatan = async (
         })
       );
     } else {
-      console.log(`No file found with filepath containing: temp/${cuid}`);
+      console.log(
+        `No record file found with filepath containing: temp/${cuid}`
+      );
     }
 
     return {
@@ -202,17 +209,35 @@ export const setupKegiatan = async (
 
 const moveFolderToFinalLocation = async (
   fromCuid: string,
-  toKegiatanId: string
+  toKegiatanFolder: string
 ) => {
   // move the folder to the final location
-  const tempFolder = path.join(BASE_PATH_UPLOAD, "temp", fromCuid);
-  const finalFolder = path.join(BASE_PATH_UPLOAD, toKegiatanId);
+  const tempFolder = path.posix.join(BASE_PATH_UPLOAD, "temp", fromCuid);
+  const finalFolder = path.posix.join(BASE_PATH_UPLOAD, toKegiatanFolder);
   try {
     // Ensure the final folder exists
-    fs.mkdirSync(finalFolder, { recursive: true });
-    fs.renameSync(tempFolder, finalFolder);
+    await fse.ensureDir(finalFolder);
+
+    // Move the tempFolder to finalFolder and remove the tempFolder
+    await fse.move(tempFolder, finalFolder, { overwrite: true });
+
+    // Copy all contents to the final folder
+    //await fse.copy(tempFolder, finalFolder);
+    // Remove the temporary folder
+    // await fse.remove(tempFolder);
   } catch (error) {
-    console.error("Error moving folder:", error);
+    if (error instanceof Error) {
+      if ((error as NodeJS.ErrnoException).code === "EPERM") {
+        console.error("Permission error moving folder:", error);
+      } else if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+        console.error("Folder not found:", error);
+      } else {
+        console.error("Error moving folder:", error);
+      }
+      console.error("Error stack:", error.stack);
+    } else {
+      console.error("Unknown error:", error);
+    }
     throw new Error("Error moving folder");
   }
 };

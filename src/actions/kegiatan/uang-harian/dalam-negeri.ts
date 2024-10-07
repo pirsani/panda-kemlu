@@ -35,7 +35,7 @@ export const ajukanUhDalamNegeri = async (
     }; // change to message
   }
 
-  const fileFolder = path.join(dataparsed.kegiatanId, "uh-dalam-negeri");
+  const fileFolder = path.posix.join(dataparsed.kegiatanId, "uh-dalam-negeri");
 
   try {
     // save file to temp folder

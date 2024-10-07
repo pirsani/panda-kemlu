@@ -5,14 +5,17 @@ import { BASE_PATH_UPLOAD_CHUNK } from "../config";
 
 const saveChunk = async (chunk: string, filename: string) => {
   return new Promise((resolve, reject) => {
-    const filesFolder = path.join(BASE_PATH_UPLOAD_CHUNK, "chunk");
-    const filePath = path.join(filesFolder, filename);
-    if (!fs.existsSync(filesFolder)) {
-      fs.mkdirSync(filesFolder);
-    }
-    console.log("filePath ", filePath);
+    const filesFolder = path.posix.join(BASE_PATH_UPLOAD_CHUNK, "chunk");
+    const osCompatibleFolder = path.resolve(filesFolder);
+    const filePath = path.posix.join(filesFolder, filename);
+    const resolvedPath = path.resolve(filePath);
 
-    const writeStream = fs.createWriteStream(filePath);
+    if (!fs.existsSync(osCompatibleFolder)) {
+      fs.mkdirSync(osCompatibleFolder);
+    }
+    console.log("filePath ", resolvedPath);
+
+    const writeStream = fs.createWriteStream(resolvedPath);
     writeStream.on("finish", () => {
       resolve("finish");
     });

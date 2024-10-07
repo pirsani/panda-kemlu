@@ -20,28 +20,27 @@ export async function DELETE(req: NextRequest) {
     const { filename, folder } = await req.json();
 
     // Create the /files folder if it doesn't exist
-    const fileTobeDeleted = path.join(
+    const fileTobeDeleted = path.posix.join(
       BASE_PATH_UPLOAD,
       "temp",
       folder,
       filename
     );
 
-    logger.info("fileTobeDeleted", fileTobeDeleted);
+    const resolvedPath = path.resolve(fileTobeDeleted);
+    logger.info("[fileTobeDeleted resolvedPath ]", resolvedPath);
 
-    if (!fs.existsSync(fileTobeDeleted)) {
+    if (!fs.existsSync(resolvedPath)) {
       return NextResponse.json({ message: "File not found" }, { status: 404 });
     }
 
     // Delete the file from the /files folder
     //https://www.tutorialkart.com/nodejs/delete-a-file-in-nodejs-using-node-fs/
-    fs.unlinkSync(fileTobeDeleted);
+    fs.unlinkSync(resolvedPath);
 
     return NextResponse.json({ message: "File deleted" });
   } catch (error) {
     console.error("[ERROR DELETE]", error);
     return NextResponse.json({ message: "Delete failed" }, { status: 500 });
-  } finally {
-    console.log("Delete complete");
   }
 }

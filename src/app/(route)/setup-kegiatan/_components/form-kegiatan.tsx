@@ -28,9 +28,7 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import ItineraryContainer from "./itinerary-container";
 import PesertaContainer from "./peserta-container";
 //import SelectSbmProvinsi from "./select-sbm-provinsi";
-import setupKegiatan, {
-  setupKegiatanWithoutFile,
-} from "@/actions/kegiatan/setup-kegiatan";
+import setupKegiatan from "@/actions/kegiatan/setup-kegiatan";
 import CummulativeErrors from "@/components/form/cummulative-error";
 import FormFileImmediateUpload from "@/components/form/form-file-immediate-upload";
 import {
@@ -169,6 +167,7 @@ export const FormKegiatan = ({ editId }: FormKegiatanProps) => {
     if (lokasi === LOKASI.LUAR_NEGERI) {
       setValue("dokumenSuratSetnegSptjmCuid", "sptjm" + createId() + ".pdf");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lokasi]);
 
   const displayAllErrors = false;

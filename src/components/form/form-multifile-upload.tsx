@@ -162,7 +162,7 @@ export const FormMultiFileUpload = ({
       axios
         .delete("/api/upload/delete", {
           data: {
-            filename: files[fileIdentifier].filename + "." + ext,
+            filename: files[fileIdentifier].filename,
             folder: folder,
           },
         })
@@ -189,6 +189,7 @@ export const FormMultiFileUpload = ({
       console.log("cuids", cuids, filenames);
       setValue(cuids, filenames);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [files]);
 
   return (
