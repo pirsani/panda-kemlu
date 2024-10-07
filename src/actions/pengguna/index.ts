@@ -210,3 +210,42 @@ export const getSessionPengguna = async () => {
     data: session.user,
   };
 };
+
+interface SessionPenggunaForActionResponse {
+  satkerId: string;
+  unitKerjaId: string;
+  penggunaId: string;
+}
+export const getSessionPenggunaForAction = async (): Promise<
+  ActionResponse<SessionPenggunaForActionResponse>
+> => {
+  const pengguna = await getSessionPengguna();
+  logger.info("Pengguna", pengguna);
+  if (!pengguna.success || !pengguna.data || !pengguna.data.id) {
+    return {
+      success: false,
+      error: "E-UAuth-01",
+      message: "User not found",
+    };
+  }
+
+  if (!pengguna.data?.satkerId || !pengguna.data?.unitKerjaId) {
+    return {
+      success: false,
+      error: "E-UORG-01",
+      message: "User tidak mempunyai satkerId atau unitKerjaId",
+    };
+  }
+
+  const satkerId = pengguna.data.satkerId;
+  const unitKerjaId = pengguna.data.unitKerjaId;
+  const penggunaId = pengguna.data.id;
+  return {
+    success: true,
+    data: {
+      satkerId,
+      unitKerjaId,
+      penggunaId,
+    },
+  };
+};

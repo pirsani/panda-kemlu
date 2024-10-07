@@ -1,35 +1,42 @@
 import { z } from "zod";
 import { fileSchema } from "./file-schema";
 
-export const DokumenUhLuarNegeriSchema = z.object({
-  cuid: z.string({ required_error: "CUID harus diisi" }),
-  laporanKegiatan: fileSchema({ required: true }),
+export const DokumenUhLuarNegeriWithoutFileSchema = z.object({
+  kegiatanId: z.string({ required_error: "Tidak ada referensi kegiatan" }),
   laporanKegiatanCuid: z.string({
     required_error: "Dokumen laporan kegiatan harus diupload",
   }),
-  daftarHadir: fileSchema({ required: true }),
   daftarHadirCuid: z.string({
     required_error: "Dokumen daftar hadir harus diupload",
   }),
-  dokumentasi: fileSchema({ required: true }),
-  dokumentasiCuid: z.string({
+  dokumentasiKegiatanCuid: z.string({
     required_error: "Dokumen dokumentasi harus diupload",
   }),
-  rampungan: fileSchema({ required: true }),
-  rampunganCuid: z.string({
+  rampunganTerstempelCuid: z.string({
     required_error: "Dokumen rampungan harus diupload",
   }),
-  suratSetneg: fileSchema({ required: true }),
-  suratSetnegCuid: z.string({
+  suratPersetujuanJaldisSetnegCuid: z.string({
     required_error: "Dokumen surat setneg harus diupload",
   }),
-  paspor: fileSchema({ required: true }),
   pasporCuid: z.string({ required_error: "Dokumen paspor harus diupload" }),
-  tiketBoardingPass: fileSchema({ required: true }),
   tiketBoardingPassCuid: z.string({
     required_error: "Dokumen tiket boarding pass harus diupload",
   }),
 });
+
+export const DokumenUhLuarNegeriFileSchema = z.object({
+  laporanKegiatan: fileSchema({ required: true }),
+  daftarHadir: fileSchema({ required: true }),
+  dokumentasi: fileSchema({ required: true }),
+  rampungan: fileSchema({ required: true }),
+  suratSetneg: fileSchema({ required: true }),
+  paspor: fileSchema({ required: true }),
+  tiketBoardingPass: fileSchema({ required: true }),
+});
+
+// Merging the schemas
+export const DokumenUhLuarNegeriSchema =
+  DokumenUhLuarNegeriWithoutFileSchema.merge(DokumenUhLuarNegeriFileSchema);
 
 // Extend the refined schema for edit mode
 export const DokumenUhLuarNegeriSchemaEditMode =
@@ -42,7 +49,12 @@ export const DokumenUhLuarNegeriSchemaEditMode =
     paspor: fileSchema({ required: false }),
     tiketBoardingPass: fileSchema({ required: false }),
   });
-
+export type DokumenUhLuarNegeriWithoutFile = z.infer<
+  typeof DokumenUhLuarNegeriWithoutFileSchema
+>;
+export type DokumenUhLuarNegeriFile = z.infer<
+  typeof DokumenUhLuarNegeriFileSchema
+>;
 export type DokumenUhLuarNegeri = z.infer<typeof DokumenUhLuarNegeriSchema>;
 export type DokumenUhLuarNegeriEditMode = z.infer<
   typeof DokumenUhLuarNegeriSchemaEditMode

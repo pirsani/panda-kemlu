@@ -383,6 +383,14 @@ async function main() {
         untukLokasiDi: "2;",
       },
       {
+        id: "surat-persetujuan-jaldis",
+        nama: "surat-persetujuan-jaldis-setneg",
+        createdBy: "init",
+        deskripsi:
+          "Surat Persetujuan Jaldis dari Kementerian Sekretaris Negara",
+        untukLokasiDi: "2;",
+      },
+      {
         id: "laporan-kegiatan",
         nama: "laporan-kegiatan",
         createdBy: "init",
@@ -423,8 +431,8 @@ async function main() {
         untukLokasiDi: "2;",
       },
       {
-        id: "tiket",
-        nama: "tiket",
+        id: "tiket-boarding-pass",
+        nama: "tiket-boarding-pass",
         createdBy: "init",
         deskripsi: "Tiket atau boarding pass",
         untukLangkahKe: 1,

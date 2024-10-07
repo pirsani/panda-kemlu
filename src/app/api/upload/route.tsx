@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     const file = data.get("file") as File;
     const originalFilename = file.name;
     const sanitized = originalFilename.replace(/[^a-z0-9.]/gi, "_");
-    const folderIdentifier = data.get("folder") as string;
+    const folderIdentifier = data.get("folder") as string; // folder identifier is kegiatanId
     // check if file have extension
 
     let hasFileExtension = getFileExtension(filename);
