@@ -8,7 +8,6 @@ import {
 } from "@/zod/schemas/permission";
 import { createId } from "@paralleldrive/cuid2";
 import { Permission } from "@prisma-honorarium/client";
-import bcrypt from "bcryptjs"; // Import bcrypt for password hashing and comparison
 import { revalidatePath } from "next/cache";
 import { Logger } from "tslog";
 import { ZodError } from "zod";

@@ -1,12 +1,11 @@
 import { cn } from "@/lib/utils";
 import { createId } from "@paralleldrive/cuid2";
 import axios from "axios";
-import { Check, CircleX, Eye, List, Minimize2 } from "lucide-react";
+import { Check, CircleX, List } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Controller, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
-import { FormLabel } from "../ui/form";
 import { Progress } from "./progress";
 
 interface FormMultiFileUploadProps {

@@ -1,7 +1,5 @@
 import { randomStrimg } from "@/utils/random-string";
-import { LOKASI } from "@prisma-honorarium/client";
-import { useContext, useState } from "react";
-import { useController, useFormContext } from "react-hook-form";
+import { useState } from "react";
 import Select, { SingleValue } from "react-select";
 
 // hardocded options

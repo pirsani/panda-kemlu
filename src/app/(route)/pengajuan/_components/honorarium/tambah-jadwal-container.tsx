@@ -1,34 +1,18 @@
-import InputDatePicker from "@/components/form/date-picker/input-date-picker";
-import FormFileUpload from "@/components/form/form-file-upload";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Jadwal, jadwalSchema } from "@/zod/schemas/jadwal";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Calendar, Plus, Users } from "lucide-react";
+import { Calendar, Plus } from "lucide-react";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import FormJadwal from "./form-jadwal";
-import SelectKelas from "./select-kelas";
-import SelectMateri from "./select-materi";
-import SelectNarasumber from "./select-narasumber";
 
 const TambahJadwalContainer = () => {
   const [open, setOpen] = useState(false);

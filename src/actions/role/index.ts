@@ -1,7 +1,6 @@
 "use server";
 import { ActionResponse } from "@/actions/response";
 import { dbHonorarium } from "@/lib/db-honorarium";
-import { CustomPrismaClientError } from "@/types/custom-prisma-client-error";
 import { Role as ZRole } from "@/zod/schemas/role";
 import { createId } from "@paralleldrive/cuid2";
 import { Role } from "@prisma-honorarium/client";

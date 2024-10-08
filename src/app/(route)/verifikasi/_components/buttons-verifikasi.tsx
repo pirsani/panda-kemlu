@@ -1,12 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { JenisPengajuan } from "@/types";
-import {
-  JENIS_PENGAJUAN,
-  Kegiatan,
-  LOKASI,
-  RiwayatProses,
-} from "@prisma-honorarium/client";
+import { Kegiatan, LOKASI } from "@prisma-honorarium/client";
 import {
   Coins,
   FileStack,
@@ -16,7 +11,7 @@ import {
   PlaneTakeoff,
   Store,
 } from "lucide-react";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface ButtonsVerifikasiProps {
   handleSelection: (jenis: JenisPengajuan) => void;

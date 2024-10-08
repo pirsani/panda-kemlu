@@ -7,11 +7,6 @@ import dynamic from "next/dynamic";
 import CummulativeErrors from "@/components/form/cummulative-error";
 import SelectPermissions from "@/components/form/select-permissions";
 import {
-  default as SelectRole,
-  default as SelectUnitKerja,
-} from "@/components/form/select-unit-kerja";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
   Form,
   FormControl,
   FormField,

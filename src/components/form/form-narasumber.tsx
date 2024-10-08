@@ -1,4 +1,3 @@
-import { NarasumberWithStringDate } from "@/data/narasumber";
 import { cn } from "@/lib/utils";
 import {
   Narasumber,

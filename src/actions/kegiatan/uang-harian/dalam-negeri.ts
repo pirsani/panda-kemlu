@@ -13,18 +13,15 @@ import { getSessionPenggunaForAction } from "@/actions/pengguna";
 import { ActionResponse } from "@/actions/response";
 import { BASE_PATH_UPLOAD } from "@/app/api/upload/config";
 import { dbHonorarium } from "@/lib/db-honorarium";
-import saveFile from "@/utils/file-operations/save";
 import {
   DokumenUhDalamNegeri,
-  dokumenUhDalamNegeriSchema,
   DokumenUhDalamNegeriWithoutFile,
   dokumenUhDalamNegeriWithoutFileSchema,
 } from "@/zod/schemas/dokumen-uh-dalam-negeri";
 import { Kegiatan } from "@prisma-honorarium/client";
-import fse, { copy } from "fs-extra";
+import fse from "fs-extra";
 import path from "path";
 import { Logger } from "tslog";
-import { ZodError } from "zod";
 import { updateStatusUhDalamNegeri } from "../proses";
 
 // Create a Logger instance with custom settings

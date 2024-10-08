@@ -1,7 +1,6 @@
 import { KegiatanWithDetail } from "@/actions/kegiatan";
 import DaftarJadwal from "@/components/kegiatan/honorarium/daftar-jadwal";
 import { JenisPengajuan } from "@/types";
-import { Kegiatan } from "@prisma-honorarium/client";
 import { useEffect, useState } from "react";
 import ButtonsVerifikasi from "./buttons-verifikasi";
 import FormGenerateRampungan from "./rampungan/form-generate-rampungan";

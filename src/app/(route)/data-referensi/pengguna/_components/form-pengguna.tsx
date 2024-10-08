@@ -7,7 +7,6 @@ import dynamic from "next/dynamic";
 import Required from "@/components/form/required";
 import { SelectRoles } from "@/components/form/select-roles";
 import SelectUnitKerja from "@/components/form/select-unit-kerja";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -19,7 +18,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Pengguna, penggunaSchema } from "@/zod/schemas/pengguna";
-import { es } from "@faker-js/faker";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";

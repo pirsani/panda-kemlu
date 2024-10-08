@@ -8,7 +8,8 @@
   "editor.wordWrapColumn": 100,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always",
-    "source.sortImports": "always"
+    "source.sortImports": "always",
+    "source.organizeImports": "always" // This will organize and remove unused imports
   },
   "editor.quickSuggestions": {
     "other": "on",

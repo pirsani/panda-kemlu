@@ -3,7 +3,6 @@ import { pengajuanGenerateRampungan } from "@/actions/kegiatan/proses";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Kegiatan } from "@prisma-honorarium/client";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 

@@ -1,7 +1,7 @@
 "use server";
 import { ActionResponse, getUserId } from "@/actions";
 import { hasPermission } from "@/data/user";
-import { dbHonorarium, Prisma } from "@/lib/db-honorarium";
+import { dbHonorarium } from "@/lib/db-honorarium";
 import { CustomPrismaClientError } from "@/types/custom-prisma-client-error";
 import saveFile from "@/utils/file-operations/save";
 import {
@@ -9,10 +9,8 @@ import {
   Narasumber as ZNarasumber,
 } from "@/zod/schemas/narasumber";
 import { Narasumber } from "@prisma-honorarium/client";
-import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
-import { basename, extname, join } from "path";
-import { ZodError } from "zod";
+import { extname, join } from "path";
 
 import { createId } from "@paralleldrive/cuid2";
 import { Logger } from "tslog";

@@ -1,37 +1,16 @@
 "use client";
-import {
-  deleteDataPejabatPerbendaharaan,
-  simpanPejabatPerbendaharaan,
-} from "@/actions/pejabat-perbendaharaan";
+import { deleteDataPejabatPerbendaharaan } from "@/actions/pejabat-perbendaharaan";
 import ZodErrorList from "@/approute/data-referensi/_components/zod-error-list";
 
 import {
-  KolomAksi,
   KolomPilihanAksi,
   TabelGenericWithoutInlineEdit,
 } from "@/components/tabel-generic-without-inline-edit";
-import { Button } from "@/components/ui/button";
 import { PejabatPerbendaharaanWithStringDate } from "@/data/pejabat-perbendaharaan";
 import { useSearchTerm } from "@/hooks/use-search-term";
-import {
-  pejabatPerbendaharaanSchema,
-  PejabatPerbendaharaan as ZPejabatPerbendaharaan,
-} from "@/zod/schemas/pejabat-perbendaharaan";
-import { PejabatPerbendaharaan } from "@prisma-honorarium/client";
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  Row,
-  SortingState,
-  Table,
-  useReactTable,
-} from "@tanstack/react-table";
+import { ColumnDef, createColumnHelper, Row } from "@tanstack/react-table";
 import { format } from "date-fns";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ZodError } from "zod";
 
 const data: PejabatPerbendaharaanWithStringDate[] = [];

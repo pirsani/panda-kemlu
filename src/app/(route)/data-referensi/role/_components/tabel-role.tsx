@@ -1,34 +1,16 @@
 "use client";
-import {
-  deleteRole,
-  RoleWithPermissions,
-  simpanDataRole,
-} from "@/actions/role";
+import { deleteRole, RoleWithPermissions } from "@/actions/role";
 import ConfirmDialog from "@/components/confirm-dialog";
-import { KolomAksi, TabelGeneric } from "@/components/tabel-generic";
 import {
   KolomPilihanAksi,
   TabelGenericWithoutInlineEdit,
 } from "@/components/tabel-generic-without-inline-edit";
 import { useSearchTerm } from "@/hooks/use-search-term";
-import { roleSchema, Role as Zrole } from "@/zod/schemas/role";
 import { Organisasi as Role } from "@prisma-honorarium/client";
 
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  Row,
-  SortingState,
-  Table,
-  useReactTable,
-} from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ZodError } from "zod";
 
 interface TabelRoleProps {
   data: RoleWithPermissions[];

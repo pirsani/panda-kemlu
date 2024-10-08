@@ -2,7 +2,6 @@
 import { simpanDataNegara } from "@/actions/negara";
 //import SelectKegiatan from "@/components/form/select-kegiatan";
 import { Button } from "@/components/ui/button";
-import dynamic from "next/dynamic";
 
 import {
   Form,

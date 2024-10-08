@@ -1,27 +1,12 @@
 "use client";
-import {
-  deleteDataMateri,
-  simpanDataMateri,
-  updateDataMateri,
-} from "@/actions/materi";
+import { deleteDataMateri, updateDataMateri } from "@/actions/materi";
 import ConfirmDialog from "@/components/confirm-dialog";
 import { KolomAksi, TabelGeneric } from "@/components/tabel-generic";
 import { useSearchTerm } from "@/hooks/use-search-term";
-import { materiSchema, Materi as ZMateri } from "@/zod/schemas/materi";
+import { materiSchema } from "@/zod/schemas/materi";
 import { Materi } from "@prisma-honorarium/client";
 
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  Row,
-  SortingState,
-  Table,
-  useReactTable,
-} from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ZodError } from "zod";

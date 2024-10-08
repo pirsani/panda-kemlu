@@ -1,8 +1,5 @@
-import { getKegiatan, getOptionsKegiatan } from "@/actions/kegiatan";
 import { getMateri } from "@/actions/materi";
-import { get } from "lodash";
 import { DialogTambahMateri } from "./_components/dialog-tambah-materi";
-import FormMateri from "./_components/form-materi";
 import { TabelMateri } from "./_components/tabel-materi";
 
 const MateriPage = async () => {

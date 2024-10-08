@@ -1,14 +1,10 @@
 "use client";
 import BasicDatePicker from "@/components/form/date-picker/basic-date-picker";
-import FocusableDatePicker from "@/components/form/date-picker/focusable-date-picker";
-import InputDatePicker from "@/components/form/date-picker/input-date-picker";
-import FormFileUpload from "@/components/form/form-file-upload";
 import { FormMultiFileUpload } from "@/components/form/form-multifile-upload";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -31,10 +27,7 @@ import PesertaContainer from "./peserta-container";
 import setupKegiatan from "@/actions/kegiatan/setup-kegiatan";
 import CummulativeErrors from "@/components/form/cummulative-error";
 import FormFileImmediateUpload from "@/components/form/form-file-immediate-upload";
-import {
-  default as Required,
-  default as RequiredLabel,
-} from "@/components/form/required";
+import { default as RequiredLabel } from "@/components/form/required";
 
 import { cn } from "@/lib/utils";
 import { Itinerary } from "@/zod/schemas/itinerary";

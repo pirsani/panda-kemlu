@@ -8,22 +8,15 @@ import {
   RiwayatProses,
 } from "@prisma-honorarium/client";
 import {
-  Car,
   Coins,
   FileStack,
   Globe,
   HandCoins,
-  MapPin,
   MapPinned,
-  Plane,
   PlaneTakeoff,
-  Ship,
   Store,
-  Train,
 } from "lucide-react";
-import { use, useEffect, useState } from "react";
-import FormPengajuanGenerateRampungan from "./form-pengajuan-generate-rampungan";
-import { DisplayFormPengajuanGenerateRampungan } from "./honorarium/display-form-pengajuan-generate-rampungan";
+import { useEffect, useState } from "react";
 
 // generate rampungan, uh dalam negeri, uh luar negeri hanya dapat di ajukan sekali
 // honorarium, penggantian reimbursement, pembayaran pihak ke-3 dapat di ajukan berkali-kali

@@ -1,8 +1,7 @@
-import { getOptionsPengguna, getPengguna } from "@/actions/pengguna";
+import { getPengguna } from "@/actions/pengguna";
 import { getOptionsRole } from "@/actions/role";
 import { getOptionsUnitKerja } from "@/actions/unit-kerja";
 import PenggunaContainer from "./_components/pengguna-container";
-import TabelPengguna from "./_components/tabel-pengguna";
 
 const ReferensiPenggunaPage = async () => {
   const data = await getPengguna();

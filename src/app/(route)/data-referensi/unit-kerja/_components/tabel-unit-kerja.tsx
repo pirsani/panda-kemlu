@@ -1,31 +1,16 @@
 "use client";
 import {
   deleteDataUnitKerja,
-  simpanDataUnitKerja,
   UnitKerjaWithInduk,
   updateDataUnitKerja,
 } from "@/actions/unit-kerja";
 import ConfirmDialog from "@/components/confirm-dialog";
 import { KolomAksi, TabelGeneric } from "@/components/tabel-generic";
 import { useSearchTerm } from "@/hooks/use-search-term";
-import {
-  unitKerjaSchema,
-  UnitKerja as ZunitKerja,
-} from "@/zod/schemas/unit-kerja";
+import { unitKerjaSchema } from "@/zod/schemas/unit-kerja";
 import { Organisasi as UnitKerja } from "@prisma-honorarium/client";
 
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  Row,
-  SortingState,
-  Table,
-  useReactTable,
-} from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ZodError } from "zod";

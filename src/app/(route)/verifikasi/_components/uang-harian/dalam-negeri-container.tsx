@@ -1,6 +1,6 @@
 import { KegiatanWithDetail } from "@/actions/kegiatan";
 import getPesertaKegiatanDalamNegeri from "@/actions/kegiatan/peserta/dalam-negeri";
-import { Kegiatan, PesertaKegiatan } from "@prisma-honorarium/client";
+import { PesertaKegiatan } from "@prisma-honorarium/client";
 import { useEffect, useState } from "react";
 import { PesertaKegiatanTable } from "../../uang-harian/peserta-kegiatan-table-dalam-negeri";
 import VerifikasiDataDukungUangHarianDalamNegeri from "./data-dukung-dalam-negeri";

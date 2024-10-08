@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User as UserIcon } from "lucide-react";
+import { User as UserIcon } from "lucide-react";
 //import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { SignOut } from "./signout-button";

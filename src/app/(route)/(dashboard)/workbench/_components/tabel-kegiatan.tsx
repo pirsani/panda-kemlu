@@ -1,35 +1,18 @@
 "use client";
 
 import { KegiatanWithSatker } from "@/actions/kegiatan";
-import ButtonEye from "@/components/button-eye-open-document";
-import ConfirmDialog from "@/components/confirm-dialog";
 import {
   ExpandedState,
   RowDetails,
   TabelExpandable,
 } from "@/components/tabel-expandable";
-import { KolomAksi, TabelGeneric } from "@/components/tabel-generic";
-import { TabelGenericWithoutInlineEdit } from "@/components/tabel-generic-without-inline-edit";
 import { Button } from "@/components/ui/button";
 import { Kegiatan } from "@prisma-honorarium/client";
 
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  Row,
-  SortingState,
-  Table,
-  useReactTable,
-} from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { ChevronRight, Eye } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { ZodError } from "zod";
 
 interface TabelKegiatanProps {
   data: KegiatanWithSatker[];

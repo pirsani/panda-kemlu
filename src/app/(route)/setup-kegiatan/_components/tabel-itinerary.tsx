@@ -1,25 +1,10 @@
 import {
-  KolomPilihanAksi,
   KolomPilihanAksi2,
   TabelGenericWithoutInlineEdit,
 } from "@/components/tabel-generic-without-inline-edit";
-import { Button } from "@/components/ui/button";
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  Row,
-  SortingState,
-  Table,
-  useReactTable,
-} from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table";
 import { format, formatDate } from "date-fns";
-import { Delete, Edit, Save, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
-import SelectSbmNegara from "./select-sbm-negara";
 
 interface ValidationResult {
   isValid: boolean;

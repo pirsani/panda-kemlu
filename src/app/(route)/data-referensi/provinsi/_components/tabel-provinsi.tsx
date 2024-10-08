@@ -1,27 +1,12 @@
 "use client";
-import {
-  deleteDataProvinsi,
-  simpanDataProvinsi,
-  updateDataProvinsi,
-} from "@/actions/provinsi";
+import { deleteDataProvinsi, updateDataProvinsi } from "@/actions/provinsi";
 import ConfirmDialog from "@/components/confirm-dialog";
 import { KolomAksi, TabelGeneric } from "@/components/tabel-generic";
 import { useSearchTerm } from "@/hooks/use-search-term";
-import { provinsiSchema, Provinsi as ZProvinsi } from "@/zod/schemas/provinsi";
+import { provinsiSchema } from "@/zod/schemas/provinsi";
 import { Provinsi } from "@prisma-honorarium/client";
 
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  Row,
-  SortingState,
-  Table,
-  useReactTable,
-} from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ZodError } from "zod";

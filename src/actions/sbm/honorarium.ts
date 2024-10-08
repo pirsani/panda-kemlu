@@ -8,7 +8,6 @@ import { convertSpecialTypesToPlain } from "@/utils/convert-obj-to-plain";
 import { SbmHonorarium as ZSbmHonorarium } from "@/zod/schemas/sbm-honorarium";
 import { createId } from "@paralleldrive/cuid2";
 import { SbmHonorarium } from "@prisma-honorarium/client";
-import Decimal from "decimal.js";
 import { revalidatePath } from "next/cache";
 import { Logger } from "tslog";
 export type { SbmHonorariumPlainObject } from "@/data/sbm-honorarium";

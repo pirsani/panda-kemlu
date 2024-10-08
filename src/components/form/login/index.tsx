@@ -4,7 +4,6 @@ import { UncomplexLoginSchema } from "@/zod/schemas/login";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader, Phone } from "lucide-react";
 import { signIn } from "next-auth/react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";

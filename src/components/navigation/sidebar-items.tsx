@@ -3,7 +3,6 @@ import useToggleSidebar from "@/hooks/use-toggle-sidebar";
 import { cn } from "@/lib/utils";
 import { RouteItem } from "@/route";
 import {
-  Activity,
   AlertTriangle,
   Banknote,
   BookOpen,
@@ -33,7 +32,6 @@ import {
   SquareActivity,
   Table,
   User,
-  User2,
   UserCog,
   Users,
 } from "lucide-react";

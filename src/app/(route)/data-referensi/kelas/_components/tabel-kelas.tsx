@@ -2,27 +2,15 @@
 import {
   deleteDataKelas,
   kelasWithKegiatan,
-  simpanDataKelas,
   updateDataKelas,
 } from "@/actions/kelas";
 import ConfirmDialog from "@/components/confirm-dialog";
 import { KolomAksi, TabelGeneric } from "@/components/tabel-generic";
 import { useSearchTerm } from "@/hooks/use-search-term";
-import { kelasSchema, Kelas as Zkelas } from "@/zod/schemas/kelas";
+import { kelasSchema } from "@/zod/schemas/kelas";
 import { Kelas } from "@prisma-honorarium/client";
 
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  Row,
-  SortingState,
-  Table,
-  useReactTable,
-} from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ZodError } from "zod";

@@ -1,30 +1,12 @@
 "use client";
-import {
-  deletePengguna,
-  PenggunaWithRoles,
-  simpanDataPengguna,
-} from "@/actions/pengguna";
+import { deletePengguna, PenggunaWithRoles } from "@/actions/pengguna";
 import ConfirmDialog from "@/components/confirm-dialog";
 import { KolomAksi, TabelGeneric } from "@/components/tabel-generic";
 import { useSearchTerm } from "@/hooks/use-search-term";
-import { penggunaSchema, Pengguna as ZPengguna } from "@/zod/schemas/pengguna";
-import { User as Pengguna } from "@prisma-honorarium/client";
 
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  Row,
-  SortingState,
-  Table,
-  useReactTable,
-} from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ZodError } from "zod";
 
 interface TabelPenggunaProps {
   data: PenggunaWithRoles[];

@@ -1,8 +1,5 @@
-import { getKegiatan, getOptionsKegiatan } from "@/actions/kegiatan";
 import { getNegara } from "@/actions/negara";
-import { get } from "lodash";
 import { DialogTambahNegara } from "./_components/dialog-tambah-negara";
-import FormNegara from "./_components/form-negara";
 import { TabelNegara } from "./_components/tabel-negara";
 
 const NegaraPage = async () => {

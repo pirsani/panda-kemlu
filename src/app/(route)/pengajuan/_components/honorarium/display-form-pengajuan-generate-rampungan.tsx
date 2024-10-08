@@ -1,6 +1,5 @@
 import { KegiatanWithDetail } from "@/actions/kegiatan";
 import { JenisPengajuan } from "@/types";
-import { Kegiatan } from "@prisma-honorarium/client";
 import FormPengajuanGenerateRampungan from "../form-pengajuan-generate-rampungan";
 
 interface DisplayFormPengajuanGenerateRampunganProps {

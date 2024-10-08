@@ -2,7 +2,6 @@
 import {
   deleteDataSbmUangRepresentasi,
   sbmUangRepresentasiWithPejabat,
-  simpanDataSbmUangRepresentasi,
   updateDataSbmUangRepresentasi,
 } from "@/actions/sbm/uang-representasi";
 import ZodErrorList from "@/approute/data-referensi/_components/zod-error-list";
@@ -12,24 +11,10 @@ import {
   KolomAksi,
   TabelGeneric,
 } from "@/components/tabel-generic";
-import {
-  sbmUangRepresentasiSchema,
-  SbmUangRepresentasi as ZSbmUangRepresentasi,
-} from "@/zod/schemas/sbm-uang-representasi";
+import { sbmUangRepresentasiSchema } from "@/zod/schemas/sbm-uang-representasi";
 import { SbmUangRepresentasi } from "@prisma-honorarium/client";
 
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  Row,
-  SortingState,
-  Table,
-  useReactTable,
-} from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ZodError } from "zod";

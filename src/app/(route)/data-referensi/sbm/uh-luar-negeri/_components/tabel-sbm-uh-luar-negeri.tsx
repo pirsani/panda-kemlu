@@ -8,30 +8,13 @@ import ConfirmDialog from "@/components/confirm-dialog";
 import {
   formatCurrency,
   KolomAksi,
-  PaginationControls,
   TabelGeneric,
 } from "@/components/tabel-generic";
-import { Button } from "@/components/ui/button";
-import { NarasumberWithStringDate } from "@/data/narasumber";
 import { SbmUhLuarNegeriPlainObject } from "@/data/sbm-uh-luar-negeri";
 import { useSearchTerm } from "@/hooks/use-search-term";
 import { sbmUhLuarNegeriSchema } from "@/zod/schemas/sbm-uh-luar-negeri";
-import { SbmUhLuarNegeri } from "@prisma-honorarium/client";
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  Row,
-  SortingState,
-  Table,
-  useReactTable,
-} from "@tanstack/react-table";
-import { info } from "console";
-import { format } from "date-fns";
-import React, { useEffect, useState } from "react";
+import { ColumnDef, createColumnHelper, Row } from "@tanstack/react-table";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ZodError } from "zod";
 

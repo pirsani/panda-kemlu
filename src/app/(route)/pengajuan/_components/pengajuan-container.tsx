@@ -4,14 +4,13 @@ import FloatingComponent from "@/components/floating-component";
 import PreviewKegiatan from "@/components/kegiatan";
 import PdfPreviewContainer from "@/components/pdf-preview-container";
 import { JenisPengajuan } from "@/types";
-import { Kegiatan, RiwayatProses } from "@prisma-honorarium/client";
+import { RiwayatProses } from "@prisma-honorarium/client";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
 import { getRiwayatProses } from "@/actions/kegiatan/proses";
 import useFileStore from "@/hooks/use-file-store";
 import ButtonsPengajuan from "./buttons-pengajuan";
-import FormPengajuanGenerateRampungan from "./form-pengajuan-generate-rampungan";
 import { DisplayFormPengajuanGenerateRampungan } from "./honorarium/display-form-pengajuan-generate-rampungan";
 import HonorariumContainer from "./honorarium/honorarium-container";
 import PenggantianContainer from "./penggantian-container";

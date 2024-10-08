@@ -2,7 +2,7 @@
 import { useIsLoading } from "@/hooks/use-loading";
 import { cn } from "@/lib/utils";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
-import { Icon, List, LucideIcon } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Tooltip, TooltipContent, TooltipProvider } from "../ui/tooltip";

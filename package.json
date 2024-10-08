@@ -8,8 +8,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "prune": "ts-prune",
     "prisma:db-push": "cross-env DATABASE_URL=${DATABASE_URL_ADMIN} pnpm prisma db push --schema=./prisma/db-honorarium/schema.prisma",
-    "prisma:generate": "cross-env DATABASE_URL=${DATABASE_URL_ADMIN} pnpm prisma generate --schema=./prisma/db-honorarium/schema.prisma"
+    "prisma:generate": "cross-env DATABASE_URL=${DATABASE_URL_ADMIN} pnpm prisma generate --schema=./prisma/db-honorarium/schema.prisma",
+    "analyze": "cross-env ANALYZE=true pnpm build"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -76,6 +78,7 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^14.2.14",
     "@types/bcryptjs": "^2.4.6",
     "@types/fs-extra": "^11.0.4",
     "@types/lodash": "^4.17.10",
@@ -87,6 +90,8 @@
     "dotenv-cli": "^7.4.2",
     "eslint": "^8.57.1",
     "eslint-config-next": "14.2.14",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
     "postcss": "^8.4.47",
     "prisma": "^5.20.0",
     "tailwindcss": "^3.4.13",

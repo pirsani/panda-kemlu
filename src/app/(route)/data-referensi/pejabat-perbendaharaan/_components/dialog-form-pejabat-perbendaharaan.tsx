@@ -1,18 +1,14 @@
 "use client";
-import { simpanPejabatPerbendaharaan } from "@/actions/pejabat-perbendaharaan";
-import FormPejabatPerbendaharaan from "@/app/(route)/data-referensi/pejabat-perbendaharaan/_components/form-pejabat-perbendaharaan";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Contact, GraduationCap, Plus, Signature } from "lucide-react";
-import { useState } from "react";
+import { Contact, Plus, Signature } from "lucide-react";
 
 interface DialogFormPejabatPerbendaharaanProps {
   open: boolean;

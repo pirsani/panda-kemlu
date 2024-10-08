@@ -1,10 +1,9 @@
 "use client";
-import { getKegiatanById, KegiatanWithDetail } from "@/actions/kegiatan";
-import { Kegiatan, LOKASI } from "@prisma-honorarium/client";
+import { KegiatanWithDetail } from "@/actions/kegiatan";
+import { LOKASI } from "@prisma-honorarium/client";
 //import { Kegiatan } from "@/zod/schemas/kegiatan";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { useEffect, useState } from "react";
 import TextDokumenMultiFile from "./text-dokumen-multi-file";
 import TextDokumenWithPreviewButton from "./text-dokumen-with-preview-button";
 

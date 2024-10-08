@@ -1,8 +1,6 @@
-import { getKegiatan, getOptionsKegiatan } from "@/actions/kegiatan";
+import { getOptionsKegiatan } from "@/actions/kegiatan";
 import { getKelas } from "@/actions/kelas";
-import { get } from "lodash";
 import { DialogTambahKelas } from "./_components/dialog-tambah-kelas";
-import FormKelas from "./_components/form-kelas";
 import { TabelKelas } from "./_components/tabel-kelas";
 
 const KelasPage = async () => {

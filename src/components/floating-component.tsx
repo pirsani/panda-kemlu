@@ -3,7 +3,6 @@ import { cn } from "@/lib/utils";
 import { Maximize, Minimize, Minus, X } from "lucide-react";
 import React, {
   MouseEvent,
-  use,
   useCallback,
   useEffect,
   useRef,

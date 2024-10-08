@@ -7,7 +7,6 @@ import { convertSpecialTypesToPlain } from "@/utils/convert-obj-to-plain";
 import { SbmUhDalamNegeri as ZSbmUhDalamNegeri } from "@/zod/schemas/sbm-uh-dalam-negeri";
 import { createId } from "@paralleldrive/cuid2";
 import { SbmUhDalamNegeri } from "@prisma-honorarium/client";
-import Decimal from "decimal.js";
 import { revalidatePath } from "next/cache";
 import { Logger } from "tslog";
 export type { SbmUhDalamNegeriPlainObject } from "@/data/sbm-uh-dalam-negeri";

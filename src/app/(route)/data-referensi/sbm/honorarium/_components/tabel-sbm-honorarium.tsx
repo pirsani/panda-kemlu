@@ -8,27 +8,13 @@ import ConfirmDialog from "@/components/confirm-dialog";
 import {
   formatCurrency,
   KolomAksi,
-  PaginationControls,
   TabelGeneric,
 } from "@/components/tabel-generic";
-import { Button } from "@/components/ui/button";
 import { SbmHonorariumPlainObject } from "@/data/sbm-honorarium";
 import { useSearchTerm } from "@/hooks/use-search-term";
 import { sbmHonorariumSchema } from "@/zod/schemas/sbm-honorarium";
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  Row,
-  SortingState,
-  Table,
-  useReactTable,
-} from "@tanstack/react-table";
-import { format } from "date-fns";
-import React, { useEffect, useState } from "react";
+import { ColumnDef, createColumnHelper, Row } from "@tanstack/react-table";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ZodError } from "zod";
 

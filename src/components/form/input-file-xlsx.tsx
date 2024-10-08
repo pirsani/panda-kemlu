@@ -1,7 +1,5 @@
 import FormFileUpload from "@/components/form/form-file-upload";
 import parseExcel, { ParseExcelResult } from "@/utils/excel/parse-excel";
-import { ChangeEvent, useState } from "react";
-import * as XLSX from "xlsx";
 
 interface InputFileXlsxProps {
   name: string;

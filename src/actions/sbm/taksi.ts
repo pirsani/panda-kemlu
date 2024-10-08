@@ -7,7 +7,6 @@ import { convertSpecialTypesToPlain } from "@/utils/convert-obj-to-plain";
 import { SbmTaksi as ZSbmTaksi } from "@/zod/schemas/sbm-taksi";
 import { createId } from "@paralleldrive/cuid2";
 import { SbmTaksi } from "@prisma-honorarium/client";
-import Decimal from "decimal.js";
 import { revalidatePath } from "next/cache";
 import { Logger } from "tslog";
 export type { SbmTaksiPlainObject } from "@/data/sbm-taksi";

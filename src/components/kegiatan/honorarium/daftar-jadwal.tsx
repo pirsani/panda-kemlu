@@ -4,11 +4,9 @@ import { getOptionsSbmHonorarium, OptionSbm } from "@/actions/sbm";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { getJadwalByKegiatanId, JadwalKelasNarasumber } from "@/data/jadwal";
-import { cn } from "@/lib/utils";
 import { formatHariTanggal } from "@/utils/date-format";
 import Decimal from "decimal.js";
-import { ChevronRight } from "lucide-react";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import NarasumberListItem from "./narasumber-list-item";
 
 export type Proses = "pengajuan" | "verfikasi" | "pembayaran";

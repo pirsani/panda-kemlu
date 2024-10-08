@@ -1,13 +1,10 @@
 import { OptionSbm } from "@/actions/sbm";
 import ButtonEye from "@/components/button-eye-open-document";
-import TextDokumenWithPreviewButton from "@/components/kegiatan/text-dokumen-with-preview-button";
-import { Button } from "@/components/ui/button";
 import formatCurrency from "@/utils/format-currency";
 import { JadwalNarasumber, Narasumber } from "@prisma-honorarium/client";
 import Decimal from "decimal.js";
-import { Eye } from "lucide-react";
-import { use, useEffect, useMemo, useState } from "react";
-import Select, { ActionMeta, Options, SingleValue } from "react-select";
+import { useEffect, useMemo, useState } from "react";
+import Select, { ActionMeta, SingleValue } from "react-select";
 
 interface PerkiraanPembayaran {
   pajak: Decimal;

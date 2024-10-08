@@ -1,7 +1,6 @@
 "use server";
 import { ActionResponse } from "@/actions/response";
 import { dbHonorarium } from "@/lib/db-honorarium";
-import { CustomPrismaClientError } from "@/types/custom-prisma-client-error";
 import { SatkerAnggaran as ZSatkerAnggaran } from "@/zod/schemas/satker-anggaran";
 import { Organisasi as SatkerAnggaran } from "@prisma-honorarium/client";
 import { revalidatePath } from "next/cache";

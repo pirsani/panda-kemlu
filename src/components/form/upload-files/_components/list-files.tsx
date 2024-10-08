@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 //import FileItem from "./file-item";
-import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import FileItem from "./file-item";

@@ -2,10 +2,6 @@
 import ajukanUhLuarNegeri from "@/actions/kegiatan/uang-harian/luar-negeri";
 import ButtonEye from "@/components/button-eye-open-document";
 import FormFileImmediateUpload from "@/components/form/form-file-immediate-upload";
-import FormFileUpload from "@/components/form/form-file-upload";
-import LoadingIndicator from "@/components/loading";
-import PdfPreview from "@/components/pdf-preview";
-import PdfPreviewContainer from "@/components/pdf-preview-container";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -21,13 +17,12 @@ import {
   DokumenUhLuarNegeriEditMode,
   dokumenUhLuarNegeriSchema,
   dokumenUhLuarNegeriSchemaEditMode,
-  DokumenUhLuarNegeriWithoutFile,
   dokumenUhLuarNegeriWithoutFileSchema,
 } from "@/zod/schemas/dokumen-uh-luar-negeri";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createId } from "@paralleldrive/cuid2";
 import { Loader } from "lucide-react";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import {
   ControllerRenderProps,
   FieldValues,

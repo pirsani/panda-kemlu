@@ -1,6 +1,5 @@
 import { getDataRealisasi } from "@/actions/dashboard";
 import { getTahunAnggranPilihan } from "@/actions/pengguna/preference";
-import { get } from "lodash";
 import Card from "./_components/card";
 import ChartContainer from "./_components/chart-container";
 

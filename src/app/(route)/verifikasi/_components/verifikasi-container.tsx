@@ -5,7 +5,6 @@ import PreviewKegiatan from "@/components/kegiatan";
 import PdfPreviewContainer from "@/components/pdf-preview-container";
 import useFileStore from "@/hooks/use-file-store";
 import { JenisPengajuan } from "@/types";
-import { Kegiatan } from "@prisma-honorarium/client";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import VerfikasiSelectionContainer from "./verifikasi-selection-container";

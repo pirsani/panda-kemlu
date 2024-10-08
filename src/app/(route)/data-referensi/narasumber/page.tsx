@@ -1,7 +1,5 @@
 import getNarasumber from "@/data/narasumber";
 import FormNarasumberContainer from "./_components/form-narasumber-container";
-import FormUploadExcelNarasumber from "./_components/form-upload-excel-narasumber";
-import { TabelNarasumber } from "./_components/tabel-narasumber";
 
 const ReferensiNarasumberPage = async () => {
   const narasumber = await getNarasumber(); // this will include Date Object so we need to convert it to string first before sending it to the client component

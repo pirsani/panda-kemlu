@@ -5,12 +5,11 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Banknote, BookOpen, GraduationCap, Plus } from "lucide-react";
+import { Banknote, Plus } from "lucide-react";
 import { useState } from "react";
 import { default as FormSbmUangRepresentasi } from "./form-sbm-uang-representasi";
 

@@ -2,7 +2,6 @@
 import { KegiatanWithDetail } from "@/actions/kegiatan";
 import { updateStatusRampungan } from "@/actions/kegiatan/proses";
 import { Button } from "@/components/ui/button";
-import { Kegiatan } from "@prisma-honorarium/client";
 
 interface FormGenerateRampunganProps {
   kegiatanId: string;

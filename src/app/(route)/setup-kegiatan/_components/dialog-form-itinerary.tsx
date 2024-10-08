@@ -5,15 +5,13 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Itinerary } from "@/zod/schemas/itinerary";
-import { BookOpen, GraduationCap, Grid, Plus, Ticket } from "lucide-react";
+import { Plus, Ticket } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import FormItinerary from "./form-itinerary";
 
 interface DialogFormItineraryProps {

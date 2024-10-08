@@ -1,9 +1,7 @@
 import { BASE_PATH_UPLOAD } from "@/app/api/upload/config";
 import { dbHonorarium } from "@/lib/db-honorarium";
-import saveFile from "@/utils/file-operations/save";
-import { createId } from "@paralleldrive/cuid2";
 import fse from "fs-extra";
-import path, { extname } from "path";
+import path from "path";
 import { Logger } from "tslog";
 import { getJenisDokumenFromKey, mapsCuidToJenisDokumen } from "./utils";
 // Create a Logger instance with custom settings

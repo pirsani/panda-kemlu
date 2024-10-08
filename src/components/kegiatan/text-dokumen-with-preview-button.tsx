@@ -2,8 +2,6 @@
 import ButtonEye from "@/components/button-eye-open-document";
 import useFileStore from "@/hooks/use-file-store";
 import { DokumenKegiatan } from "@prisma-honorarium/client";
-import { Eye } from "lucide-react";
-import { Button } from "../ui/button";
 
 interface TextDokumenWithPreviewButtonProps {
   label: string;

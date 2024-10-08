@@ -2,35 +2,14 @@
 import {
   deleteSatkerAnggaran,
   satkerAnggaranWithPejabatPengelolaKeuangan,
-  setSatkerAnggaran,
 } from "@/actions/satker-anggaran";
 import ConfirmDialog from "@/components/confirm-dialog";
-import {
-  KolomAksi,
-  KolomAksiDelete,
-  TabelGeneric,
-} from "@/components/tabel-generic";
-import {
-  satkerAnggaranSchema,
-  SatkerAnggaran as ZsatkerAnggaran,
-} from "@/zod/schemas/satker-anggaran";
+import { KolomAksiDelete, TabelGeneric } from "@/components/tabel-generic";
 import { Organisasi as SatkerAnggaran } from "@prisma-honorarium/client";
 
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  Row,
-  SortingState,
-  Table,
-  useReactTable,
-} from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ZodError } from "zod";
 
 interface TabelSatkerAnggaranProps {
   data: satkerAnggaranWithPejabatPengelolaKeuangan[];

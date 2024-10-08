@@ -1,31 +1,15 @@
 "use client";
-import { deleteNarasumber, simpanNarasumber } from "@/actions/narasumber";
+import { deleteNarasumber } from "@/actions/narasumber";
 import ConfirmDialog from "@/components/confirm-dialog";
 import {
   KolomAksi,
-  PaginationControls,
   TabelGenericWithoutInlineEdit,
 } from "@/components/tabel-generic-without-inline-edit";
-import { Button } from "@/components/ui/button";
 import { NarasumberWithStringDate } from "@/data/narasumber";
 import { useSearchTerm } from "@/hooks/use-search-term";
-import { cn } from "@/lib/utils";
-import { narasumberSchema } from "@/zod/schemas/narasumber";
 import { Narasumber } from "@prisma-honorarium/client";
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  Row,
-  SortingState,
-  Table,
-  useReactTable,
-} from "@tanstack/react-table";
-import { format } from "date-fns";
-import React, { useEffect, useState } from "react";
+import { ColumnDef, createColumnHelper, Row } from "@tanstack/react-table";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ZodError } from "zod";
 

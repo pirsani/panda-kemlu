@@ -1,5 +1,5 @@
 import { getTahunAnggranPilihan } from "@/actions/pengguna/preference";
-import { getOptionsNegara, getOptionsProvinsi } from "@/actions/sbm";
+import { getOptionsNegara } from "@/actions/sbm";
 import getReferensiSbmUhLuarNegeri, {
   SbmUhLuarNegeriPlainObject,
 } from "@/data/sbm-uh-luar-negeri";

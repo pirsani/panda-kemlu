@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import downloadDokumenKegiatan from "./dokumen-kegiatan";
-import generatorDokumenPengadaan, {
-  downloadDokumenPengadaan,
-} from "./generator-dokumen-pengadaan";
+import { downloadDokumenPengadaan } from "./generator-dokumen-pengadaan";
 import { downloadDokumenRampungan } from "./generator-rampungan";
 import { downloadTemplateExcel } from "./template-excel";
 

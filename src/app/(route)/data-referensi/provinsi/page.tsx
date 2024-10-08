@@ -1,8 +1,5 @@
-import { getKegiatan, getOptionsKegiatan } from "@/actions/kegiatan";
 import { getProvinsi } from "@/actions/provinsi";
-import { get } from "lodash";
 import { DialogTambahProvinsi } from "./_components/dialog-tambah-provinsi";
-import FormProvinsi from "./_components/form-provinsi";
 import { TabelProvinsi } from "./_components/tabel-provinsi";
 
 const ProvinsiPage = async () => {

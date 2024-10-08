@@ -1,5 +1,5 @@
 import { DokumenKegiatan } from "@prisma-honorarium/client";
-import { Eye, List } from "lucide-react";
+import { List } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import ListItemDokumenWithPreviewButton from "./list-item-dokumen-with-preview-button";

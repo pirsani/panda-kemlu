@@ -1,27 +1,12 @@
 "use client";
-import {
-  deleteDataNegara,
-  simpanDataNegara,
-  updateDataNegara,
-} from "@/actions/negara";
+import { deleteDataNegara, updateDataNegara } from "@/actions/negara";
 import ConfirmDialog from "@/components/confirm-dialog";
 import { KolomAksi, TabelGeneric } from "@/components/tabel-generic";
 import { useSearchTerm } from "@/hooks/use-search-term";
-import { negaraSchema, Negara as ZNegara } from "@/zod/schemas/negara";
+import { negaraSchema } from "@/zod/schemas/negara";
 import { Negara } from "@prisma-honorarium/client";
 
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  Row,
-  SortingState,
-  Table,
-  useReactTable,
-} from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ZodError } from "zod";

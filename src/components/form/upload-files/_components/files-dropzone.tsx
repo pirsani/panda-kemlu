@@ -1,7 +1,7 @@
 "use client";
 import Dropzone from "@/components/dropzone";
 import axios from "axios";
-import { ParseResult, parse } from "papaparse";
+import { ParseResult } from "papaparse";
 import { useCallback, useState } from "react";
 import { DropzoneOptions, FileRejection } from "react-dropzone";
 import { toast } from "sonner";

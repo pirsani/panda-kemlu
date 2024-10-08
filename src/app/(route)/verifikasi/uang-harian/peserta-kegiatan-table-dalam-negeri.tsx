@@ -5,7 +5,6 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import React from "react";
 
 // Define the type for the data
 const data: PesertaKegiatan[] = [
