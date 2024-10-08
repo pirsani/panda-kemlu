@@ -34,7 +34,8 @@ jobs:
 
       - name: Run Prisma Push
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL_ADMIN }}
+          DATABASE_URL_ADMIN: ${{ secrets.DATABASE_URL_ADMIN }} # Existing secret
+          DATABASE_URL_HONORARIUM: ${{ secrets.DATABASE_URL_HONORARIUM }} # New secret added
         run: pnpm run prisma:db-push
 
       - name: Build the application
@@ -46,8 +47,8 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: ".next/*, public/*, package.json, package-lock.json, pnpm-lock.yaml" # Include pnpm-lock.yaml
-          target: "/path/to/deploy/directory" # Path on the server
+          source: ".next/*, public/*, package.json, package-lock.json, pnpm-lock.yaml"
+          target: "/home/submin/www/d01.pirsani.id"
 
       - name: SSH commands to start the application
         uses: appleboy/ssh-action@master
@@ -56,6 +57,6 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /path/to/deploy/directory  # Change to your deployment directory
+            cd /home/submin/www/d01.pirsani.id  # Change to your deployment directory
             pnpm install --prod  # Use pnpm to install production dependencies
-            pm2 restart your-app-name || pm2 start pnpm --name "your-app-name" -- start  # Start using pnpm
+            pm2 restart d01 || pm2 start pnpm --name "d01" -- start  # Start using pnpm
