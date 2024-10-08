@@ -1,0 +1,53 @@
+name: Deploy to Ubuntu Server
+
+on:
+  push:
+    branches:
+      - main # Change this to your default branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16" # Use the appropriate Node.js version
+
+      - name: Install pnpm
+        run: npm install -g pnpm # Install pnpm globally
+
+      - name: Install dependencies
+        run: pnpm install # Use pnpm to install dependencies
+
+      - name: Run Prisma Migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_ADMIN }}
+        run: npx prisma migrate deploy
+
+      - name: Build the application
+        run: pnpm run build # Use pnpm to build the application
+
+      - name: Deploy to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: ".next/*, public/*, package.json, package-lock.json, pnpm-lock.yaml" # Include pnpm-lock.yaml
+          target: "/path/to/deploy/directory" # Path on the server
+
+      - name: SSH commands to start the application
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /path/to/deploy/directory  # Change to your deployment directory
+            pnpm install --prod  # Use pnpm to install production dependencies
+            pm2 restart your-app-name || pm2 start pnpm --name "your-app-name" -- start  # Start using pnpm
