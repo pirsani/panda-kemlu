@@ -1,4 +1,5 @@
 "use server";
+import { ErrorResponseSwitcher } from "@/actions/lib";
 import { ActionResponse } from "@/actions/response";
 import { BASE_PATH_UPLOAD } from "@/app/api/upload/config";
 import {
@@ -22,7 +23,11 @@ import { startsWith } from "lodash";
 import path from "path";
 import { Logger } from "tslog";
 import { never, ZodError } from "zod";
-import { getSessionPengguna } from "../pengguna";
+import {
+  copyLogUploadedFileToDokumenKegiatan,
+  saveDokumenKegiatanToFinalFolder,
+} from "../file";
+import { getSessionPengguna, getSessionPenggunaForAction } from "../pengguna";
 import { getPrismaErrorResponse } from "../prisma-error-response";
 // Create a Logger instance with custom settings
 const logger = new Logger({
@@ -33,27 +38,15 @@ export const setupKegiatan = async (
   kegiatan: ZKegiatan
 ): Promise<ActionResponse<Kegiatan>> => {
   // get satkerId and unitKerjaId from the user
-  const pengguna = await getSessionPengguna();
-  logger.info("Pengguna", pengguna);
-  if (!pengguna.success || !pengguna.data || !pengguna.data.id) {
-    return {
-      success: false,
-      error: "E-UAuth-01",
-      message: "User not found",
-    };
-  }
 
-  if (!pengguna.data?.satkerId || !pengguna.data?.unitKerjaId) {
-    return {
-      success: false,
-      error: "E-UORG-01",
-      message: "User tidak mempunyai satkerId atau unitKerjaId",
-    };
+  const pengguna = await getSessionPenggunaForAction();
+  if (!pengguna.success) {
+    return pengguna;
   }
 
   const satkerId = pengguna.data.satkerId;
   const unitKerjaId = pengguna.data.unitKerjaId;
-  const penggunaId = pengguna.data.id;
+  const penggunaId = pengguna.data.penggunaId;
 
   const cuid = kegiatan.cuid; // this is the cuid of the kegiatan yang akan digunakan untuk referensi file yang telah diupload
 
@@ -67,7 +60,7 @@ export const setupKegiatan = async (
     const pesertaXlsxCuid = kegiatan.pesertaXlsxCuid;
 
     // add the file extension
-    const filePesertaXlsx = `${pesertaXlsxCuid}.xlsx`;
+    const filePesertaXlsx = `${pesertaXlsxCuid}`;
     const excelFilePath = path.posix.join(
       BASE_PATH_UPLOAD,
       "temp",
@@ -129,12 +122,12 @@ export const setupKegiatan = async (
       //   penggunaId
       // );
 
-      const insertedDokumenKegiatan = await insertDokumenKegiatan(
-        prisma,
-        kegiatanBaru.id,
-        kegiatan,
-        penggunaId
-      );
+      // const insertedDokumenKegiatan = await insertDokumenKegiatan(
+      //   prisma,
+      //   kegiatanBaru.id,
+      //   kegiatan,
+      //   penggunaId
+      // );
 
       // if kegiatan.lokasi === "LUAR_NEGERI" then insert itinerary
       if (kegiatan.lokasi === "LUAR_NEGERI" && kegiatan.itinerary) {
@@ -150,55 +143,32 @@ export const setupKegiatan = async (
     });
 
     // move the file to the final folder
-    const year = kegiatan.tanggalMulai.getFullYear();
-    const kegiatanFolder = path.posix.join(year.toString(), kegiatanBaru.id);
-    await moveFolderToFinalLocation(cuid, kegiatanFolder);
-    // update database uploaded file
-    // Fetch the uploaded file record
-    const uploadedFiles = await dbHonorarium.uploadedFile.findMany({
-      where: {
-        filePath: {
-          contains: `temp/${cuid}`,
-        },
-      },
-    });
+    const logUploadedFile = await saveDokumenKegiatanToFinalFolder(
+      kegiatan,
+      kegiatanBaru.id
+    );
 
-    if (uploadedFiles.length > 0) {
-      const year = new Date().getFullYear();
-
-      // make sure to save the path in posix style
-      await Promise.all(
-        uploadedFiles.map(async (file) => {
-          const newFilePath = file.filePath.replace(
-            `temp/${cuid}`,
-            `${year}/${kegiatanBaru.id}`
-          );
-
-          // Update the filepath in the database
-          await dbHonorarium.uploadedFile.update({
-            where: {
-              id: file.id,
-            },
-            data: {
-              filePath: newFilePath,
-            },
-          });
-
-          console.log(`Filepath updated to: ${newFilePath}`);
-        })
-      );
-    } else {
-      console.log(
-        `No record file found with filepath containing: temp/${cuid}`
-      );
+    if (logUploadedFile.length === 0) {
+      return {
+        success: false,
+        error: "E-FSK01", // no file found in temp folder
+        message: "No File Found",
+      };
     }
+
+    await copyLogUploadedFileToDokumenKegiatan(
+      logUploadedFile,
+      pengguna.data.penggunaId
+    );
 
     return {
       success: true,
       data: kegiatanBaru,
     };
   } catch (error) {
-    return getPrismaErrorResponse(error as Error);
+    return ErrorResponseSwitcher(error);
+
+    //return getPrismaErrorResponse(error as Error);
     // return {
     //   success: false,
     //   error: "Error saving kegiatan",

@@ -1,6 +1,7 @@
 export const mapsCuidToJenisDokumen = {
   dokumenSuratTugasCuid: "surat-tugas",
   dokumenNodinMemoSkCuid: "nodin-memo-sk",
+  dokumenJadwalCuid: "jadwal-kegiatan",
   dokumenSuratSetnegSptjmCuid: "surat-setneg-sptjm",
   laporanKegiatanCuid: "laporan-kegiatan",
   daftarHadirCuid: "daftar-hadir",
@@ -9,6 +10,7 @@ export const mapsCuidToJenisDokumen = {
   suratPersetujuanJaldisSetnegCuid: "surat-persetujuan-jaldis-setneg",
   pasporCuid: "paspor",
   tiketBoardingPassCuid: "tiket-boarding-pass",
+  pesertaXlsxCuid: "peserta-xlsx",
 };
 
 export function getJenisDokumenFromKey(

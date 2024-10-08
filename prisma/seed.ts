@@ -376,6 +376,14 @@ async function main() {
         isMultiple: true,
       },
       {
+        id: "peserta-xlsx",
+        nama: "peserta-xlsx",
+        createdBy: "init",
+        deskripsi: "daftar peserta dalam format excel",
+        untukLangkahKe: 0,
+        untukLokasiDi: "0;1;2;",
+      },
+      {
         id: "surat-setneg-sptjm",
         nama: "surat-setneg-sptjm",
         createdBy: "init",

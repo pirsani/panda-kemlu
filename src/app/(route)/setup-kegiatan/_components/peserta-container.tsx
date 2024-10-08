@@ -38,7 +38,7 @@ const PesertaContainer = ({
   const [missingColumns, setMissingColumns] = useState<string[]>([]);
 
   // Use a ref to store the folderCuid
-  const fileCuidRef = useRef(createId());
+  const fileCuidRef = useRef(createId() + ".xlsx");
   const fileCuid = fileCuidRef.current;
   setValue(pesertaXlsxCuid, fileCuid);
 

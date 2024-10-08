@@ -8,6 +8,7 @@ import {
   getJenisDokumenFromKey,
   mapsCuidToJenisDokumen,
 } from "@/actions/file/utils";
+import { ErrorResponseSwitcher } from "@/actions/lib";
 import { getSessionPenggunaForAction } from "@/actions/pengguna";
 import { getPrismaErrorResponse } from "@/actions/prisma-error-response";
 import { ActionResponse } from "@/actions/response";
@@ -24,7 +25,6 @@ import path from "path";
 import { Logger } from "tslog";
 import { ZodError } from "zod";
 import { updateStatusUhLuarNegeri } from "../proses";
-import { ErrorResponseSwitcher } from "./utils";
 
 // Create a Logger instance with custom settings
 const logger = new Logger({

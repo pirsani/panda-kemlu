@@ -80,9 +80,10 @@ export const logUploadedFile = async (
   return uploadedFile;
 };
 
-async function saveDokumenKegiatanToFinalFolder(
-  obj: Record<string, string>,
-  kegiatanId: string
+export async function saveDokumenKegiatanToFinalFolder(
+  obj: Record<string, any>,
+  kegiatanId: string,
+  subFolder?: string
 ) {
   let logUploadedFile: LogUploadedFile[] = [];
   try {
@@ -103,7 +104,7 @@ async function saveDokumenKegiatanToFinalFolder(
       BASE_PATH_UPLOAD,
       kegiatanYear,
       kegiatanId,
-      "uh-luar-negeri"
+      subFolder ?? ""
     );
 
     const tempPath = path.posix.join(BASE_PATH_UPLOAD, "temp", kegiatanId);
@@ -125,31 +126,58 @@ async function saveDokumenKegiatanToFinalFolder(
           return;
         }
 
-        // logger.info(key, value);
-        // logger.info("jenisDokumen", jenisDokumen);
-        const finalPathFile = path.posix.join(finalPath, value);
-        const tempPathFile = path.posix.join(tempPath, value);
-        const resolvedPathFile = path.resolve(finalPathFile);
-        const resolvedTempPathFile = path.resolve(tempPathFile);
-        // check if temp file exists
-        const fileExists = await fse.pathExists(resolvedTempPathFile);
-        if (!fileExists) {
-          logger.error(
-            "File not found in temp folder, skipping moving file to final folder"
+        // if value is array, iterate over the array
+        if (Array.isArray(value)) {
+          for (const val of value) {
+            const log = await processFile(
+              kegiatanId,
+              jenisDokumen,
+              val,
+              finalPath,
+              tempPath
+            );
+            if (log) {
+              logUploadedFile.push(log);
+            }
+          }
+        } else {
+          const log = await processFile(
+            kegiatanId,
+            jenisDokumen,
+            value,
+            finalPath,
+            tempPath
           );
-          return;
+          if (log) {
+            logUploadedFile.push(log);
+          }
         }
 
-        await moveFileToFinalFolder(resolvedTempPathFile, resolvedPathFile);
+        // logger.info(key, value);
+        // logger.info("jenisDokumen", jenisDokumen);
+        // const finalPathFile = path.posix.join(finalPath, value);
+        // const tempPathFile = path.posix.join(tempPath, value);
+        // const resolvedPathFile = path.resolve(finalPathFile);
+        // const resolvedTempPathFile = path.resolve(tempPathFile);
+        // // check if temp file exists
+        // const fileExists = await fse.pathExists(resolvedTempPathFile);
+        // if (!fileExists) {
+        //   logger.error(
+        //     "File not found in temp folder, skipping moving file to final folder"
+        //   );
+        //   return;
+        // }
 
-        logger.info("File exists in temp folder, moving to final folder");
-        logger.info("collecting log file to be updated in database");
-        logUploadedFile.push({
-          dokumen: value,
-          kegiatanId: kegiatanId,
-          jenisDokumenId: jenisDokumen,
-          filePath: path.posix.relative(BASE_PATH_UPLOAD, finalPathFile),
-        });
+        // await moveFileToFinalFolder(resolvedTempPathFile, resolvedPathFile);
+
+        // logger.info("File exists in temp folder, moving to final folder");
+        // logger.info("collecting log file to be updated in database");
+        // logUploadedFile.push({
+        //   dokumen: value,
+        //   kegiatanId: kegiatanId,
+        //   jenisDokumenId: jenisDokumen,
+        //   filePath: path.posix.relative(BASE_PATH_UPLOAD, finalPathFile),
+        // });
       })();
     }
 
@@ -159,6 +187,40 @@ async function saveDokumenKegiatanToFinalFolder(
     //throw new Error("Error parsing form data");
     throw error;
   }
+}
+
+export async function processFile(
+  kegiatanId: string,
+  jenisDokumen: string,
+  value: string,
+  finalPath: string,
+  tempPath: string
+) {
+  const finalPathFile = path.posix.join(finalPath, value);
+  const tempPathFile = path.posix.join(tempPath, value);
+  const resolvedPathFile = path.resolve(finalPathFile);
+  const resolvedTempPathFile = path.resolve(tempPathFile);
+  // check if temp file exists
+  // Get the filename from the resolved path
+  const filename = path.basename(resolvedPathFile);
+  const fileExists = await fse.pathExists(resolvedTempPathFile);
+  if (!fileExists) {
+    logger.error(
+      `File ${filename} not found in temp folder, skipping moving file to final folder`
+    );
+    return;
+  }
+
+  await moveFileToFinalFolder(resolvedTempPathFile, resolvedPathFile);
+
+  logger.info("File exists in temp folder, moving to final folder");
+  logger.info("collecting log file to be updated in database");
+  return {
+    dokumen: value,
+    kegiatanId: kegiatanId,
+    jenisDokumenId: jenisDokumen,
+    filePath: path.posix.relative(BASE_PATH_UPLOAD, finalPathFile),
+  };
 }
 
 export async function moveFileToFinalFolder(
