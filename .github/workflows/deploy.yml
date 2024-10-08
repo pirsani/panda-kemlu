@@ -18,6 +18,9 @@ jobs:
         with:
           node-version: "20" # Use the appropriate Node.js version
 
+      - name: check Node.js version
+        run: node -v
+
       - name: Install pnpm
         run: npm install -g pnpm # Install pnpm globally
 
