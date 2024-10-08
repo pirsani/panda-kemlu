@@ -27,10 +27,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install # Use pnpm to install dependencies
 
-      - name: Run Prisma Migrations
+      # - name: Run Prisma Migrations
+      #   env:
+      #     DATABASE_URL: ${{ secrets.DATABASE_URL_ADMIN }}
+      #   run: npx prisma migrate deploy
+
+      - name: Run Prisma Push
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_ADMIN }}
-        run: npx prisma migrate deploy
+        run: pnpm run prisma:db-push
 
       - name: Build the application
         run: pnpm run build # Use pnpm to build the application
