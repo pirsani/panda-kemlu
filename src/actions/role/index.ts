@@ -22,7 +22,7 @@ export const getRoles = async (role?: string) => {
       rolePermission: true,
     },
   });
-  logger.info("dataRole", dataRole);
+  //logger.info("dataRole", dataRole);
   return dataRole;
 };
 

@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
-import * as XLSX from "xlsx";
+import { utils, write } from "xlsx";
 import InputFileXlsx from "./input-file-xlsx";
 import TabelPeserta from "./tabel-peserta";
 
@@ -178,10 +178,10 @@ export async function exportPesertaXlsx(
   }
 
   const data = parseResult.rows;
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Peserta");
-  const buf = XLSX.write(wb, { bookType: "xlsx", type: "buffer" });
+  const ws = utils.json_to_sheet(data);
+  const wb = utils.book_new();
+  utils.book_append_sheet(wb, ws, "Peserta");
+  const buf = write(wb, { bookType: "xlsx", type: "buffer" });
   // return buf;
   const newExcel = new Blob([buf], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

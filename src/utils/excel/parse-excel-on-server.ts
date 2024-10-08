@@ -1,5 +1,4 @@
 import { fileTypeFromBuffer } from "file-type";
-import * as XLSX from "xlsx";
 
 export interface ParseExcelOptions {
   extractFromColumns: string[];
@@ -56,14 +55,17 @@ const parseExcelOnServer = async (
       throw new Error("Invalid file type. Only .xlsx files are supported.");
     }
 
+    
+    // Dynamically import the xlsx library
+    const { read, utils } = await import('xlsx');
     // Parse the file using XLSX
-    const workbook = XLSX.read(buffer, { type: "buffer" });
+    const workbook = read(buffer, { type: "buffer" });
     const sheetName = options.sheetName || workbook.SheetNames[0];
     const { extractFromColumns } = options;
 
     console.log(`Parsing sheet: ${sheetName}`);
 
-    const rawData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
+    const rawData = utils.sheet_to_json(workbook.Sheets[sheetName], {
       defval: "",
       header: 1, // Read raw rows as arrays
       range: options.range || undefined,

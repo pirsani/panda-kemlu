@@ -1,5 +1,3 @@
-import * as XLSX from "xlsx";
-
 interface ParseExcelOptions {
   extractFromColumns: string[];
   sheetName?: string;
@@ -26,12 +24,16 @@ const parseExcel = async (
   try {
     const arrayBuffer = await file.arrayBuffer();
     const data = new Uint8Array(arrayBuffer);
-    const workbook = XLSX.read(data, { type: "array" });
+
+    // Dynamically import the xlsx library
+    const { read, utils } = await import('xlsx');
+
+    const workbook = read(data, { type: "array" });
     const sheetName = options.sheetName || workbook.SheetNames[0];
     const { extractFromColumns } = options;
 
     // Read and parse the worksheet
-    const rawData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
+    const rawData = utils.sheet_to_json(workbook.Sheets[sheetName], {
       defval: "",
       header: 1, // Read raw rows as arrays
       range: options.range || undefined,
